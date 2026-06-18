@@ -4,6 +4,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
   <title>راه‌آموز | مسیر یادگیری برنامه‌نویسی</title>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2" defer></script>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.2/codemirror.min.css">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.2/theme/material-darker.min.css">
   <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.2/codemirror.min.js"></script>
@@ -5636,6 +5637,36 @@ function updateProfilesList() {
 function setTheme(theme) { document.body.className = `theme-${theme}`; localStorage.setItem('theme', theme); document.querySelectorAll('.theme-btn').forEach(btn => btn.classList.remove('active')); document.querySelector(`.theme-${theme}`)?.classList.add('active'); }
 function loadTheme() { const savedTheme = localStorage.getItem('theme') || 'dark'; setTheme(savedTheme); }
 
+// ==================== Supabase ====================
+const SUPABASE_URL = 'https://dkfqvgtlkqunttccukoo.supabase.co';
+const SUPABASE_KEY = 'sb_publishable_M-TIwnlhn3A8NHNADyx22g_cN2nOvcM';
+let supabase = null;
+
+window.addEventListener('load', () => {
+  try { if (window.supabase) { supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY); subscribeToAdminChat(); } } catch(e) {}
+});
+
+async function loadAdminMessages() {
+  if (!supabase) { displayChatMessages(); return; }
+  const { data } = await supabase.from('messages').select('*').eq('room', 'admin').order('id', { ascending: true });
+  if (data) { adminMessages = data.map(m => ({ sender: m.sender, text: m.text, time: m.time })); displayChatMessages(); updateChatList(); }
+}
+
+async function sendToSupabase(text, senderName) {
+  if (!supabase) { adminMessages.push({ sender: senderName, text: text, time: getCurrentTime() }); saveMessages(); displayChatMessages(); updateChatList(); return; }
+  await supabase.from('messages').insert([{ sender: senderName, text: text, time: getCurrentTime(), room: 'admin' }]);
+}
+
+function subscribeToAdminChat() {
+  if (!supabase) return;
+  supabase.channel('admin-room').on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'messages', filter: 'room=eq.admin' }, (payload) => {
+    const m = payload.new;
+    adminMessages.push({ sender: m.sender, text: m.text, time: m.time });
+    if (currentChatType === 'admin') displayChatMessages();
+    updateChatList();
+  }).subscribe();
+}
+
 // ==================== پیام‌ها ====================
 let savedMessages = [], aiMessages = [], adminMessages = [], currentChatType = null, selectedMessageIndex = null, editingIndex = null, forwardMessageIndex = null, replyToMessageData = null, pinnedMessage = JSON.parse(localStorage.getItem('pinnedMessage')) || null, weeklyActivityData = [0,0,0,0,0,0,0], lastActivityDate = '', lastLessonTime = '';
 function saveMessages() { saveAllData(); }
@@ -5695,13 +5726,17 @@ function sendChatMessage() {
   const input = document.getElementById('chat-detail-input');
   const text = input.value.trim();
   if (!text) return;
+  if (currentChatType === 'admin') {
+    sendToSupabase(text, username || 'کاربر');
+    input.value = '';
+    return;
+  }
   const msgs = getMessages();
   const newMsg = { sender: 'user', text: text, time: getCurrentTime() };
   if (replyToMessageData) { newMsg.replyTo = replyToMessageData.text; cancelReply(); }
   msgs.push(newMsg);
   saveMessages(); displayChatMessages(); input.value = ''; updateChatList();
-  if (currentChatType === 'admin') setTimeout(() => { adminMessages.push({ sender: 'bot', text: '✅ پیام شما دریافت شد.', time: getCurrentTime() }); saveMessages(); displayChatMessages(); updateChatList(); }, 500);
-  else if (currentChatType === 'ai') setTimeout(() => { aiMessages.push({ sender: 'bot', text: '⚡ در حال توسعه...', time: getCurrentTime() }); saveMessages(); displayChatMessages(); updateChatList(); }, 500);
+  if (currentChatType === 'ai') setTimeout(() => { aiMessages.push({ sender: 'bot', text: '⚡ در حال توسعه...', time: getCurrentTime() }); saveMessages(); displayChatMessages(); updateChatList(); }, 500);
 }
 function toggleSearch() { const sa = document.getElementById('search-area'); sa.style.display = sa.style.display === 'none' ? 'block' : 'none'; if (sa.style.display === 'none') displayChatMessages(); }
 function searchMessages() {
@@ -5716,7 +5751,7 @@ function searchMessages() {
 function toggleEmojiPicker() { const p = document.getElementById('emoji-picker'); p.style.display = p.style.display === 'none' ? 'grid' : 'none'; }
 function addEmoji(e) { const i = document.getElementById('chat-detail-input'); i.value += e; i.focus(); document.getElementById('emoji-picker').style.display = 'none'; }
 function clearCurrentChat() { if (confirm('همه پیام‌ها پاک شوند؟')) { if (currentChatType === 'saved') savedMessages = []; else if (currentChatType === 'ai') aiMessages = []; else adminMessages = []; saveMessages(); displayChatMessages(); updateChatList(); clearSelection(); } }
-function openChat(type) { currentChatType = type; selectedMessageIndex = null; document.getElementById('chat-detail-title').innerHTML = type === 'saved' ? '📝 پیام‌های ذخیره شده' : (type === 'ai' ? '🤖 هوش مصنوعی' : '📞 ارتباط با ادمین'); document.getElementById('chat-detail-sub').innerHTML = type === 'saved' ? 'یادداشت‌های شخصی' : (type === 'ai' ? 'به زودی فعال می‌شود' : 'پاسخگویی ۲۴ ساعته'); displayChatMessages(); document.querySelectorAll('.page').forEach(p => p.classList.remove('active')); document.getElementById('chat-detail-page').classList.add('active'); }
+function openChat(type) { currentChatType = type; selectedMessageIndex = null; document.getElementById('chat-detail-title').innerHTML = type === 'saved' ? '📝 پیام‌های ذخیره شده' : (type === 'ai' ? '🤖 هوش مصنوعی' : '📞 ارتباط با ادمین'); document.getElementById('chat-detail-sub').innerHTML = type === 'saved' ? 'یادداشت‌های شخصی' : (type === 'ai' ? 'به زودی فعال می‌شود' : 'پاسخگویی ۲۴ ساعته'); if (type === 'admin') loadAdminMessages(); else displayChatMessages(); document.querySelectorAll('.page').forEach(p => p.classList.remove('active')); document.getElementById('chat-detail-page').classList.add('active'); }
 function goBackFromChat() { clearSelection(); document.querySelectorAll('.page').forEach(p => p.classList.remove('active')); document.getElementById('chat-list-page').classList.add('active'); document.getElementById('nav-chat').classList.add('active'); updateChatList(); }
 
 // ==================== متغیرهای اصلی ====================
