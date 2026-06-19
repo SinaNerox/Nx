@@ -5605,23 +5605,23 @@ function loadTheme() { const savedTheme = localStorage.getItem('theme') || 'dark
 // ==================== Supabase ====================
 const SUPABASE_URL = 'https://dkfqvgtlkqunttccukoo.supabase.co';
 const SUPABASE_KEY = 'sb_publishable_M-TIwnlhn3A8NHNADyx22g_cN2nOvcM';
-let supabase = null;
+let sb = null;
 
 window.addEventListener('load', () => {
   try {
     if (window.supabase) {
-      supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+      sb = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
       subscribeToGeneralChat();
       console.log('✅ Supabase متصل شد');
     } else {
-      console.error('❌ کتابخانه Supabase لود نشد - اینترنت یا فیلترشکن را چک کنید');
+      console.error('❌ کتابخانه Supabase لود نشد');
     }
   } catch(e) { console.error('❌ خطای اتصال Supabase:', e); }
 });
 
 async function loadGroupMessages() {
-  if (!supabase) { displayChatMessages(); return; }
-  const { data } = await supabase
+  if (!sb) { displayChatMessages(); return; }
+  const { data } = await sb
     .from('messages')
     .select('*')
     .eq('room', 'general')
@@ -5634,7 +5634,7 @@ async function loadGroupMessages() {
 }
 
 async function sendToSupabase(text, senderName) {
-  if (!supabase) {
+  if (!sb) {
     adminMessages.push({ sender: senderName, text: text, time: getCurrentTime() });
     displayChatMessages(); updateChatList();
     return;
@@ -5642,12 +5642,12 @@ async function sendToSupabase(text, senderName) {
   const time = getCurrentTime();
   adminMessages.push({ sender: senderName, text: text, time: time });
   displayChatMessages(); updateChatList();
-  await supabase.from('messages').insert([{ sender: senderName, text: text, time: time, room: 'general' }]);
+  await sb.from('messages').insert([{ sender: senderName, text: text, time: time, room: 'general' }]);
 }
 
 function subscribeToGeneralChat() {
-  if (!supabase) return;
-  supabase
+  if (!sb) return;
+  sb
     .channel('general-room')
     .on('postgres_changes', 
       { event: 'INSERT', schema: 'public', table: 'messages', filter: 'room=eq.general' }, 
