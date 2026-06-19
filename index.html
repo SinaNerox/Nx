@@ -224,8 +224,29 @@
 </head>
 <body class="theme-dark">
 
+<!-- صفحه ورود / ثبت‌نام -->
+<div class="page active" id="auth-page" style="display: flex; align-items: center; justify-content: center; min-height: 100vh;">
+  <div style="width: 100%; max-width: 360px; padding: 24px;">
+    <div style="text-align: center; margin-bottom: 24px;">
+      <h1 style="font-size: 28px; color: var(--primary);">راه‌آموز</h1>
+      <p style="color: var(--text-secondary); font-size: 13px;">مسیر حرفه‌ای برنامه‌نویسی</p>
+    </div>
+    <div class="section" style="padding: 20px;">
+      <h3 id="auth-title" style="text-align: center; margin-bottom: 16px;">ورود به حساب</h3>
+      <input type="text" id="auth-username" class="edit-name-input" placeholder="نام کاربری" style="width: 100%; margin-bottom: 10px; box-sizing: border-box;">
+      <input type="password" id="auth-password" class="edit-name-input" placeholder="رمز عبور" style="width: 100%; margin-bottom: 10px; box-sizing: border-box;">
+      <div id="auth-error" style="color: var(--danger); font-size: 12px; text-align: center; margin-bottom: 8px; display: none;"></div>
+      <button class="btn-primary" id="auth-submit-btn" onclick="submitAuth()" style="width: 100%;">ورود</button>
+      <p style="text-align: center; font-size: 13px; margin-top: 14px; color: var(--text-secondary);">
+        <span id="auth-switch-text">حساب نداری؟</span>
+        <a href="#" onclick="toggleAuthMode(); return false;" style="color: var(--primary-light);" id="auth-switch-link">ثبت‌نام کن</a>
+      </p>
+    </div>
+  </div>
+</div>
+
 <!-- صفحه خانه -->
-<div class="page active" id="home-page">
+<div class="page" id="home-page">
   <div class="header">
     <div class="header-center">
       <h1><svg fill="currentColor" height="28" width="28" viewBox="-63 65 128 128"><path d="M1,102.1c9.7,0,17.5-7.9,17.5-17.6S10.7,66.9,1,66.9s-17.6,7.8-17.6,17.6C-16.6,94.2-8.7,102.1,1,102.1 M18,106.3c8,0.3,11.4,6.7,11.4,6.7l25.9,35.6c1.1,1.6,1.7,3.5,1.7,5.6c0,5.5-4.5,10-10,10c-1.3,0-2.5-0.3-3.7-0.7l-15.6-4.4v15.6h-54.2v-15.6l-15.6,4.4c-1.1,0.4-2.3,0.7-3.7,0.7c-5.5,0-10-4.5-10-10c0-2.1,0.6-4,1.7-5.6l25.9-35.6c0,0,3.4-6.4,11.4-6.7H18z M0.6,163.8L0.6,163.8l20.3-6.7l-0.5-0.1c-14-4.1-8.6-22.6,5.4-18.5l1.9,0.7v-20.9l-27.1,8.9l-27.2-8.9v20.9l1.9-0.7c14-4.1,19.4,14.3,5.4,18.5l-0.5,0.1L0.6,163.8z M56.4,188.6c1.4,0,2.5-1.4,2.5-3.3c0-1.9-1.1-3.3-2.5-3.3H-53.2c-1.4,0-2.5,1.5-2.5,3.3c0,1.8,1.1,3.3,2.5,3.3H56.4z"/></svg>راه‌آموز</h1>
@@ -282,6 +303,7 @@
     <p style="text-align: center; color: var(--text-secondary); font-size: 13px;" id="profile-level">سطح 1</p>
     <p style="text-align: center; color: var(--primary-light); font-size: 12px; margin-top: 4px;" id="total-study-time">⏱ زمان کل مطالعه: ۰ دقیقه</p>
     <div class="edit-name-section"><input type="text" id="edit-name-input" class="edit-name-input" placeholder="نام جدید..."><button class="edit-name-btn" onclick="changeUsername()">تغییر نام</button></div>
+    <button onclick="logout()" style="width:100%;margin-top:14px;background:none;border:1px solid var(--danger);color:var(--danger);padding:10px;border-radius:10px;cursor:pointer;">🚪 خروج از حساب</button>
     <div id="streak-medal" class="medal-badge" style="justify-content: center; margin-top: 16px;"></div>
   </div>
   <div style="padding: 16px;"><div class="section"><h4>👥 پروفایل‌ها</h4><div id="profiles-list" class="profile-selector"></div><button onclick="addNewProfile()" class="add-profile-btn" style="margin-top: 10px; width: 100%;">➕ ساخت پروفایل جدید</button></div></div>
@@ -299,7 +321,7 @@
     <div class="chat-item" onclick="openChat('saved')"><div class="chat-avatar"><svg fill="currentColor" width="28" height="28" viewBox="0 0 24 24"><path d="M20 2H4c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h4l4 4 4-4h4c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2zm-8 14h-2v-2h2v2zm0-4h-2V6h2v6z"/></svg></div><div class="chat-info"><div class="chat-name">📝 پیام‌های ذخیره شده</div><div class="chat-lastmsg" id="saved-lastmsg">یادداشت‌های خود را اینجا بنویسید</div></div><div class="chat-time" id="saved-time">-</div></div>
     <div class="chat-item" onclick="openChat('ai')"><div class="chat-avatar"><svg fill="currentColor" width="28" height="28" viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 4c1.1 0 2 .9 2 2s-.9 2-2 2-2-.9-2-2 .9-2 2-2zm0 13c-2.33 0-4.31-1.46-5.11-3.5h10.22c-.8 2.04-2.78 3.5-5.11 3.5z"/></svg></div><div class="chat-info"><div class="chat-name">🤖 هوش مصنوعی Gemini</div><div class="chat-lastmsg" id="ai-lastmsg">به زودی فعال می‌شود...</div></div><div class="chat-time" id="ai-time">-</div></div>
     <!-- چت گروهی عمومی - جایگزین ادمین -->
-    <div class="chat-item" onclick="openChat('group')"><div class="chat-avatar"><svg fill="currentColor" width="28" height="28" viewBox="0 0 24 24"><path d="M16 11c1.66 0 2.99-1.34 2.99-3S17.66 5 16 5c-1.66 0-3 1.34-3 3s1.34 3 3 3zm-8 0c1.66 0 2.99-1.34 2.99-3S9.66 5 8 5C6.34 5 5 6.34 5 8s1.34 3 3 3zm0 2c-2.33 0-7 1.17-7 3.5V19h14v-2.5c0-2.33-4.67-3.5-7-3.5zm8 0c-.29 0-.62.02-.97.05 1.16.84 1.97 1.97 1.97 3.45V19h6v-2.5c0-2.33-4.67-3.5-7-3.5z"/></svg></div><div class="chat-info"><div class="chat-name">👥 گروه عمومی</div><div class="chat-lastmsg" id="group-lastmsg">به گروه خوش آمدید...</div></div><div class="chat-time" id="group-time">-</div></div>
+    <div class="chat-item" onclick="openChat('group')"><div class="chat-avatar"><svg fill="currentColor" width="28" height="28" viewBox="0 0 24 24"><path d="M16 11c1.66 0 2.99-1.34 2.99-3S17.66 5 16 5c-1.66 0-3 1.34-3 3s1.34 3 3 3zm-8 0c1.66 0 2.99-1.34 2.99-3S9.66 5 8 5C6.34 5 5 6.34 5 8s1.34 3 3 3zm0 2c-2.33 0-7 1.17-7 3.5V19h14v-2.5c0-2.33-4.67-3.5-7-3.5zm8 0c-.29 0-.62.02-.97.05 1.16.84 1.97 1.97 1.97 3.45V19h6v-2.5c0-2.33-4.67-3.5-7-3.5z"/></svg></div><div class="chat-info"><div class="chat-name">👥 گروه عمومی</div><div class="chat-lastmsg" id="group-lastmsg">به گروه خوش آمدید...</div></div><div style="display:flex;flex-direction:column;align-items:flex-end;gap:4px;"><div class="chat-time" id="group-time">-</div><div id="group-unread-badge" style="display:none;background:var(--danger);color:#fff;border-radius:999px;min-width:20px;height:20px;font-size:11px;display:none;align-items:center;justify-content:center;padding:0 6px;"></div></div></div>
   </div>
 </div>
 
@@ -5617,7 +5639,85 @@ window.addEventListener('load', () => {
       console.error('❌ کتابخانه Supabase لود نشد');
     }
   } catch(e) { console.error('❌ خطای اتصال Supabase:', e); }
+  checkAuthSession();
 });
+
+// ==================== Authentication ====================
+let authMode = 'login'; // یا 'signup'
+let unreadGroupCount = 0;
+
+function toggleAuthMode() {
+  authMode = authMode === 'login' ? 'signup' : 'login';
+  document.getElementById('auth-title').innerText = authMode === 'login' ? 'ورود به حساب' : 'ساخت حساب جدید';
+  document.getElementById('auth-submit-btn').innerText = authMode === 'login' ? 'ورود' : 'ثبت‌نام';
+  document.getElementById('auth-switch-text').innerText = authMode === 'login' ? 'حساب نداری؟' : 'حساب داری؟';
+  document.getElementById('auth-switch-link').innerText = authMode === 'login' ? 'ثبت‌نام کن' : 'وارد شو';
+  document.getElementById('auth-error').style.display = 'none';
+}
+
+function showAuthError(msg) {
+  const el = document.getElementById('auth-error');
+  el.innerText = msg;
+  el.style.display = 'block';
+}
+
+async function submitAuth() {
+  const uname = document.getElementById('auth-username').value.trim();
+  const pass = document.getElementById('auth-password').value;
+  if (!uname || !pass) { showAuthError('نام کاربری و رمز عبور را وارد کنید'); return; }
+  if (uname.length < 3) { showAuthError('نام کاربری باید حداقل ۳ کاراکتر باشد'); return; }
+  if (pass.length < 4) { showAuthError('رمز عبور باید حداقل ۴ کاراکتر باشد'); return; }
+  if (!sb) { showAuthError('اتصال به سرور برقرار نیست، فیلترشکن را بررسی کنید'); return; }
+
+  if (authMode === 'signup') {
+    const { data: existing } = await sb.from('users').select('username').eq('username', uname);
+    if (existing && existing.length > 0) { showAuthError('این نام کاربری قبلاً ثبت شده'); return; }
+    const { error } = await sb.from('users').insert([{ username: uname, password: pass }]);
+    if (error) { showAuthError('خطا در ثبت‌نام، دوباره تلاش کنید'); return; }
+    loginSuccess(uname);
+  } else {
+    const { data, error } = await sb.from('users').select('*').eq('username', uname).eq('password', pass);
+    if (error || !data || data.length === 0) { showAuthError('نام کاربری یا رمز عبور اشتباه است'); return; }
+    loginSuccess(uname);
+  }
+}
+
+function loginSuccess(uname) {
+  localStorage.setItem('authUser', uname);
+  document.getElementById('auth-page').classList.remove('active');
+  document.getElementById('auth-page').style.display = 'none';
+  document.querySelector('.bottom-nav').style.display = 'flex';
+  startApp(uname);
+}
+
+function checkAuthSession() {
+  const saved = localStorage.getItem('authUser');
+  if (saved) {
+    document.getElementById('auth-page').classList.remove('active');
+    document.getElementById('auth-page').style.display = 'none';
+    document.querySelector('.bottom-nav').style.display = 'flex';
+    startApp(saved);
+  } else {
+    document.querySelector('.bottom-nav').style.display = 'none';
+  }
+}
+
+function logout() {
+  if (!confirm('از حساب خارج شوید؟')) return;
+  localStorage.removeItem('authUser');
+  location.reload();
+}
+
+function startApp(uname) {
+  document.getElementById('home-page').classList.add('active');
+  // اگر پروفایلی با این نام کاربری وجود ندارد، بسازش
+  if (!profiles[uname]) {
+    profiles[uname] = { name: uname, xp: 0, completedLessons: [], quizSolvedCount: 0, streak: 0, lastActive: '', savedMessages: [], aiMessages: [], adminMessages: [], totalStudyMinutes: 0, weeklyActivity: [0,0,0,0,0,0,0], lastActivityDate: '', lastLessonTime: '' };
+  }
+  loadProfile(uname);
+  updateProfilesList();
+}
+
 
 async function loadGroupMessages() {
   if (!sb) { displayChatMessages(); return; }
@@ -5658,12 +5758,29 @@ function subscribeToGeneralChat() {
         );
         if (!exists) {
           adminMessages.push({ sender: m.sender, text: m.text, time: m.time });
-          if (currentChatType === 'group') displayChatMessages();
+          if (currentChatType === 'group') {
+            displayChatMessages();
+          } else if (m.sender !== username) {
+            unreadGroupCount++;
+            updateUnreadBadge();
+          }
           updateChatList();
+          saveMessages();
         }
       }
     )
     .subscribe();
+}
+
+function updateUnreadBadge() {
+  const badge = document.getElementById('group-unread-badge');
+  if (!badge) return;
+  if (unreadGroupCount > 0) {
+    badge.innerText = unreadGroupCount > 99 ? '99+' : unreadGroupCount;
+    badge.style.display = 'flex';
+  } else {
+    badge.style.display = 'none';
+  }
 }
 
 // ==================== پیام‌ها ====================
@@ -5698,6 +5815,7 @@ function displayChatMessages() {
     const isMyMsg = (currentChatType === 'group') ? (msg.sender === username) : (msg.sender === 'user');
     html += `<div class="message ${isMyMsg ? 'user' : 'bot'} ${selectedMessageIndex === i ? 'selected' : ''}" onclick="selectMessage(${i})">`;
     if (msg.replyTo) html += `<div class="reply-preview">↩️ پاسخ به: ${escapeHtml(msg.replyTo)}</div>`;
+    if (currentChatType === 'group' && !isMyMsg) html += `<div style="font-size:11px;color:var(--primary-light);margin-bottom:4px;padding-right:4px;font-weight:bold;">👤 ${escapeHtml(msg.sender)}</div>`;
     html += `<div class="message-bubble">${escapeHtml(msg.text)}</div><span class="message-time">${msg.time}</span></div>`;
   }
   container.innerHTML = html;
@@ -5762,7 +5880,7 @@ function openChat(type) {
   const subs = { saved: 'یادداشت‌های شخصی', ai: 'به زودی فعال می‌شود', group: 'همه کاربران' };
   document.getElementById('chat-detail-title').innerHTML = titles[type] || 'گروه عمومی';
   document.getElementById('chat-detail-sub').innerHTML = subs[type] || 'همه کاربران';
-  if (type === 'group') loadGroupMessages(); else displayChatMessages(); 
+  if (type === 'group') { unreadGroupCount = 0; updateUnreadBadge(); loadGroupMessages(); } else displayChatMessages(); 
   document.querySelectorAll('.page').forEach(p => p.classList.remove('active')); 
   document.getElementById('chat-detail-page').classList.add('active'); 
 }
@@ -5917,7 +6035,9 @@ function answerQuiz(selected) {
 function nextQuiz() { if (currentQuizIndex < quickQuizzes.length-1) { currentQuizIndex++; renderQuiz(); } else { alert(`تمرین تمام شد! ${quizAnswers.filter((a,i)=>a===quickQuizzes[i].a).length} از ${quickQuizzes.length} درست 🎉`); navigateTo('home'); } }
 function prevQuiz() { if (currentQuizIndex > 0) { currentQuizIndex--; renderQuiz(); } }
 
-loadProfile(localStorage.getItem('currentProfile') || 'default');
+if (localStorage.getItem('authUser')) {
+  loadProfile(localStorage.getItem('authUser'));
+}
 loadTheme();
 updateUI();
 checkDailyReminder();
