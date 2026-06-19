@@ -328,11 +328,9 @@
     <h2 style="text-align: center; margin-top: 12px; font-size: 18px;" id="profile-name-display">کاربر</h2>
     <p style="text-align: center; color: var(--text-secondary); font-size: 13px;" id="profile-level">سطح 1</p>
     <p style="text-align: center; color: var(--primary-light); font-size: 12px; margin-top: 4px;" id="total-study-time">⏱ زمان کل مطالعه: ۰ دقیقه</p>
-    <div class="edit-name-section"><input type="text" id="edit-name-input" class="edit-name-input" placeholder="نام جدید..."><button class="edit-name-btn" onclick="changeUsername()">تغییر نام</button></div>
     <button onclick="logout()" style="width:100%;margin-top:14px;background:none;border:1px solid var(--danger);color:var(--danger);padding:10px;border-radius:10px;cursor:pointer;">🚪 خروج از حساب</button>
     <div id="streak-medal" class="medal-badge" style="justify-content: center; margin-top: 16px;"></div>
   </div>
-  <div style="padding: 16px;"><div class="section"><h4>👥 پروفایل‌ها</h4><div id="profiles-list" class="profile-selector"></div><button onclick="addNewProfile()" class="add-profile-btn" style="margin-top: 10px; width: 100%;">➕ ساخت پروفایل جدید</button></div></div>
   <div style="padding: 16px;"><div class="section"><h4>🎨 تم رنگی</h4><div class="theme-selector"><div class="theme-btn theme-dark" onclick="setTheme('dark')" title="تاریک"></div><div class="theme-btn theme-light" onclick="setTheme('light')" title="روشن"></div><div class="theme-btn theme-nature" onclick="setTheme('nature')" title="طبیعت"></div><div class="theme-btn theme-ocean" onclick="setTheme('ocean')" title="اقیانوسی"></div><div class="theme-btn theme-fire" onclick="setTheme('fire')" title="آتشین"></div><div class="theme-btn theme-pink" onclick="setTheme('pink')" title="صورتی"></div></div></div></div>
   <div class="grid-2"><div class="stat-card"><p style="color: var(--text-secondary); font-size: 12px;">کل XP</p><p class="stat-value" id="profile-xp">0</p></div><div class="stat-card"><p style="color: var(--text-secondary); font-size: 12px;">روزهای پیاپی</p><p class="stat-value" style="color: var(--warning);" id="profile-streak">0</p></div><div class="stat-card"><p style="color: var(--text-secondary); font-size: 12px;">درس تموم شده</p><p class="stat-value" id="profile-lessons">0</p></div><div class="stat-card"><p style="color: var(--text-secondary); font-size: 12px;">تمرین حل شده</p><p class="stat-value" id="profile-quiz">0</p></div></div>
   <div style="padding: 16px;"><div class="section"><h4>📊 فعالیت هفتگی</h4><div id="weekly-chart" class="progress-chart"></div><p style="text-align: center; font-size: 11px; color: var(--text-secondary); margin-top: 8px;" id="chart-note">روزهایی که درس خوندی</p></div></div>
@@ -5635,10 +5633,10 @@ function resetQuiz() { hearts = 5; updateHeartsDisplay(); currentQuizIndex = 0; 
 
 // ==================== پروفایل‌های چندگانه ====================
 let currentProfile = localStorage.getItem('currentProfile') || 'default';
-let profiles = JSON.parse(localStorage.getItem('profiles')) || { default: { name: 'کاربر مهمان', xp: 0, completedLessons: [], quizSolvedCount: 0, streak: 0, lastActive: '', savedMessages: [], aiMessages: [], adminMessages: [], totalStudyMinutes: 0, weeklyActivity: [0,0,0,0,0,0,0], lastActivityDate: '', lastLessonTime: '' } };
+let profiles = JSON.parse(localStorage.getItem('profiles')) || { default: { name: 'کاربر مهمان', xp: 0, completedLessons: [], quizSolvedCount: 0, streak: 0, lastActive: '', aiMessages: [], adminMessages: [], totalStudyMinutes: 0, weeklyActivity: [0,0,0,0,0,0,0], lastActivityDate: '', lastLessonTime: '' } };
 
 function saveAllData() {
-  profiles[currentProfile] = { name: username, xp: xp, completedLessons: completedLessons, quizSolvedCount: quizSolvedCount, streak: streak, lastActive: lastActive, savedMessages: savedMessages, aiMessages: aiMessages, adminMessages: adminMessages, totalStudyMinutes: totalStudyMinutes, weeklyActivity: weeklyActivityData, lastActivityDate: lastActivityDate, lastLessonTime: lastLessonTime };
+  profiles[currentProfile] = { name: username, xp: xp, completedLessons: completedLessons, quizSolvedCount: quizSolvedCount, streak: streak, lastActive: lastActive, aiMessages: aiMessages, adminMessages: adminMessages, totalStudyMinutes: totalStudyMinutes, weeklyActivity: weeklyActivityData, lastActivityDate: lastActivityDate, lastLessonTime: lastLessonTime };
   localStorage.setItem('profiles', JSON.stringify(profiles));
   localStorage.setItem('currentProfile', currentProfile);
 }
@@ -5652,7 +5650,6 @@ function loadProfile(profileName) {
   quizSolvedCount = profile.quizSolvedCount || 0;
   streak = profile.streak || 0;
   lastActive = profile.lastActive || '';
-  savedMessages = profile.savedMessages || [];
   aiMessages = profile.aiMessages || [];
   adminMessages = profile.adminMessages || [];
   totalStudyMinutes = profile.totalStudyMinutes || 0;
@@ -5660,11 +5657,12 @@ function loadProfile(profileName) {
   lastActivityDate = profile.lastActivityDate || '';
   lastLessonTime = profile.lastLessonTime || '';
   updateUI(); updateChatList(); saveAllData();
+  loadSavedMessagesFromSupabase();
 }
 function addNewProfile() {
   let newName = prompt('نام پروفایل جدید را وارد کنید:');
   if (newName && !profiles[newName]) {
-    profiles[newName] = { name: newName, xp: 0, completedLessons: [], quizSolvedCount: 0, streak: 0, lastActive: '', savedMessages: [], aiMessages: [], adminMessages: [], totalStudyMinutes: 0, weeklyActivity: [0,0,0,0,0,0,0], lastActivityDate: '', lastLessonTime: '' };
+    profiles[newName] = { name: newName, xp: 0, completedLessons: [], quizSolvedCount: 0, streak: 0, lastActive: '', aiMessages: [], adminMessages: [], totalStudyMinutes: 0, weeklyActivity: [0,0,0,0,0,0,0], lastActivityDate: '', lastLessonTime: '' };
     localStorage.setItem('profiles', JSON.stringify(profiles));
     loadProfile(newName);
     updateProfilesList();
@@ -5676,6 +5674,24 @@ function updateProfilesList() {
   let html = '';
   for (let p in profiles) html += `<div class="profile-badge ${p === currentProfile ? 'active' : ''}" onclick="loadProfile('${p}')">👤 ${profiles[p].name || p}</div>`;
   container.innerHTML = html;
+}
+
+// ==================== پیام‌های ذخیره شده (Supabase) ====================
+async function loadSavedMessagesFromSupabase() {
+  if (!sb || !username) return;
+  try {
+    const { data, error } = await sb.from('saved_messages').select('messages').eq('username', username).maybeSingle();
+    if (!error && data) savedMessages = data.messages || [];
+    else if (!error) savedMessages = [];
+    updateChatList();
+    if (currentChatType === 'saved') displayChatMessages();
+  } catch (e) { console.error('❌ خطا در دریافت پیام‌های ذخیره شده:', e); }
+}
+async function syncSavedMessagesToSupabase() {
+  if (!sb || !username) return;
+  try {
+    await sb.from('saved_messages').upsert({ username: username, messages: savedMessages, updated_at: new Date().toISOString() });
+  } catch (e) { console.error('❌ خطا در ذخیره پیام‌های ذخیره شده:', e); }
 }
 
 // ==================== تم رنگی ====================
@@ -5770,7 +5786,7 @@ function startApp(uname) {
   document.getElementById('home-page').classList.add('active');
   // اگر پروفایلی با این نام کاربری وجود ندارد، بسازش
   if (!profiles[uname]) {
-    profiles[uname] = { name: uname, xp: 0, completedLessons: [], quizSolvedCount: 0, streak: 0, lastActive: '', savedMessages: [], aiMessages: [], adminMessages: [], totalStudyMinutes: 0, weeklyActivity: [0,0,0,0,0,0,0], lastActivityDate: '', lastLessonTime: '' };
+    profiles[uname] = { name: uname, xp: 0, completedLessons: [], quizSolvedCount: 0, streak: 0, lastActive: '', aiMessages: [], adminMessages: [], totalStudyMinutes: 0, weeklyActivity: [0,0,0,0,0,0,0], lastActivityDate: '', lastLessonTime: '' };
   }
   loadProfile(uname);
   updateProfilesList();
@@ -5923,7 +5939,7 @@ function updateUnreadBadge() {
 
 // ==================== پیام‌ها ====================
 let savedMessages = [], aiMessages = [], adminMessages = [], currentChatType = null, selectedMessageIndex = null, editingIndex = null, forwardMessageIndex = null, replyToMessageData = null, pinnedMessage = JSON.parse(localStorage.getItem('pinnedMessage')) || null, weeklyActivityData = [0,0,0,0,0,0,0], lastActivityDate = '', lastLessonTime = '';
-function saveMessages() { saveAllData(); }
+function saveMessages() { saveAllData(); syncSavedMessagesToSupabase(); }
 function updateChatList() {
   const getLastMsg = (arr) => arr.length ? (arr[arr.length-1].text.length > 30 ? arr[arr.length-1].text.substring(0,30)+'...' : arr[arr.length-1].text) : null;
   const getTime = (arr) => arr.length ? arr[arr.length-1].time : '-';
