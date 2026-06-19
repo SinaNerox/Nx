@@ -69,6 +69,16 @@
       --text-primary: #eee;
       --text-secondary: #aaa;
     }
+    body.theme-pink {
+      --bg-primary: #1a0a14;
+      --bg-secondary: #2a1020;
+      --bg-card: #351528;
+      --border: #4a1f38;
+      --primary: #ec4899;
+      --primary-light: #f472b6;
+      --text-primary: #f5d0e8;
+      --text-secondary: #c084a8;
+    }
     
     .header { background: var(--bg-secondary); padding: 16px 20px; border-bottom: 2px solid var(--primary); display: flex; align-items: center; gap: 12px; position: sticky; top: 0; z-index: 100; }
     .header-center { text-align: center; flex: 1; }
@@ -204,6 +214,7 @@
     .theme-nature { background: #10b981; }
     .theme-ocean { background: #3b82f6; }
     .theme-fire { background: #f97316; }
+    .theme-pink { background: linear-gradient(135deg, #ec4899, #f472b6); }
     
     .forward-option { background: var(--border); border-radius: 8px; padding: 10px; margin: 5px 0; cursor: pointer; display: flex; align-items: center; gap: 10px; }
     .forward-option:hover { background: var(--primary); color: white; }
@@ -322,7 +333,7 @@
     <div id="streak-medal" class="medal-badge" style="justify-content: center; margin-top: 16px;"></div>
   </div>
   <div style="padding: 16px;"><div class="section"><h4>👥 پروفایل‌ها</h4><div id="profiles-list" class="profile-selector"></div><button onclick="addNewProfile()" class="add-profile-btn" style="margin-top: 10px; width: 100%;">➕ ساخت پروفایل جدید</button></div></div>
-  <div style="padding: 16px;"><div class="section"><h4>🎨 تم رنگی</h4><div class="theme-selector"><div class="theme-btn theme-dark" onclick="setTheme('dark')" title="تاریک"></div><div class="theme-btn theme-light" onclick="setTheme('light')" title="روشن"></div><div class="theme-btn theme-nature" onclick="setTheme('nature')" title="طبیعت"></div><div class="theme-btn theme-ocean" onclick="setTheme('ocean')" title="اقیانوسی"></div><div class="theme-btn theme-fire" onclick="setTheme('fire')" title="آتشین"></div></div></div></div>
+  <div style="padding: 16px;"><div class="section"><h4>🎨 تم رنگی</h4><div class="theme-selector"><div class="theme-btn theme-dark" onclick="setTheme('dark')" title="تاریک"></div><div class="theme-btn theme-light" onclick="setTheme('light')" title="روشن"></div><div class="theme-btn theme-nature" onclick="setTheme('nature')" title="طبیعت"></div><div class="theme-btn theme-ocean" onclick="setTheme('ocean')" title="اقیانوسی"></div><div class="theme-btn theme-fire" onclick="setTheme('fire')" title="آتشین"></div><div class="theme-btn theme-pink" onclick="setTheme('pink')" title="صورتی"></div></div></div></div>
   <div class="grid-2"><div class="stat-card"><p style="color: var(--text-secondary); font-size: 12px;">کل XP</p><p class="stat-value" id="profile-xp">0</p></div><div class="stat-card"><p style="color: var(--text-secondary); font-size: 12px;">روزهای پیاپی</p><p class="stat-value" style="color: var(--warning);" id="profile-streak">0</p></div><div class="stat-card"><p style="color: var(--text-secondary); font-size: 12px;">درس تموم شده</p><p class="stat-value" id="profile-lessons">0</p></div><div class="stat-card"><p style="color: var(--text-secondary); font-size: 12px;">تمرین حل شده</p><p class="stat-value" id="profile-quiz">0</p></div></div>
   <div style="padding: 16px;"><div class="section"><h4>📊 فعالیت هفتگی</h4><div id="weekly-chart" class="progress-chart"></div><p style="text-align: center; font-size: 11px; color: var(--text-secondary); margin-top: 8px;" id="chart-note">روزهایی که درس خوندی</p></div></div>
   <div style="padding: 16px;"><div class="section"><h4>🏆 دستاوردها</h4><div id="achievements-list"></div></div></div>
@@ -334,7 +345,7 @@
   <div class="header"><div class="header-center"><h1 style="font-size: 18px;">💬 پیام‌ها</h1><p style="font-size: 11px; color: var(--text-secondary);">گفتگوها</p></div></div>
   <div class="chat-list" id="chats-list">
     <div class="chat-item" onclick="openChat('saved')"><div class="chat-avatar"><svg fill="currentColor" width="28" height="28" viewBox="0 0 24 24"><path d="M20 2H4c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h4l4 4 4-4h4c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2zm-8 14h-2v-2h2v2zm0-4h-2V6h2v6z"/></svg></div><div class="chat-info"><div class="chat-name">📝 پیام‌های ذخیره شده</div><div class="chat-lastmsg" id="saved-lastmsg">یادداشت‌های خود را اینجا بنویسید</div></div><div class="chat-time" id="saved-time">-</div></div>
-    <div class="chat-item" onclick="openChat('ai')"><div class="chat-avatar"><svg fill="currentColor" width="28" height="28" viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 4c1.1 0 2 .9 2 2s-.9 2-2 2-2-.9-2-2 .9-2 2-2zm0 13c-2.33 0-4.31-1.46-5.11-3.5h10.22c-.8 2.04-2.78 3.5-5.11 3.5z"/></svg></div><div class="chat-info"><div class="chat-name">🤖 هوش مصنوعی Gemini</div><div class="chat-lastmsg" id="ai-lastmsg">به زودی فعال می‌شود...</div></div><div class="chat-time" id="ai-time">-</div></div>
+    <div class="chat-item" onclick="openChat('ai')"><div class="chat-avatar"><svg fill="currentColor" width="28" height="28" viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 4c1.1 0 2 .9 2 2s-.9 2-2 2-2-.9-2-2 .9-2 2-2zm0 13c-2.33 0-4.31-1.46-5.11-3.5h10.22c-.8 2.04-2.78 3.5-5.11 3.5z"/></svg></div><div class="chat-info"><div class="chat-name">🤖 🤖 دستیار هوشمند</div><div class="chat-lastmsg" id="ai-lastmsg">سلام! چطور می‌تونم کمکت کنم؟</div></div><div class="chat-time" id="ai-time">-</div></div>
     <!-- چت گروهی عمومی - جایگزین ادمین -->
     <div class="chat-item" onclick="openChat('group')"><div class="chat-avatar"><svg fill="currentColor" width="28" height="28" viewBox="0 0 24 24"><path d="M16 11c1.66 0 2.99-1.34 2.99-3S17.66 5 16 5c-1.66 0-3 1.34-3 3s1.34 3 3 3zm-8 0c1.66 0 2.99-1.34 2.99-3S9.66 5 8 5C6.34 5 5 6.34 5 8s1.34 3 3 3zm0 2c-2.33 0-7 1.17-7 3.5V19h14v-2.5c0-2.33-4.67-3.5-7-3.5zm8 0c-.29 0-.62.02-.97.05 1.16.84 1.97 1.97 1.97 3.45V19h6v-2.5c0-2.33-4.67-3.5-7-3.5z"/></svg></div><div class="chat-info"><div class="chat-name">👥 گروه عمومی</div><div class="chat-lastmsg" id="group-lastmsg">به گروه خوش آمدید...</div></div><div style="display:flex;flex-direction:column;align-items:flex-end;gap:4px;"><div class="chat-time" id="group-time">-</div><div id="group-unread-badge" style="display:none;background:var(--danger);color:#fff;border-radius:999px;min-width:20px;height:20px;font-size:11px;display:none;align-items:center;justify-content:center;padding:0 6px;"></div></div></div>
   </div>
@@ -397,6 +408,7 @@
 </div>
 
 <script>
+const API_KEY = 'sk-knjVROlK2ptpc4JcAEnzy5p5kbK0rAPvGm8gSfsSStnujpa9';
 // ==================== HTML درس‌ها (۵۰ درس اول با محتوای کامل) ====================
 const htmlLessonsList = [
   "خانه (HOME)", "مقدمه (Introduction)", "ویرایشگرها (Editors)", "پایه‌ها (Basic)", "المان‌ها (Elements)",
@@ -5828,7 +5840,7 @@ function updateChatList() {
   const getTime = (arr) => arr.length ? arr[arr.length-1].time : '-';
   document.getElementById('saved-lastmsg').innerHTML = getLastMsg(savedMessages) || 'یادداشت‌های خود را اینجا بنویسید';
   document.getElementById('saved-time').innerHTML = getTime(savedMessages);
-  document.getElementById('ai-lastmsg').innerHTML = getLastMsg(aiMessages) || 'به زودی فعال می‌شود...';
+  document.getElementById('ai-lastmsg').innerHTML = getLastMsg(aiMessages) || 'سلام! چطور می‌تونم کمکت کنم؟';
   document.getElementById('ai-time').innerHTML = getTime(aiMessages);
   document.getElementById('group-lastmsg').innerHTML = getLastMsg(adminMessages) || 'به گروه خوش آمدید...';
   document.getElementById('group-time').innerHTML = getTime(adminMessages);
@@ -5895,7 +5907,46 @@ function sendChatMessage() {
   if (replyToMessageData) { newMsg.replyTo = replyToMessageData.text; cancelReply(); }
   msgs.push(newMsg);
   saveMessages(); displayChatMessages(); input.value = ''; updateChatList();
-  if (currentChatType === 'ai') setTimeout(() => { aiMessages.push({ sender: 'bot', text: '⚡ در حال توسعه...', time: getCurrentTime() }); saveMessages(); displayChatMessages(); updateChatList(); }, 500);
+  if (currentChatType === 'ai') sendToAI(text);
+}
+async function sendToAI(userText) {
+  const typingMsg = { sender: 'bot', text: '⏳ در حال تایپ...', time: getCurrentTime(), isTyping: true };
+  aiMessages.push(typingMsg); displayChatMessages(); updateChatList();
+  const history = aiMessages.filter(m => !m.isTyping).slice(-10).map(m => ({
+    role: m.sender === 'user' ? 'user' : 'assistant',
+    content: m.text
+  }));
+  try {
+    const res = await fetch('https://api.anthropic.com/v1/messages', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'x-api-key': API_KEY,
+        'anthropic-version': '2023-06-01',
+        'anthropic-dangerous-direct-browser-access': 'true'
+      },
+      body: JSON.stringify({
+        model: 'claude-haiku-4-5',
+        max_tokens: 1024,
+        system: 'تو یک دستیار هوشمند برنامه‌نویسی هستی که به فارسی پاسخ می‌دهی. در یادگیری HTML، CSS، JavaScript و Python به کاربر کمک می‌کنی. پاسخ‌هایت را واضح و مفید نگه دار.',
+        messages: [...history, { role: 'user', content: userText }]
+      })
+    });
+    const data = await res.json();
+    const idx = aiMessages.findLastIndex(m => m.isTyping);
+    if (idx !== -1) aiMessages.splice(idx, 1);
+    if (data.content && data.content[0]) {
+      aiMessages.push({ sender: 'bot', text: data.content[0].text, time: getCurrentTime() });
+    } else {
+      const errMsg = data.error ? data.error.message : 'خطا در دریافت پاسخ';
+      aiMessages.push({ sender: 'bot', text: '❌ ' + errMsg, time: getCurrentTime() });
+    }
+  } catch(e) {
+    const idx = aiMessages.findLastIndex(m => m.isTyping);
+    if (idx !== -1) aiMessages.splice(idx, 1);
+    aiMessages.push({ sender: 'bot', text: '❌ خطا در اتصال: ' + e.message, time: getCurrentTime() });
+  }
+  saveMessages(); displayChatMessages(); updateChatList();
 }
 function toggleSearch() { const sa = document.getElementById('search-area'); sa.style.display = sa.style.display === 'none' ? 'block' : 'none'; if (sa.style.display === 'none') displayChatMessages(); }
 function searchMessages() {
@@ -5914,7 +5965,7 @@ function openChat(type) {
   currentChatType = type; 
   selectedMessageIndex = null; 
   const titles = { saved: '📝 پیام‌های ذخیره شده', ai: '🤖 هوش مصنوعی', group: '👥 گروه عمومی' };
-  const subs = { saved: 'یادداشت‌های شخصی', ai: 'به زودی فعال می‌شود', group: 'همه کاربران' };
+  const subs = { saved: 'یادداشت‌های شخصی', ai: 'دستیار هوش مصنوعی برنامه‌نویسی', group: 'همه کاربران' };
   document.getElementById('chat-detail-title').innerHTML = titles[type] || 'گروه عمومی';
   document.getElementById('chat-detail-sub').innerHTML = subs[type] || 'همه کاربران';
   if (type === 'group') { unreadGroupCount = 0; updateUnreadBadge(); loadGroupMessages(); } else displayChatMessages(); 
