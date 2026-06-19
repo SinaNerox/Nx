@@ -5654,16 +5654,22 @@ async function loadAdminMessages() {
 
 async function sendToSupabase(text, senderName) {
   if (!supabase) { adminMessages.push({ sender: senderName, text: text, time: getCurrentTime() }); saveMessages(); displayChatMessages(); updateChatList(); return; }
-  await supabase.from('messages').insert([{ sender: senderName, text: text, time: getCurrentTime(), room: 'admin' }]);
+  const time = getCurrentTime();
+  adminMessages.push({ sender: senderName, text: text, time: time });
+  displayChatMessages(); updateChatList();
+  await supabase.from('messages').insert([{ sender: senderName, text: text, time: time, room: 'admin' }]);
 }
 
 function subscribeToAdminChat() {
   if (!supabase) return;
   supabase.channel('admin-room').on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'messages', filter: 'room=eq.admin' }, (payload) => {
     const m = payload.new;
-    adminMessages.push({ sender: m.sender, text: m.text, time: m.time });
-    if (currentChatType === 'admin') displayChatMessages();
-    updateChatList();
+    const isDuplicate = adminMessages.some(msg => msg.text === m.text && msg.time === m.time && msg.sender === m.sender);
+    if (!isDuplicate) {
+      adminMessages.push({ sender: m.sender, text: m.text, time: m.time });
+      if (currentChatType === 'admin') displayChatMessages();
+      updateChatList();
+    }
   }).subscribe();
 }
 
@@ -5692,7 +5698,8 @@ function displayChatMessages() {
   if (!messages.length) html += '<div style="text-align: center; padding: 40px;">پیامی وجود ندارد</div>';
   else for (let i = 0; i < messages.length; i++) {
     const msg = messages[i];
-    html += `<div class="message ${msg.sender === 'user' ? 'user' : 'bot'} ${selectedMessageIndex === i ? 'selected' : ''}" onclick="selectMessage(${i})">`;
+    const isMyMsg = (currentChatType === 'admin') ? (msg.sender === username) : (msg.sender === 'user');
+    html += `<div class="message ${isMyMsg ? 'user' : 'bot'} ${selectedMessageIndex === i ? 'selected' : ''}" onclick="selectMessage(${i})">`;
     if (msg.replyTo) html += `<div class="reply-preview">↩️ پاسخ به: ${escapeHtml(msg.replyTo)}</div>`;
     html += `<div class="message-bubble">${escapeHtml(msg.text)}</div><span class="message-time">${msg.time}</span></div>`;
   }
