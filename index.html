@@ -208,18 +208,33 @@
     .forward-option { background: var(--border); border-radius: 8px; padding: 10px; margin: 5px 0; cursor: pointer; display: flex; align-items: center; gap: 10px; }
     .forward-option:hover { background: var(--primary); color: white; }
     
-    .editor-container { display: flex; flex-direction: column; gap: 16px; padding: 12px; height: calc(100vh - 140px); }
-    .editor-panel { display: flex; gap: 16px; flex: 1; min-height: 0; }
-    .editor-code { flex: 1; display: flex; flex-direction: column; gap: 8px; }
-    .editor-preview { flex: 1; background: var(--bg-primary); border: 1px solid var(--border); border-radius: 12px; padding: 12px; overflow: auto; }
-    .editor-tabs { display: flex; gap: 4px; border-bottom: 1px solid var(--border); padding-bottom: 8px; }
-    .editor-tab { padding: 6px 12px; cursor: pointer; border-radius: 8px 8px 0 0; background: none; border: none; color: var(--text-secondary); }
+    .editor-container { display: flex; flex-direction: column; padding: 8px; height: calc(100vh - 130px); overflow: hidden; }
+    .editor-panel { display: flex; flex-direction: column; flex: 1; min-height: 0; gap: 0; }
+    .editor-code { display: flex; flex-direction: column; flex: 1; min-height: 0; }
+    .editor-preview { background: var(--bg-primary); border: 1px solid var(--border); border-radius: 12px; overflow: hidden; flex: 1; min-height: 0; }
+    .editor-preview.hidden { display: none; }
+    .editor-code.hidden { display: none; }
+    .editor-tabs { display: flex; gap: 4px; border-bottom: 1px solid var(--border); padding-bottom: 6px; margin-bottom: 6px; overflow-x: auto; flex-shrink: 0; }
+    .editor-tab { padding: 6px 10px; cursor: pointer; border-radius: 8px 8px 0 0; background: none; border: none; color: var(--text-secondary); white-space: nowrap; font-size: 13px; }
     .editor-tab.active { background: var(--border); color: var(--primary); }
-    .CodeMirror { height: 100%; min-height: 300px; border-radius: 12px; overflow: hidden; }
-    .editor-buttons { display: flex; gap: 8px; margin-top: 8px; flex-wrap: wrap; }
-    .editor-template-btn { background: var(--border); border: none; padding: 6px 12px; border-radius: 20px; color: var(--text-primary); cursor: pointer; font-size: 12px; }
+    .editor-view-tabs { display: flex; gap: 4px; margin-bottom: 6px; flex-shrink: 0; }
+    .editor-view-tab { flex: 1; padding: 7px; cursor: pointer; border-radius: 8px; background: var(--border); border: none; color: var(--text-secondary); font-size: 13px; text-align: center; }
+    .editor-view-tab.active { background: var(--primary); color: white; }
+    .CodeMirror { height: 100% !important; min-height: 200px; border-radius: 12px; overflow: hidden; font-size: 13px; }
+    .CodeMirror-scroll { height: 100% !important; }
+    .editor-buttons { display: flex; gap: 6px; margin-top: 6px; flex-wrap: wrap; flex-shrink: 0; }
+    .editor-template-btn { background: var(--border); border: none; padding: 6px 10px; border-radius: 20px; color: var(--text-primary); cursor: pointer; font-size: 11px; }
     .editor-template-btn:hover { background: var(--primary); }
-    iframe { width: 100%; height: 100%; border: none; background: white; border-radius: 8px; }
+    iframe { width: 100%; height: 100%; border: none; background: white; border-radius: 8px; display: block; }
+
+    @media (min-width: 768px) {
+      .editor-view-tabs { display: none; }
+      .editor-panel { flex-direction: row; gap: 12px; flex: 1; min-height: 0; }
+      .editor-code { flex: 1; min-height: 0; }
+      .editor-code.hidden, .editor-preview.hidden { display: flex !important; }
+      .editor-preview { flex: 1; display: flex; min-height: 0; padding: 0; }
+      .editor-container { height: calc(100vh - 140px); gap: 8px; padding: 12px; }
+    }
   </style>
 </head>
 <body class="theme-dark">
@@ -344,22 +359,28 @@
 <div class="page" id="editor-page">
   <div class="header"><button class="back-btn" onclick="goBack()">←</button><div class="header-center"><h1 style="font-size: 18px;">✏️ ادیتور کد زنده</h1><p style="font-size: 11px; color: var(--text-secondary);">HTML/CSS/JS را بنویسید و نتیجه را ببینید</p></div><div style="width: 45px;"></div></div>
   <div class="editor-container">
-    <div class="editor-tabs">
-      <button class="editor-tab active" data-mode="html" onclick="switchEditorMode('html')">HTML</button>
-      <button class="editor-tab" data-mode="css" onclick="switchEditorMode('css')">CSS</button>
-      <button class="editor-tab" data-mode="js" onclick="switchEditorMode('js')">JavaScript</button>
+    <div class="editor-view-tabs">
+      <button class="editor-view-tab active" id="view-tab-code" onclick="switchEditorView('code')">💻 کد</button>
+      <button class="editor-view-tab" id="view-tab-preview" onclick="switchEditorView('preview')">👁 پیش‌نمایش</button>
     </div>
     <div class="editor-panel">
-      <div class="editor-code"><textarea id="code-editor"></textarea></div>
-      <div class="editor-preview"><iframe id="preview-frame" sandbox="allow-same-origin allow-scripts allow-popups allow-forms"></iframe></div>
+      <div class="editor-code" id="editor-code-panel">
+        <div class="editor-tabs">
+          <button class="editor-tab active" data-mode="html" onclick="switchEditorMode('html')">HTML</button>
+          <button class="editor-tab" data-mode="css" onclick="switchEditorMode('css')">CSS</button>
+          <button class="editor-tab" data-mode="js" onclick="switchEditorMode('js')">JavaScript</button>
+        </div>
+        <textarea id="code-editor"></textarea>
+      </div>
+      <div class="editor-preview hidden" id="editor-preview-panel"><iframe id="preview-frame" sandbox="allow-same-origin allow-scripts allow-popups allow-forms"></iframe></div>
     </div>
     <div class="editor-buttons">
-      <button class="editor-template-btn" onclick="loadTemplate('basic')">📄 صفحه ساده</button>
+      <button class="editor-template-btn" onclick="loadTemplate('basic')">📄 ساده</button>
       <button class="editor-template-btn" onclick="loadTemplate('card')">🎴 کارت</button>
       <button class="editor-template-btn" onclick="loadTemplate('form')">📝 فرم</button>
-      <button class="editor-template-btn" onclick="loadTemplate('flex')">📐 فلکس باکس</button>
+      <button class="editor-template-btn" onclick="loadTemplate('flex')">📐 فلکس</button>
       <button class="editor-template-btn" onclick="loadTemplate('grid')">📊 گرید</button>
-      <button class="editor-template-btn" onclick="runCode()">▶️ اجرا</button>
+      <button class="editor-template-btn" onclick="runCodeAndPreview()">▶️ اجرا</button>
       <button class="editor-template-btn" onclick="saveCode()">💾 ذخیره</button>
       <button class="editor-template-btn" onclick="loadSavedCode()">📂 بارگذاری</button>
     </div>
@@ -5550,6 +5571,22 @@ function switchEditorMode(mode) {
 }
 
 function runCode() { const iframe = document.getElementById('preview-frame'); iframe.contentDocument.open(); iframe.contentDocument.write(editor.getValue()); iframe.contentDocument.close(); }
+function runCodeAndPreview() { runCode(); switchEditorView('preview'); }
+function switchEditorView(view) {
+  const codePanel = document.getElementById('editor-code-panel');
+  const previewPanel = document.getElementById('editor-preview-panel');
+  const codeTab = document.getElementById('view-tab-code');
+  const previewTab = document.getElementById('view-tab-preview');
+  if (view === 'code') {
+    codePanel.classList.remove('hidden'); previewPanel.classList.add('hidden');
+    codeTab.classList.add('active'); previewTab.classList.remove('active');
+    if (editor) setTimeout(() => editor.refresh(), 50);
+  } else {
+    runCode();
+    previewPanel.classList.remove('hidden'); codePanel.classList.add('hidden');
+    previewTab.classList.add('active'); codeTab.classList.remove('active');
+  }
+}
 function loadTemplate(name) { if (templates[name]) { editor.setValue(templates[name]); runCode(); } }
 function saveCode() { localStorage.setItem('savedCode', editor.getValue()); alert('کد ذخیره شد!'); }
 function loadSavedCode() { const code = localStorage.getItem('savedCode'); if (code) { editor.setValue(code); runCode(); alert('کد بارگذاری شد!'); } else alert('کد ذخیره‌ای وجود ندارد'); }
