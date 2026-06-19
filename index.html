@@ -5603,12 +5603,20 @@ function setTheme(theme) { document.body.className = `theme-${theme}`; localStor
 function loadTheme() { const savedTheme = localStorage.getItem('theme') || 'dark'; setTheme(savedTheme); }
 
 // ==================== Supabase ====================
-const SUPABASE_URL = 'dkfqvgtlkqunttccukoo.supabase.co';
+const SUPABASE_URL = 'https://dkfqvgtlkqunttccukoo.supabase.co';
 const SUPABASE_KEY = 'sb_publishable_M-TIwnlhn3A8NHNADyx22g_cN2nOvcM';
 let supabase = null;
 
 window.addEventListener('load', () => {
-  try { if (window.supabase) { supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY); subscribeToGeneralChat(); } } catch(e) {}
+  try {
+    if (window.supabase) {
+      supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+      subscribeToGeneralChat();
+      console.log('✅ Supabase متصل شد');
+    } else {
+      console.error('❌ کتابخانه Supabase لود نشد - اینترنت یا فیلترشکن را چک کنید');
+    }
+  } catch(e) { console.error('❌ خطای اتصال Supabase:', e); }
 });
 
 async function loadGroupMessages() {
