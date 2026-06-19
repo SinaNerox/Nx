@@ -5782,7 +5782,7 @@ function logout() {
   location.reload();
 }
 
-function startApp(uname) {
+async function startApp(uname) {
   document.getElementById('home-page').classList.add('active');
   // اگر پروفایلی با این نام کاربری وجود ندارد، بسازش
   if (!profiles[uname]) {
@@ -5790,7 +5790,9 @@ function startApp(uname) {
   }
   loadProfile(uname);
   updateProfilesList();
-  discoverDmConversations();
+  await discoverDmConversations();
+  await loadReadStatus();
+  await computeUnreadCounts();
 }
 
 async function discoverDmConversations() {
@@ -5820,7 +5822,7 @@ async function preloadDmPreviews() {
     if (dmMessages[u]) continue; // قبلاً لود شده
     const room = dmRoomId(username, u);
     const { data } = await sb.from('messages').select('*').eq('room', room).order('id', { ascending: true });
-    if (data) dmMessages[u] = data.map(m => ({ sender: m.sender, text: m.text, time: m.time, replyTo: m.reply_to || null }));
+    if (data) dmMessages[u] = data.map(m => ({ id: m.id, sender: m.sender, text: m.text, time: m.time, replyTo: m.reply_to || null }));
   }
 }
 
@@ -5833,14 +5835,55 @@ async function loadGroupMessages() {
     .eq('room', 'general')
     .order('id', { ascending: true });
   if (data) {
-    adminMessages = data.map(m => ({ sender: m.sender, text: m.text, time: m.time, replyTo: m.reply_to || null }));
+    adminMessages = data.map(m => ({ id: m.id, sender: m.sender, text: m.text, time: m.time, replyTo: m.reply_to || null }));
     displayChatMessages();
     updateChatList();
+    const maxId = data.length ? Math.max(...data.map(m => m.id)) : 0;
+    markRoomRead('general', maxId);
   }
 }
 
 function dmRoomId(u1, u2) {
   return 'dm:' + [u1, u2].sort().join(':');
+}
+
+// ==================== وضعیت خوانده‌شدن پیام‌ها (Supabase) ====================
+let readStatus = {}; // { room: last_read_id }
+
+async function loadReadStatus() {
+  if (!sb || !username) return;
+  try {
+    const { data } = await sb.from('read_status').select('room,last_read_id').eq('username', username);
+    readStatus = {};
+    if (data) for (const row of data) readStatus[row.room] = row.last_read_id;
+  } catch (e) { console.error('❌ خطا در دریافت وضعیت خوانده‌شدن:', e); }
+}
+
+async function markRoomRead(room, lastId) {
+  if (!sb || !username) return;
+  if ((readStatus[room] || 0) >= lastId) return;
+  readStatus[room] = lastId;
+  try {
+    await sb.from('read_status').upsert({ username: username, room: room, last_read_id: lastId });
+  } catch (e) { console.error('❌ خطا در ذخیره وضعیت خوانده‌شدن:', e); }
+}
+
+async function computeUnreadCounts() {
+  if (!sb || !username) return;
+  try {
+    const groupLastRead = readStatus['general'] || 0;
+    const { count: groupCount } = await sb.from('messages').select('id', { count: 'exact', head: true }).eq('room', 'general').gt('id', groupLastRead).neq('sender', username);
+    unreadGroupCount = groupCount || 0;
+    updateUnreadBadge();
+
+    for (const u of knownDmUsers) {
+      const room = dmRoomId(username, u);
+      const lastRead = readStatus[room] || 0;
+      const { count } = await sb.from('messages').select('id', { count: 'exact', head: true }).eq('room', room).gt('id', lastRead).neq('sender', username);
+      dmUnread[u] = count || 0;
+    }
+    updateChatList();
+  } catch (e) { console.error('❌ خطا در محاسبه پیام‌های نخوانده:', e); }
 }
 
 let dmMessages = {}; // { otherUsername: [msgs] }
@@ -5860,8 +5903,10 @@ async function loadDmMessages(otherUser) {
     .eq('room', room)
     .order('id', { ascending: true });
   if (data) {
-    dmMessages[otherUser] = data.map(m => ({ sender: m.sender, text: m.text, time: m.time, replyTo: m.reply_to || null }));
+    dmMessages[otherUser] = data.map(m => ({ id: m.id, sender: m.sender, text: m.text, time: m.time, replyTo: m.reply_to || null }));
     displayChatMessages();
+    const maxId = data.length ? Math.max(...data.map(m => m.id)) : 0;
+    markRoomRead(room, maxId);
   }
 }
 
@@ -5891,7 +5936,7 @@ function subscribeToGeneralChat() {
       { event: 'INSERT', schema: 'public', table: 'messages' },
       (payload) => {
         const m = payload.new;
-        const msgObj = { sender: m.sender, text: m.text, time: m.time, replyTo: m.reply_to || null };
+        const msgObj = { id: m.id, sender: m.sender, text: m.text, time: m.time, replyTo: m.reply_to || null };
 
         if (m.room === 'general') {
           const exists = adminMessages.some(msg => msg.text === m.text && msg.time === m.time && msg.sender === m.sender);
@@ -5899,6 +5944,7 @@ function subscribeToGeneralChat() {
           adminMessages.push(msgObj);
           if (currentChatType === 'group') {
             displayChatMessages();
+            markRoomRead('general', m.id);
           } else if (m.sender !== username) {
             unreadGroupCount++;
             updateUnreadBadge();
@@ -5916,6 +5962,7 @@ function subscribeToGeneralChat() {
           dmMessages[otherUser].push(msgObj);
           if (currentChatType === 'dm' && currentDmUser === otherUser) {
             displayChatMessages();
+            markRoomRead(m.room, m.id);
           } else if (m.sender !== username) {
             dmUnread[otherUser] = (dmUnread[otherUser] || 0) + 1;
           }
