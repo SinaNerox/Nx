@@ -342,14 +342,23 @@
 
 <!-- صفحه لیست چت‌ها -->
 <div class="page" id="chat-list-page">
-  <div class="header"><div class="header-center"><h1 style="font-size: 18px;">💬 پیام‌ها</h1><p style="font-size: 11px; color: var(--text-secondary);">گفتگوها</p></div></div>
+  <div class="header" style="position:relative;"><div class="header-center"><h1 style="font-size: 18px;">💬 پیام‌ها</h1><p style="font-size: 11px; color: var(--text-secondary);">گفتگوها</p></div><button onclick="openUserSearch()" style="position:absolute;left:16px;top:50%;transform:translateY(-50%);background:none;border:none;color:var(--primary-light);cursor:pointer;font-size:20px;">🔍</button></div>
   <div class="chat-list" id="chats-list">
     <div class="chat-item" onclick="openChat('saved')"><div class="chat-avatar"><svg fill="currentColor" width="28" height="28" viewBox="0 0 24 24"><path d="M20 2H4c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h4l4 4 4-4h4c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2zm-8 14h-2v-2h2v2zm0-4h-2V6h2v6z"/></svg></div><div class="chat-info"><div class="chat-name">📝 پیام‌های ذخیره شده</div><div class="chat-lastmsg" id="saved-lastmsg">یادداشت‌های خود را اینجا بنویسید</div></div><div class="chat-time" id="saved-time">-</div></div>
     <div class="chat-item" onclick="openChat('ai')"><div class="chat-avatar"><svg fill="currentColor" width="28" height="28" viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 4c1.1 0 2 .9 2 2s-.9 2-2 2-2-.9-2-2 .9-2 2-2zm0 13c-2.33 0-4.31-1.46-5.11-3.5h10.22c-.8 2.04-2.78 3.5-5.11 3.5z"/></svg></div><div class="chat-info"><div class="chat-name">🤖 🤖 دستیار هوشمند</div><div class="chat-lastmsg" id="ai-lastmsg">سلام! چطور می‌تونم کمکت کنم؟</div></div><div class="chat-time" id="ai-time">-</div></div>
     <!-- چت گروهی عمومی - جایگزین ادمین -->
     <div class="chat-item" onclick="openChat('group')"><div class="chat-avatar"><svg fill="currentColor" width="28" height="28" viewBox="0 0 24 24"><path d="M16 11c1.66 0 2.99-1.34 2.99-3S17.66 5 16 5c-1.66 0-3 1.34-3 3s1.34 3 3 3zm-8 0c1.66 0 2.99-1.34 2.99-3S9.66 5 8 5C6.34 5 5 6.34 5 8s1.34 3 3 3zm0 2c-2.33 0-7 1.17-7 3.5V19h14v-2.5c0-2.33-4.67-3.5-7-3.5zm8 0c-.29 0-.62.02-.97.05 1.16.84 1.97 1.97 1.97 3.45V19h6v-2.5c0-2.33-4.67-3.5-7-3.5z"/></svg></div><div class="chat-info"><div class="chat-name">👥 گروه عمومی</div><div class="chat-lastmsg" id="group-lastmsg">به گروه خوش آمدید...</div></div><div style="display:flex;flex-direction:column;align-items:flex-end;gap:4px;"><div class="chat-time" id="group-time">-</div><div id="group-unread-badge" style="display:none;background:var(--danger);color:#fff;border-radius:999px;min-width:20px;height:20px;font-size:11px;display:none;align-items:center;justify-content:center;padding:0 6px;"></div></div></div>
+    <div id="dm-chats-list"></div>
   </div>
 </div>
+
+<!-- صفحه جستجوی کاربران -->
+<div class="page" id="user-search-page">
+  <div class="header"><button class="back-btn" onclick="closeUserSearch()">←</button><div class="header-center"><h1 style="font-size: 18px;">🔍 جستجوی کاربر</h1></div></div>
+  <div style="padding: 12px;"><input type="text" id="user-search-input" class="search-box" placeholder="نام کاربری را وارد کنید..." oninput="searchUsers()"></div>
+  <div id="user-search-results" style="padding: 0 12px;"></div>
+</div>
+
 
 <!-- صفحه گفتگوی چت -->
 <div class="page" id="chat-detail-page">
@@ -5776,37 +5785,70 @@ async function loadGroupMessages() {
     .eq('room', 'general')
     .order('id', { ascending: true });
   if (data) {
-    adminMessages = data.map(m => ({ sender: m.sender, text: m.text, time: m.time }));
+    adminMessages = data.map(m => ({ sender: m.sender, text: m.text, time: m.time, replyTo: m.reply_to || null }));
     displayChatMessages();
     updateChatList();
   }
 }
 
-async function sendToSupabase(text, senderName) {
-  if (!sb) {
-    adminMessages.push({ sender: senderName, text: text, time: getCurrentTime() });
-    displayChatMessages(); updateChatList();
-    return;
+function dmRoomId(u1, u2) {
+  return 'dm:' + [u1, u2].sort().join(':');
+}
+
+let dmMessages = {}; // { otherUsername: [msgs] }
+let dmUnread = {}; // { otherUsername: count }
+let currentDmUser = null;
+let knownDmUsers = JSON.parse(localStorage.getItem('knownDmUsers') || '[]');
+
+function saveKnownDmUsers() { localStorage.setItem('knownDmUsers', JSON.stringify(knownDmUsers)); }
+
+async function loadDmMessages(otherUser) {
+  currentDmUser = otherUser;
+  if (!sb) { dmMessages[otherUser] = dmMessages[otherUser] || []; displayChatMessages(); return; }
+  const room = dmRoomId(username, otherUser);
+  const { data } = await sb
+    .from('messages')
+    .select('*')
+    .eq('room', room)
+    .order('id', { ascending: true });
+  if (data) {
+    dmMessages[otherUser] = data.map(m => ({ sender: m.sender, text: m.text, time: m.time, replyTo: m.reply_to || null }));
+    displayChatMessages();
   }
+}
+
+async function sendToSupabase(text, senderName, replyText) {
   const time = getCurrentTime();
-  adminMessages.push({ sender: senderName, text: text, time: time });
+  const room = currentChatType === 'dm' ? dmRoomId(username, currentDmUser) : 'general';
+  const newMsg = { sender: senderName, text: text, time: time, replyTo: replyText || null };
+
+  if (currentChatType === 'dm') {
+    dmMessages[currentDmUser] = dmMessages[currentDmUser] || [];
+    dmMessages[currentDmUser].push(newMsg);
+    if (!knownDmUsers.includes(currentDmUser)) { knownDmUsers.push(currentDmUser); saveKnownDmUsers(); }
+  } else {
+    adminMessages.push(newMsg);
+  }
   displayChatMessages(); updateChatList();
-  await sb.from('messages').insert([{ sender: senderName, text: text, time: time, room: 'general' }]);
+
+  if (!sb) return;
+  await sb.from('messages').insert([{ sender: senderName, text: text, time: time, room: room, reply_to: replyText || null }]);
 }
 
 function subscribeToGeneralChat() {
   if (!sb) return;
   sb
-    .channel('general-room')
-    .on('postgres_changes', 
-      { event: 'INSERT', schema: 'public', table: 'messages', filter: 'room=eq.general' }, 
+    .channel('all-rooms')
+    .on('postgres_changes',
+      { event: 'INSERT', schema: 'public', table: 'messages' },
       (payload) => {
         const m = payload.new;
-        const exists = adminMessages.some(msg => 
-          msg.text === m.text && msg.time === m.time && msg.sender === m.sender
-        );
-        if (!exists) {
-          adminMessages.push({ sender: m.sender, text: m.text, time: m.time });
+        const msgObj = { sender: m.sender, text: m.text, time: m.time, replyTo: m.reply_to || null };
+
+        if (m.room === 'general') {
+          const exists = adminMessages.some(msg => msg.text === m.text && msg.time === m.time && msg.sender === m.sender);
+          if (exists) return;
+          adminMessages.push(msgObj);
           if (currentChatType === 'group') {
             displayChatMessages();
           } else if (m.sender !== username) {
@@ -5815,6 +5857,21 @@ function subscribeToGeneralChat() {
           }
           updateChatList();
           saveMessages();
+        } else if (m.room.startsWith('dm:')) {
+          const parts = m.room.replace('dm:', '').split(':');
+          if (!parts.includes(username)) return;
+          const otherUser = parts[0] === username ? parts[1] : parts[0];
+          if (!knownDmUsers.includes(otherUser)) { knownDmUsers.push(otherUser); saveKnownDmUsers(); }
+          dmMessages[otherUser] = dmMessages[otherUser] || [];
+          const exists = dmMessages[otherUser].some(msg => msg.text === m.text && msg.time === m.time && msg.sender === m.sender);
+          if (exists) return;
+          dmMessages[otherUser].push(msgObj);
+          if (currentChatType === 'dm' && currentDmUser === otherUser) {
+            displayChatMessages();
+          } else if (m.sender !== username) {
+            dmUnread[otherUser] = (dmUnread[otherUser] || 0) + 1;
+          }
+          updateChatList();
         }
       }
     )
@@ -5844,12 +5901,29 @@ function updateChatList() {
   document.getElementById('ai-time').innerHTML = getTime(aiMessages);
   document.getElementById('group-lastmsg').innerHTML = getLastMsg(adminMessages) || 'به گروه خوش آمدید...';
   document.getElementById('group-time').innerHTML = getTime(adminMessages);
+  renderDmList();
 }
+
+function renderDmList() {
+  const container = document.getElementById('dm-chats-list');
+  if (!container) return;
+  let html = '';
+  for (const u of knownDmUsers) {
+    const msgs = dmMessages[u] || [];
+    const last = msgs.length ? (msgs[msgs.length-1].text.length > 30 ? msgs[msgs.length-1].text.substring(0,30)+'...' : msgs[msgs.length-1].text) : 'گفتگو را شروع کنید';
+    const time = msgs.length ? msgs[msgs.length-1].time : '-';
+    const unread = dmUnread[u] || 0;
+    html += `<div class="chat-item" onclick="openDmChat('${escapeHtml(u)}')"><div class="chat-avatar">👤</div><div class="chat-info"><div class="chat-name">${escapeHtml(u)}</div><div class="chat-lastmsg">${escapeHtml(last)}</div></div><div style="display:flex;flex-direction:column;align-items:flex-end;gap:4px;"><div class="chat-time">${time}</div><div style="background:var(--danger);color:#fff;border-radius:999px;min-width:20px;height:20px;font-size:11px;${unread > 0 ? 'display:flex' : 'display:none'};align-items:center;justify-content:center;padding:0 6px;">${unread > 99 ? '99+' : unread}</div></div></div>`;
+  }
+  container.innerHTML = html;
+}
+
 function escapeHtml(t) { const d = document.createElement('div'); d.textContent = t; return d.innerHTML; }
 function getCurrentTime() { const n = new Date(); return `${n.getHours().toString().padStart(2,'0')}:${n.getMinutes().toString().padStart(2,'0')}`; }
 function getMessages() { 
   if (currentChatType === 'saved') return savedMessages; 
   if (currentChatType === 'ai') return aiMessages; 
+  if (currentChatType === 'dm') return dmMessages[currentDmUser] || [];
   return adminMessages; 
 }
 function displayChatMessages() {
@@ -5861,7 +5935,7 @@ function displayChatMessages() {
   if (!messages.length) html += '<div style="text-align: center; padding: 40px;">پیامی وجود ندارد</div>';
   else for (let i = 0; i < messages.length; i++) {
     const msg = messages[i];
-    const isMyMsg = (currentChatType === 'group') ? (msg.sender === username) : (msg.sender === 'user');
+    const isMyMsg = (currentChatType === 'group' || currentChatType === 'dm') ? (msg.sender === username) : (msg.sender === 'user');
     html += `<div class="message ${isMyMsg ? 'user' : 'bot'} ${selectedMessageIndex === i ? 'selected' : ''}" onclick="selectMessage(${i})">`;
     if (msg.replyTo) html += `<div class="reply-preview">↩️ پاسخ به: ${escapeHtml(msg.replyTo)}</div>`;
     if (currentChatType === 'group' && !isMyMsg) html += `<div style="font-size:11px;color:var(--primary-light);margin-bottom:4px;padding-right:4px;font-weight:bold;">👤 ${escapeHtml(msg.sender)}</div>`;
@@ -5897,8 +5971,10 @@ function sendChatMessage() {
   const input = document.getElementById('chat-detail-input');
   const text = input.value.trim();
   if (!text) return;
-  if (currentChatType === 'group') {
-    sendToSupabase(text, username || 'کاربر');
+  if (currentChatType === 'group' || currentChatType === 'dm') {
+    const replyText = replyToMessageData ? replyToMessageData.text : null;
+    sendToSupabase(text, username || 'کاربر', replyText);
+    if (replyToMessageData) cancelReply();
     input.value = '';
     return;
   }
@@ -5972,6 +6048,53 @@ function openChat(type) {
   document.querySelectorAll('.page').forEach(p => p.classList.remove('active')); 
   document.getElementById('chat-detail-page').classList.add('active'); 
 }
+
+function openDmChat(otherUser) {
+  currentChatType = 'dm';
+  currentDmUser = otherUser;
+  selectedMessageIndex = null;
+  document.getElementById('chat-detail-title').innerHTML = `👤 ${escapeHtml(otherUser)}`;
+  document.getElementById('chat-detail-sub').innerHTML = 'چت خصوصی';
+  dmUnread[otherUser] = 0;
+  updateChatList();
+  loadDmMessages(otherUser);
+  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+  document.getElementById('chat-detail-page').classList.add('active');
+}
+
+function openUserSearch() {
+  document.getElementById('user-search-input').value = '';
+  document.getElementById('user-search-results').innerHTML = '';
+  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+  document.getElementById('user-search-page').classList.add('active');
+}
+function closeUserSearch() {
+  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+  document.getElementById('chat-list-page').classList.add('active');
+}
+let userSearchTimeout = null;
+function searchUsers() {
+  clearTimeout(userSearchTimeout);
+  const term = document.getElementById('user-search-input').value.trim();
+  const resultsEl = document.getElementById('user-search-results');
+  if (!term) { resultsEl.innerHTML = ''; return; }
+  userSearchTimeout = setTimeout(async () => {
+    if (!sb) { resultsEl.innerHTML = '<div style="text-align:center;padding:20px;color:var(--text-secondary);">اتصال برقرار نیست</div>'; return; }
+    const { data } = await sb.from('users').select('username').ilike('username', `%${term}%`).limit(20);
+    if (!data || data.length === 0) { resultsEl.innerHTML = '<div style="text-align:center;padding:20px;color:var(--text-secondary);">کاربری پیدا نشد</div>'; return; }
+    let html = '';
+    for (const u of data) {
+      if (u.username === username) continue;
+      html += `<div class="chat-item" onclick="startDmFromSearch('${escapeHtml(u.username)}')"><div class="chat-avatar">👤</div><div class="chat-info"><div class="chat-name">${escapeHtml(u.username)}</div></div></div>`;
+    }
+    resultsEl.innerHTML = html || '<div style="text-align:center;padding:20px;color:var(--text-secondary);">کاربری پیدا نشد</div>';
+  }, 300);
+}
+function startDmFromSearch(otherUser) {
+  if (!knownDmUsers.includes(otherUser)) { knownDmUsers.push(otherUser); saveKnownDmUsers(); }
+  openDmChat(otherUser);
+}
+
 function goBackFromChat() { clearSelection(); document.querySelectorAll('.page').forEach(p => p.classList.remove('active')); document.getElementById('chat-list-page').classList.add('active'); document.getElementById('nav-chat').classList.add('active'); updateChatList(); }
 
 // ==================== متغیرهای اصلی ====================
