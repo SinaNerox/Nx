@@ -5774,6 +5774,38 @@ function startApp(uname) {
   }
   loadProfile(uname);
   updateProfilesList();
+  discoverDmConversations();
+}
+
+async function discoverDmConversations() {
+  if (!sb || !username) return;
+  // همه ردیف‌هایی که room شون با dm: شروع میشه و شامل username ماست
+  const { data } = await sb
+    .from('messages')
+    .select('room')
+    .like('room', 'dm:%');
+  if (!data) return;
+  let changed = false;
+  for (const row of data) {
+    const parts = row.room.replace('dm:', '').split(':');
+    if (!parts.includes(username)) continue;
+    const otherUser = parts[0] === username ? parts[1] : parts[0];
+    if (otherUser && !knownDmUsers.includes(otherUser)) {
+      knownDmUsers.push(otherUser);
+      changed = true;
+    }
+  }
+  if (changed) { saveKnownDmUsers(); await preloadDmPreviews(); updateChatList(); }
+}
+
+async function preloadDmPreviews() {
+  if (!sb) return;
+  for (const u of knownDmUsers) {
+    if (dmMessages[u]) continue; // قبلاً لود شده
+    const room = dmRoomId(username, u);
+    const { data } = await sb.from('messages').select('*').eq('room', room).order('id', { ascending: true });
+    if (data) dmMessages[u] = data.map(m => ({ sender: m.sender, text: m.text, time: m.time, replyTo: m.reply_to || null }));
+  }
 }
 
 
