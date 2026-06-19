@@ -139,7 +139,7 @@
     .quiz-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.92); z-index: 1000; display: flex; align-items: center; justify-content: center; padding: 20px; }
     .quiz-box { background: var(--bg-secondary); border-radius: 20px; padding: 24px; width: 100%; max-width: 400px; border: 1px solid var(--primary); }
     
-    .chat-messages-container { flex: 1; overflow-y: auto; padding: 12px; display: flex; flex-direction: column; gap: 8px; height: calc(100vh - 180px); }
+    .chat-messages-container { flex: 1; overflow-y: auto; padding: 12px; padding-bottom: 90px; display: flex; flex-direction: column; gap: 8px; height: calc(100vh - 180px); }
     .message { max-width: 80%; margin-bottom: 8px; position: relative; cursor: pointer; transition: all 0.2s; }
     .message.selected { opacity: 0.7; background: rgba(124, 58, 237, 0.2); border-radius: 18px; }
     .message.user { align-self: flex-end; }
@@ -367,7 +367,7 @@
   <div id="pinned-area" style="padding: 8px;"></div>
   <div id="reply-bar" class="reply-bar"><span class="reply-text" id="reply-text"></span><button class="cancel-reply" onclick="cancelReply()">✖️</button></div>
   <div id="chat-detail-messages" class="chat-messages-container"></div>
-  <div class="chat-input-container"><button onclick="toggleEmojiPicker()" style="background: none; border: none; color: var(--text-secondary); cursor: pointer; font-size: 24px;">😊</button><input type="text" id="chat-detail-input" class="chat-input" placeholder="پیام خود را بنویسید..." onkeypress="if(event.key==='Enter') sendChatMessage()"><button class="send-btn" onclick="sendChatMessage()">📤</button></div>
+  <div class="chat-input-container"><button onclick="toggleEmojiPicker()" style="background: none; border: none; color: var(--text-secondary); cursor: pointer; font-size: 24px;">😊</button><input type="text" id="chat-detail-input" class="chat-input" placeholder="پیام خود را بنویسید..." onkeypress="if(event.key==='Enter') sendChatMessage()" onfocus="setTimeout(()=>{const c=document.getElementById('chat-detail-messages'); if(c) c.scrollTop = c.scrollHeight;}, 300)"><button class="send-btn" onclick="sendChatMessage()">📤</button></div>
   <div id="emoji-picker" class="emoji-picker"><div class="emoji-item" onclick="addEmoji('😀')">😀</div><div class="emoji-item" onclick="addEmoji('😂')">😂</div><div class="emoji-item" onclick="addEmoji('❤️')">❤️</div><div class="emoji-item" onclick="addEmoji('👍')">👍</div><div class="emoji-item" onclick="addEmoji('🎉')">🎉</div><div class="emoji-item" onclick="addEmoji('🔥')">🔥</div><div class="emoji-item" onclick="addEmoji('✅')">✅</div><div class="emoji-item" onclick="addEmoji('⭐')">⭐</div><div class="emoji-item" onclick="addEmoji('💡')">💡</div><div class="emoji-item" onclick="addEmoji('📚')">📚</div><div class="emoji-item" onclick="addEmoji('💻')">💻</div><div class="emoji-item" onclick="addEmoji('🐍')">🐍</div></div>
   <div id="action-menu" class="action-menu"><button class="action-btn" onclick="copyMessage()">📋 کپی</button><button class="action-btn" onclick="pinSelectedMessage()">📌 پین</button><button class="action-btn" onclick="forwardSelectedMessage()">📤 فوروارد</button><button class="action-btn" onclick="replyToMessage()">↩️ پاسخ</button><button class="action-btn" onclick="deleteSelectedMessage()">🗑️ حذف</button><button class="action-btn" onclick="editSelectedMessage()">✏️ ویرایش</button><button class="action-btn" onclick="clearSelection()">❌ لغو</button></div>
   <div id="editPanel" class="edit-panel"><div style="display: flex; gap: 12px;"><input type="text" id="editInput" class="edit-input" placeholder="متن جدید را وارد کنید..."><button onclick="saveEditedMessage()" class="btn-primary" style="width: auto; margin-top: 0;">ذخیره</button><button onclick="closeEditPanel()" class="btn-secondary" style="width: auto; margin-top: 0;">انصراف</button></div></div>
@@ -5974,7 +5974,8 @@ function displayChatMessages() {
     html += `<div class="message-bubble">${escapeHtml(msg.text)}</div><span class="message-time">${msg.time}</span></div>`;
   }
   container.innerHTML = html;
-  container.scrollTop = container.scrollHeight;
+  requestAnimationFrame(() => { container.scrollTop = container.scrollHeight; });
+  setTimeout(() => { container.scrollTop = container.scrollHeight; }, 100);
 }
 function selectMessage(i) { if (selectedMessageIndex === i) clearSelection(); else { selectedMessageIndex = i; displayChatMessages(); document.getElementById('action-menu').style.display = 'flex'; } }
 function clearSelection() { selectedMessageIndex = null; displayChatMessages(); document.getElementById('action-menu').style.display = 'none'; }
