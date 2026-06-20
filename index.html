@@ -153,6 +153,9 @@
     .action-menu { position: fixed; top: 70px; left: 0; right: 0; background: var(--bg-secondary); border-bottom: 1px solid var(--primary); padding: 8px 12px; display: none; z-index: 150; justify-content: center; gap: 16px; flex-wrap: wrap; }
     .action-btn { background: none; border: none; color: var(--text-secondary); padding: 6px 12px; border-radius: 20px; cursor: pointer; display: flex; align-items: center; gap: 6px; font-size: 12px; }
     .action-btn:hover { background: var(--border); color: var(--primary); }
+    .admin-tab { background: var(--bg-secondary); color: var(--text-secondary); }
+    .admin-tab.active { background: var(--primary); color: #fff; }
+    .admin-badge { display:inline-flex; align-items:center; justify-content:center; vertical-align:middle; }
     
     .reply-bar { position: fixed; bottom: 130px; left: 12px; right: 12px; background: var(--bg-secondary); border-radius: 12px; padding: 8px 12px; display: none; z-index: 150; border: 1px solid var(--primary); margin-bottom: 8px; }
     .reply-text { font-size: 12px; color: var(--primary-light); }
@@ -346,7 +349,17 @@
 <!-- صفحه پنل ادمین -->
 <div class="page" id="admin-panel-page">
   <div class="header"><button class="back-btn" onclick="navigateTo('profile')">←</button><div class="header-center"><h1 style="font-size: 18px;">🛡 پنل ادمین</h1><p style="font-size: 11px; color: var(--text-secondary);">دسترسی به همه‌ی گفتگوها</p></div><button onclick="loadAllRoomsForAdmin()" style="background:none;border:none;color:var(--primary-light);cursor:pointer;display:flex;align-items:center;"><svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M23 4v6h-6"/><path d="M1 20v-6h6"/><path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"/></svg></button></div>
-  <div id="admin-rooms-list" style="padding: 12px;"></div>
+  <div style="padding: 10px 12px 0;">
+    <div style="position:relative;">
+      <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="position:absolute; right:12px; top:50%; transform:translateY(-50%); color:var(--text-secondary);"><circle cx="11" cy="11" r="8"/><path d="M21 21l-4.35-4.35"/></svg>
+      <input type="text" id="admin-search-input" placeholder="جستجو در گفتگوها یا کاربران..." oninput="filterAdminRooms()" style="width:100%; padding:10px 38px 10px 12px; border-radius:10px; border:1px solid var(--border); background:var(--bg-secondary); color:var(--text-primary); font-size:13px;">
+    </div>
+  </div>
+  <div style="display:flex; gap:8px; padding:12px;">
+    <button id="admin-tab-groups" class="admin-tab active" onclick="switchAdminTab('groups')" style="flex:1; padding:9px; border-radius:10px; border:none; cursor:pointer; font-size:13px;">👥 گروه‌ها و کانال‌ها</button>
+    <button id="admin-tab-dms" class="admin-tab" onclick="switchAdminTab('dms')" style="flex:1; padding:9px; border-radius:10px; border:none; cursor:pointer; font-size:13px;">💬 پیوی‌ها</button>
+  </div>
+  <div id="admin-rooms-list" style="padding: 0 12px 12px;"></div>
 </div>
 
 <!-- صفحه لیست چت‌ها -->
@@ -5960,10 +5973,17 @@ async function loadGroupMessages() {
 }
 
 // ==================== پنل ادمین ====================
+let adminRoomsCache = {};
+let adminCurrentTab = 'groups';
+
 async function openAdminPanel() {
   if (!isAdmin) return;
   navigateTo('admin-panel');
   await loadAllRoomsForAdmin();
+}
+
+function roomLabel(room) {
+  return room === 'general' ? '👥 گروه عمومی' : (room.startsWith('dm:') ? '💬 ' + room.replace('dm:', '').replace(':', ' ↔ ') : '📢 ' + room);
 }
 
 async function loadAllRoomsForAdmin() {
@@ -5973,25 +5993,51 @@ async function loadAllRoomsForAdmin() {
   if (!sb) return;
   const { data, error } = await sb.from('messages').select('room,sender,text,time').order('id', { ascending: false });
   if (error) { list.innerHTML = '<div style="text-align:center;padding:20px;color:var(--danger);">خطا در دریافت اطلاعات</div>'; return; }
-  const rooms = {};
-  for (const m of data) { if (!rooms[m.room]) rooms[m.room] = m; } // اولین مورد = آخرین پیام چون نزولی مرتب شده
-  const roomKeys = Object.keys(rooms);
-  if (!roomKeys.length) { list.innerHTML = '<div style="text-align:center;padding:20px;color:var(--text-secondary);">هیچ گفتگویی وجود ندارد</div>'; return; }
+  adminRoomsCache = {};
+  for (const m of data) { if (!adminRoomsCache[m.room]) adminRoomsCache[m.room] = m; } // اولین مورد = آخرین پیام چون نزولی مرتب شده
+  renderAdminRoomsList();
+}
+
+function switchAdminTab(tab) {
+  adminCurrentTab = tab;
+  document.getElementById('admin-tab-groups').classList.toggle('active', tab === 'groups');
+  document.getElementById('admin-tab-dms').classList.toggle('active', tab === 'dms');
+  renderAdminRoomsList();
+}
+
+function filterAdminRooms() { renderAdminRoomsList(); }
+
+function renderAdminRoomsList() {
+  const list = document.getElementById('admin-rooms-list');
+  if (!list) return;
+  const query = (document.getElementById('admin-search-input')?.value || '').trim().toLowerCase();
+  let roomKeys = Object.keys(adminRoomsCache).filter(room => adminCurrentTab === 'dms' ? room.startsWith('dm:') : !room.startsWith('dm:'));
+  if (query) {
+    roomKeys = roomKeys.filter(room => {
+      const last = adminRoomsCache[room];
+      return roomLabel(room).toLowerCase().includes(query) || room.toLowerCase().includes(query) || (last.sender || '').toLowerCase().includes(query) || (last.text || '').toLowerCase().includes(query);
+    });
+  }
+  if (!roomKeys.length) { list.innerHTML = `<div style="text-align:center;padding:30px;color:var(--text-secondary);">${query ? 'چیزی پیدا نشد' : 'هیچ گفتگویی وجود ندارد'}</div>`; return; }
   let html = '';
   for (const room of roomKeys) {
-    const last = rooms[room];
-    let label = room === 'general' ? '👥 گروه عمومی' : '💬 ' + room.replace('dm:', '').replace(':', ' ↔ ');
-    html += `<div class="chat-item" onclick="openAdminRoom('${room.replace(/'/g, "\\'")}')"><div class="chat-item-info"><h4>${escapeHtml(label)}</h4><p>${escapeHtml(last.sender)}: ${escapeHtml(last.text.substring(0,40))}</p></div></div>`;
+    const last = adminRoomsCache[room];
+    const senderBadge = last.sender === ADMIN_USERNAME ? adminBadgeHtml(12) : '';
+    html += `<div class="chat-item" onclick="openAdminRoom('${room.replace(/'/g, "\\'")}')"><div class="chat-item-info"><h4>${escapeHtml(roomLabel(room))}</h4><p>${escapeHtml(last.sender)}${senderBadge} : ${escapeHtml(last.text.substring(0,40))}</p></div></div>`;
   }
   list.innerHTML = html;
+}
+
+function adminBadgeHtml(size) {
+  size = size || 13;
+  return `<svg class="admin-badge" width="${size}" height="${size}" viewBox="0 0 24 24" fill="#3b9eff" style="margin:0 3px; vertical-align:middle;"><path d="M12 2l2.4 1.7 2.9-.5 1.1 2.7 2.7 1.1-.5 2.9L22.3 12l-1.7 2.4.5 2.9-2.7 1.1-1.1 2.7-2.9-.5L12 22l-2.4-1.7-2.9.5-1.1-2.7-2.7-1.1.5-2.9L1.7 12l1.7-2.4-.5-2.9 2.7-1.1 1.1-2.7 2.9.5z"/><path d="M9 12l2 2 4-4" stroke="#fff" stroke-width="1.6" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg>`;
 }
 
 function openAdminRoom(room) {
   currentChatType = 'admin-view';
   currentAdminRoom = room;
   selectedMessageIndex = null;
-  let label = room === 'general' ? '👥 گروه عمومی' : '💬 ' + room.replace('dm:', '').replace(':', ' ↔ ');
-  document.getElementById('chat-detail-title').innerHTML = escapeHtml(label);
+  document.getElementById('chat-detail-title').innerHTML = escapeHtml(roomLabel(room));
   document.getElementById('chat-detail-sub').innerHTML = 'حالت ادمین (دسترسی کامل)';
   loadAdminRoomMessages(room);
   document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
@@ -6188,7 +6234,7 @@ function renderDmList() {
     const last = msgs.length ? (msgs[msgs.length-1].text.length > 30 ? msgs[msgs.length-1].text.substring(0,30)+'...' : msgs[msgs.length-1].text) : 'گفتگو را شروع کنید';
     const time = msgs.length ? msgs[msgs.length-1].time : '-';
     const unread = dmUnread[u] || 0;
-    html += `<div class="chat-item" onclick="openDmChat('${escapeHtml(u)}')"><div class="chat-avatar">👤</div><div class="chat-info"><div class="chat-name">${escapeHtml(u)}</div><div class="chat-lastmsg">${escapeHtml(last)}</div></div><div style="display:flex;flex-direction:column;align-items:flex-end;gap:4px;"><div class="chat-time">${time}</div><div style="background:var(--danger);color:#fff;border-radius:999px;min-width:20px;height:20px;font-size:11px;${unread > 0 ? 'display:flex' : 'display:none'};align-items:center;justify-content:center;padding:0 6px;">${unread > 99 ? '99+' : unread}</div></div></div>`;
+    html += `<div class="chat-item" onclick="openDmChat('${escapeHtml(u)}')"><div class="chat-avatar">👤</div><div class="chat-info"><div class="chat-name">${escapeHtml(u)}${u === ADMIN_USERNAME ? adminBadgeHtml(13) : ''}</div><div class="chat-lastmsg">${escapeHtml(last)}</div></div><div style="display:flex;flex-direction:column;align-items:flex-end;gap:4px;"><div class="chat-time">${time}</div><div style="background:var(--danger);color:#fff;border-radius:999px;min-width:20px;height:20px;font-size:11px;${unread > 0 ? 'display:flex' : 'display:none'};align-items:center;justify-content:center;padding:0 6px;">${unread > 99 ? '99+' : unread}</div></div></div>`;
   }
   container.innerHTML = html;
 }
@@ -6215,7 +6261,8 @@ function displayChatMessages() {
     const isMyMsg = (currentChatType === 'group' || currentChatType === 'dm' || currentChatType === 'admin-view') ? (msg.sender === username) : (msg.sender === 'user');
     html += `<div class="message ${isMyMsg ? 'user' : 'bot'} ${selectedMessageIndex === i ? 'selected' : ''}" onclick="selectMessage(${i})">`;
     if (msg.replyTo) html += `<div class="reply-preview">↩️ پاسخ به: ${escapeHtml(msg.replyTo)}</div>`;
-    if ((currentChatType === 'group' || currentChatType === 'admin-view') && !isMyMsg) html += `<div style="font-size:11px;color:var(--primary-light);margin-bottom:4px;padding-right:4px;font-weight:bold;">👤 ${escapeHtml(msg.sender)}</div>`;
+    if ((currentChatType === 'group' || currentChatType === 'admin-view') && !isMyMsg) html += `<div style="font-size:11px;color:var(--primary-light);margin-bottom:4px;padding-right:4px;font-weight:bold;">👤 ${escapeHtml(msg.sender)}${msg.sender === ADMIN_USERNAME ? adminBadgeHtml(13) : ''}</div>`;
+    else if (currentChatType === 'dm' && !isMyMsg && msg.sender === ADMIN_USERNAME) html += `<div style="font-size:11px;color:var(--primary-light);margin-bottom:4px;padding-right:4px;font-weight:bold;">🛡️ ادمین${adminBadgeHtml(13)}</div>`;
     html += `<div class="message-bubble">${escapeHtml(msg.text)}</div><span class="message-time">${msg.time}</span></div>`;
   }
   container.innerHTML = html;
