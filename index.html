@@ -267,6 +267,9 @@
         <span id="auth-switch-text">حساب نداری؟</span>
         <a href="#" onclick="toggleAuthMode(); return false;" style="color: var(--primary-light);" id="auth-switch-link">ثبت‌نام کن</a>
       </p>
+      <div style="text-align: center; margin-top: 14px; border-top: 1px solid var(--border); padding-top: 14px;">
+        <a href="#" onclick="enterGuestMode(); return false;" style="color: var(--text-secondary); font-size: 13px; display:inline-flex; align-items:center; gap:6px;"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg> ورود به‌عنوان مهمان (بدون ثبت‌نام)</a>
+      </div>
     </div>
   </div>
 </div>
@@ -340,7 +343,7 @@
 
 <!-- صفحه لیست چت‌ها -->
 <div class="page" id="chat-list-page">
-  <div class="header" style="position:relative;"><div class="header-center"><h1 style="font-size: 18px;">💬 پیام‌ها</h1><p style="font-size: 11px; color: var(--text-secondary);">گفتگوها</p></div><div style="position:absolute;left:16px;top:50%;transform:translateY(-50%);display:flex;gap:10px;"><button onclick="refreshChatList()" style="background:none;border:none;color:var(--primary-light);cursor:pointer;font-size:18px;">🔄</button><button onclick="openUserSearch()" style="background:none;border:none;color:var(--primary-light);cursor:pointer;font-size:20px;">🔍</button></div></div>
+  <div class="header" style="position:relative;"><div class="header-center"><h1 style="font-size: 18px;">💬 پیام‌ها</h1><p style="font-size: 11px; color: var(--text-secondary);">گفتگوها</p></div><div style="position:absolute;left:16px;top:50%;transform:translateY(-50%);display:flex;gap:14px;"><button onclick="refreshChatList()" style="background:none;border:none;color:var(--primary-light);cursor:pointer;display:flex;align-items:center;"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M23 4v6h-6"/><path d="M1 20v-6h6"/><path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"/></svg></button><button onclick="openUserSearch()" style="background:none;border:none;color:var(--primary-light);cursor:pointer;display:flex;align-items:center;"><svg width="21" height="21" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><path d="M21 21l-4.35-4.35"/></svg></button></div></div>
   <div class="chat-list" id="chats-list">
     <div class="chat-item" onclick="openChat('saved')"><div class="chat-avatar"><svg fill="currentColor" width="28" height="28" viewBox="0 0 24 24"><path d="M20 2H4c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h4l4 4 4-4h4c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2zm-8 14h-2v-2h2v2zm0-4h-2V6h2v6z"/></svg></div><div class="chat-info"><div class="chat-name">📝 پیام‌های ذخیره شده</div><div class="chat-lastmsg" id="saved-lastmsg">یادداشت‌های خود را اینجا بنویسید</div></div><div class="chat-time" id="saved-time">-</div></div>
     <div class="chat-item" onclick="openChat('ai')"><div class="chat-avatar"><svg fill="currentColor" width="28" height="28" viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 4c1.1 0 2 .9 2 2s-.9 2-2 2-2-.9-2-2 .9-2 2-2zm0 13c-2.33 0-4.31-1.46-5.11-3.5h10.22c-.8 2.04-2.78 3.5-5.11 3.5z"/></svg></div><div class="chat-info"><div class="chat-name">🤖 🤖 دستیار هوشمند</div><div class="chat-lastmsg" id="ai-lastmsg">سلام! چطور می‌تونم کمکت کنم؟</div></div><div class="chat-time" id="ai-time">-</div></div>
@@ -360,7 +363,7 @@
 
 <!-- صفحه گفتگوی چت -->
 <div class="page" id="chat-detail-page">
-  <div class="header"><button class="back-btn" onclick="goBackFromChat()">←</button><div class="header-center"><h1 id="chat-detail-title" style="font-size: 18px;"></h1><p id="chat-detail-sub" style="font-size: 11px; color: var(--text-secondary);"></p></div><div style="display: flex; gap: 8px;"><button onclick="refreshCurrentChat()" style="background: none; border: none; color: var(--text-secondary); cursor: pointer; font-size: 18px;">🔄</button><button onclick="toggleSearch()" style="background: none; border: none; color: var(--text-secondary); cursor: pointer; font-size: 18px;">🔍</button><button class="clear-chat" onclick="clearCurrentChat()" style="background: none; border: none; color: var(--danger); cursor: pointer; font-size: 18px;">🗑️</button></div></div>
+  <div class="header"><button class="back-btn" onclick="goBackFromChat()">←</button><div class="header-center"><h1 id="chat-detail-title" style="font-size: 18px;"></h1><p id="chat-detail-sub" style="font-size: 11px; color: var(--text-secondary);"></p></div><div style="display: flex; gap: 12px; align-items:center;"><button onclick="refreshCurrentChat()" style="background: none; border: none; color: var(--text-secondary); cursor: pointer; display:flex; align-items:center;"><svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M23 4v6h-6"/><path d="M1 20v-6h6"/><path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"/></svg></button><button onclick="toggleSearch()" style="background: none; border: none; color: var(--text-secondary); cursor: pointer; display:flex; align-items:center;"><svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><path d="M21 21l-4.35-4.35"/></svg></button><button class="clear-chat" onclick="clearCurrentChat()" style="background: none; border: none; color: var(--danger); cursor: pointer; display:flex; align-items:center;"><svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 6h18"/><path d="M8 6V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/><path d="M10 11v6"/><path d="M14 11v6"/></svg></button></div></div>
   <div id="search-area" style="padding: 8px; display: none;"><input type="text" id="search-input" class="search-box" placeholder="جستجو در پیام‌ها..." onkeyup="searchMessages()"></div>
   <div id="pinned-area" style="padding: 8px;"></div>
   <div id="reply-bar" class="reply-bar"><span class="reply-text" id="reply-text"></span><button class="cancel-reply" onclick="cancelReply()">✖️</button></div>
@@ -412,6 +415,17 @@
   <button class="nav-item" id="nav-editor" onclick="navigateTo('editor')"><span class="nav-icon"><svg fill="currentColor" viewBox="0 0 24 24"><path d="M3 17.25V21h3.75L17.81 9.94l-3.75-3.75L3 17.25zM20.71 5.63l-2.34-2.34a1 1 0 0 0-1.41 0l-1.83 1.83 3.75 3.75 1.83-1.83a1 1 0 0 0 0-1.41z"/></svg></span>ادیتور</button>
   <button class="nav-item" id="nav-chat" onclick="navigateTo('chat-list')"><span class="nav-icon"><svg fill="currentColor" viewBox="0 0 24 24"><path d="M20 2H4c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h4l4 4 4-4h4c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2z"/></svg></span>پیام</button>
   <button class="nav-item" id="nav-profile" onclick="navigateTo('profile')"><span class="nav-icon"><svg fill="currentColor" viewBox="0 0 24 24"><path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/></svg></span>پروفایل</button>
+</div>
+
+<!-- صفحه قفل برای مهمان -->
+<div id="guest-lock-page" style="display:none; position:fixed; inset:0; z-index:9999; background:var(--bg-primary, #11121a); align-items:center; justify-content:center; flex-direction:column; padding:24px; text-align:center;">
+  <div style="width:84px; height:84px; border-radius:50%; background:var(--primary, #6c5ce7); display:flex; align-items:center; justify-content:center; margin-bottom:22px;">
+    <svg width="38" height="38" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+  </div>
+  <h2 id="guest-lock-title" style="margin-bottom:10px; font-size:19px;">برای ادامه باید ثبت‌نام کنی</h2>
+  <p id="guest-lock-desc" style="color: var(--text-secondary); font-size:14px; max-width:320px; line-height:1.8; margin-bottom:28px;"></p>
+  <button class="btn-primary" onclick="confirmSignupFromLock()" style="width:100%; max-width:280px; margin-bottom:10px;">ثبت‌نام رایگان</button>
+  <button onclick="closeGuestLock()" style="width:100%; max-width:280px; background:none; border:1px solid var(--border); color:var(--text-secondary); padding:12px; border-radius:10px; cursor:pointer;">بازگشت</button>
 </div>
 
 <script>
@@ -5719,6 +5733,7 @@ window.addEventListener('load', () => {
 // ==================== Authentication ====================
 let authMode = 'login'; // یا 'signup'
 let unreadGroupCount = 0;
+let isGuest = false;
 
 function toggleAuthMode() {
   authMode = authMode === 'login' ? 'signup' : 'login';
@@ -5727,6 +5742,43 @@ function toggleAuthMode() {
   document.getElementById('auth-switch-text').innerText = authMode === 'login' ? 'حساب نداری؟' : 'حساب داری؟';
   document.getElementById('auth-switch-link').innerText = authMode === 'login' ? 'ثبت‌نام کن' : 'وارد شو';
   document.getElementById('auth-error').style.display = 'none';
+}
+
+function enterGuestMode() {
+  isGuest = true;
+  username = 'مهمان';
+  document.getElementById('auth-page').classList.remove('active');
+  document.getElementById('auth-page').style.display = 'none';
+  document.querySelector('.bottom-nav').style.display = 'flex';
+  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+  document.getElementById('home-page').classList.add('active');
+  document.getElementById('nav-home').classList.add('active');
+  updateUI();
+}
+
+function requireSignup(featureName) {
+  document.getElementById('guest-lock-desc').innerText = `برای استفاده از «${featureName}» باید یک حساب کاربری رایگان بسازی یا وارد حساب موجودت بشی.`;
+  document.getElementById('guest-lock-page').style.display = 'flex';
+}
+
+function closeGuestLock() {
+  document.getElementById('guest-lock-page').style.display = 'none';
+}
+
+function confirmSignupFromLock() {
+  closeGuestLock();
+  exitGuestMode(true);
+}
+
+function exitGuestMode(goToSignup) {
+  isGuest = false;
+  username = 'کاربر';
+  stopChatPolling();
+  document.querySelector('.bottom-nav').style.display = 'none';
+  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+  document.getElementById('auth-page').classList.add('active');
+  document.getElementById('auth-page').style.display = 'flex';
+  if (goToSignup && authMode !== 'signup') toggleAuthMode();
 }
 
 function showAuthError(msg) {
@@ -5777,6 +5829,11 @@ function checkAuthSession() {
 }
 
 function logout() {
+  if (isGuest) {
+    if (!confirm('از حالت مهمان خارج شوید؟')) return;
+    exitGuestMode(false);
+    return;
+  }
   if (!confirm('از حساب خارج شوید؟')) return;
   localStorage.removeItem('authUser');
   location.reload();
@@ -6312,6 +6369,7 @@ function showXPPopup(amount) { const p = document.createElement('div'); p.innerH
 let timerInterval = null, currentLessonId = '', currentLang = '', pendingComplete = null, activeQuizOverlay = false, currentQuizIndex = 0, quizAnswers = [];
 function stopTimer() { if (timerInterval) { clearInterval(timerInterval); timerInterval = null; } }
 function navigateTo(page) {
+  if (page === 'chat-list' && isGuest) { requireSignup('بخش پیام‌ها'); return; }
   stopTimer(); stopChatPolling(); clearSelection(); document.querySelectorAll('.page').forEach(p => p.classList.remove('active')); document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
   if (page === 'chat-list') { document.getElementById('chat-list-page').classList.add('active'); document.getElementById('nav-chat').classList.add('active'); updateChatList(); }
   else if (page === 'quiz') { document.getElementById('quiz-page').classList.add('active'); document.getElementById('nav-quiz').classList.add('active'); hearts = 5; updateHeartsDisplay(); }
@@ -6327,6 +6385,7 @@ function openLanguage(lang) {
   document.getElementById('lessons-list').innerHTML = html; document.querySelectorAll('.page').forEach(p => p.classList.remove('active')); document.getElementById('lessons-page').classList.add('active');
 }
 function openLesson(id, xpAmt) {
+  if (isGuest) { requireSignup('مشاهده محتوای درس'); return; }
   currentLessonId = id; pendingComplete = xpAmt;
   const lesson = languagesData[currentLang].lessons.find(l=>l.id===id);
   document.getElementById('lesson-title').innerHTML = lesson.title;
@@ -6361,7 +6420,7 @@ function checkLessonAnswer(el, sel, correct, already, mins) {
   document.getElementById('quizResult').style.display = 'block';
 }
 function closeQuizOverlay() { document.querySelector('.quiz-overlay')?.remove(); activeQuizOverlay = false; currentLessonId = ''; pendingComplete = null; goBack(); }
-function startQuiz() { hearts = 5; updateHeartsDisplay(); currentQuizIndex = 0; quizAnswers = new Array(quickQuizzes.length).fill(null); navigateTo('quiz'); renderQuiz(); }
+function startQuiz() { if (isGuest) { requireSignup('تمرین‌ها'); return; } hearts = 5; updateHeartsDisplay(); currentQuizIndex = 0; quizAnswers = new Array(quickQuizzes.length).fill(null); navigateTo('quiz'); renderQuiz(); }
 function renderQuiz() {
   const q = quickQuizzes[currentQuizIndex];
   document.getElementById('quiz-counter').innerHTML = `سوال ${currentQuizIndex+1} از ${quickQuizzes.length}`;
