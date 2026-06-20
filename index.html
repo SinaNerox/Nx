@@ -370,7 +370,15 @@
   <div id="chat-detail-messages" class="chat-messages-container"></div>
   <div class="chat-input-container"><button onclick="toggleEmojiPicker()" style="background: none; border: none; color: var(--text-secondary); cursor: pointer; font-size: 24px;">😊</button><input type="text" id="chat-detail-input" class="chat-input" placeholder="پیام خود را بنویسید..." onkeypress="if(event.key==='Enter') sendChatMessage()" onfocus="setTimeout(()=>{const c=document.getElementById('chat-detail-messages'); if(c) c.scrollTop = c.scrollHeight;}, 300)"><button class="send-btn" onclick="sendChatMessage()">📤</button></div>
   <div id="emoji-picker" class="emoji-picker"><div class="emoji-item" onclick="addEmoji('😀')">😀</div><div class="emoji-item" onclick="addEmoji('😂')">😂</div><div class="emoji-item" onclick="addEmoji('❤️')">❤️</div><div class="emoji-item" onclick="addEmoji('👍')">👍</div><div class="emoji-item" onclick="addEmoji('🎉')">🎉</div><div class="emoji-item" onclick="addEmoji('🔥')">🔥</div><div class="emoji-item" onclick="addEmoji('✅')">✅</div><div class="emoji-item" onclick="addEmoji('⭐')">⭐</div><div class="emoji-item" onclick="addEmoji('💡')">💡</div><div class="emoji-item" onclick="addEmoji('📚')">📚</div><div class="emoji-item" onclick="addEmoji('💻')">💻</div><div class="emoji-item" onclick="addEmoji('🐍')">🐍</div></div>
-  <div id="action-menu" class="action-menu"><button class="action-btn" onclick="copyMessage()">📋 کپی</button><button class="action-btn" onclick="pinSelectedMessage()">📌 پین</button><button class="action-btn" onclick="forwardSelectedMessage()">📤 فوروارد</button><button class="action-btn" onclick="replyToMessage()">↩️ پاسخ</button><button class="action-btn" onclick="deleteSelectedMessage()">🗑️ حذف</button><button class="action-btn" onclick="editSelectedMessage()">✏️ ویرایش</button><button class="action-btn" onclick="clearSelection()">❌ لغو</button></div>
+  <div id="action-menu" class="action-menu">
+    <button class="action-btn" onclick="copyMessage()" title="کپی"><svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg></button>
+    <button class="action-btn" onclick="pinSelectedMessage()" title="پین"><svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 17v5"/><path d="M9 10.76a2 2 0 0 1-1.11 1.79l-1.78.9A2 2 0 0 0 5 15.24V17h14v-1.76a2 2 0 0 0-1.11-1.79l-1.78-.9A2 2 0 0 1 15 10.76V7a1 1 0 0 1 1-1 2 2 0 0 0 0-4H8a2 2 0 0 0 0 4 1 1 0 0 1 1 1z"/></svg></button>
+    <button class="action-btn" onclick="forwardSelectedMessage()" title="فوروارد"><svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 17l5-5-5-5"/><path d="M4 18v-2a4 4 0 0 1 4-4h12"/></svg></button>
+    <button class="action-btn" onclick="replyToMessage()" title="پاسخ"><svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 17l-5-5 5-5"/><path d="M20 18v-2a4 4 0 0 0-4-4H4"/></svg></button>
+    <button class="action-btn" onclick="deleteSelectedMessage()" title="حذف"><svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 6h18"/><path d="M8 6V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/><path d="M10 11v6"/><path d="M14 11v6"/></svg></button>
+    <button class="action-btn" onclick="editSelectedMessage()" title="ویرایش"><svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.12 2.12 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg></button>
+    <button class="action-btn" onclick="clearSelection()" title="لغو"><svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 6L6 18"/><path d="M6 6l12 12"/></svg></button>
+  </div>
   <div id="editPanel" class="edit-panel"><div style="display: flex; gap: 12px;"><input type="text" id="editInput" class="edit-input" placeholder="متن جدید را وارد کنید..."><button onclick="saveEditedMessage()" class="btn-primary" style="width: auto; margin-top: 0;">ذخیره</button><button onclick="closeEditPanel()" class="btn-secondary" style="width: auto; margin-top: 0;">انصراف</button></div></div>
   <div id="forward-panel" class="edit-panel" style="display: none;"><div style="padding: 8px;"><p>انتخاب مقصد:</p><div class="forward-option" onclick="forwardToChat('saved')">📝 پیام‌های ذخیره شده</div><div class="forward-option" onclick="forwardToChat('ai')">🤖 هوش مصنوعی</div><div class="forward-option" onclick="forwardToChat('group')">👥 گروه عمومی</div><button onclick="closeForwardPanel()" class="btn-secondary">انصراف</button></div></div>
   <div id="reminder-notification" class="reminder-notification">⏰ یادآوری: امروز هنوز درسی نخوندی! 🚀<button onclick="closeReminder()" style="background: none; border: none; color: white; float: left;">✖️</button></div>
@@ -5935,6 +5943,7 @@ async function loadGroupMessages() {
     updateChatList();
     const maxId = data.length ? Math.max(...data.map(m => m.id)) : 0;
     markRoomRead('general', maxId);
+    loadPinnedForRoom('general');
   }
 }
 
@@ -6002,6 +6011,7 @@ async function loadDmMessages(otherUser) {
     displayChatMessages();
     const maxId = data.length ? Math.max(...data.map(m => m.id)) : 0;
     markRoomRead(room, maxId);
+    loadPinnedForRoom(room);
   }
 }
 
@@ -6020,7 +6030,9 @@ async function sendToSupabase(text, senderName, replyText) {
   displayChatMessages(); updateChatList();
 
   if (!sb) return;
-  await sb.from('messages').insert([{ sender: senderName, text: text, time: time, room: room, reply_to: replyText || null }]);
+  const { data, error } = await sb.from('messages').insert([{ sender: senderName, text: text, time: time, room: room, reply_to: replyText || null }]).select().single();
+  if (error) { console.error('❌ خطا در ارسال پیام:', error); return; }
+  if (data) newMsg.id = data.id;
 }
 
 function subscribeToGeneralChat() {
@@ -6034,8 +6046,8 @@ function subscribeToGeneralChat() {
         const msgObj = { id: m.id, sender: m.sender, text: m.text, time: m.time, replyTo: m.reply_to || null };
 
         if (m.room === 'general') {
-          const exists = adminMessages.some(msg => msg.text === m.text && msg.time === m.time && msg.sender === m.sender);
-          if (exists) return;
+          const existing = adminMessages.find(msg => msg.text === m.text && msg.time === m.time && msg.sender === m.sender);
+          if (existing) { if (!existing.id) existing.id = m.id; return; }
           adminMessages.push(msgObj);
           if (currentChatType === 'group') {
             displayChatMessages();
@@ -6052,8 +6064,8 @@ function subscribeToGeneralChat() {
           const otherUser = parts[0] === username ? parts[1] : parts[0];
           if (!knownDmUsers.includes(otherUser)) { knownDmUsers.push(otherUser); saveKnownDmUsers(); }
           dmMessages[otherUser] = dmMessages[otherUser] || [];
-          const exists = dmMessages[otherUser].some(msg => msg.text === m.text && msg.time === m.time && msg.sender === m.sender);
-          if (exists) return;
+          const existing = dmMessages[otherUser].find(msg => msg.text === m.text && msg.time === m.time && msg.sender === m.sender);
+          if (existing) { if (!existing.id) existing.id = m.id; return; }
           dmMessages[otherUser].push(msgObj);
           if (currentChatType === 'dm' && currentDmUser === otherUser) {
             displayChatMessages();
@@ -6121,7 +6133,6 @@ function displayChatMessages() {
   if (!container) return;
   const messages = getMessages();
   let html = '';
-  if (pinnedMessage && pinnedMessage.chatType === currentChatType) html += `<div class="pinned-message">📌 پیام پین شده: ${escapeHtml(pinnedMessage.text)}<button onclick="unpinMessage()" style="background:none;border:none;color:var(--danger);float:left;cursor:pointer;">✖️</button></div>`;
   if (!messages.length) html += '<div style="text-align: center; padding: 40px;">پیامی وجود ندارد</div>';
   else for (let i = 0; i < messages.length; i++) {
     const msg = messages[i];
@@ -6132,31 +6143,170 @@ function displayChatMessages() {
     html += `<div class="message-bubble">${escapeHtml(msg.text)}</div><span class="message-time">${msg.time}</span></div>`;
   }
   container.innerHTML = html;
+  renderPinnedBar();
   requestAnimationFrame(() => { container.scrollTop = container.scrollHeight; });
   setTimeout(() => { container.scrollTop = container.scrollHeight; }, 100);
 }
+function renderPinnedBar() {
+  const area = document.getElementById('pinned-area');
+  if (!area) return;
+  const room = currentRoomId();
+  const roomPin = room ? pinnedByRoom[room] : null;
+  const localPin = (!room && pinnedMessage && pinnedMessage.chatType === currentChatType) ? pinnedMessage : null;
+  const pin = roomPin || localPin;
+  if (pin) {
+    area.style.display = 'block';
+    area.innerHTML = `<div class="pinned-message" style="display:flex; align-items:center; gap:8px; padding:8px 12px; margin:0; border-radius:0; background:var(--bg-secondary); border-bottom:1px solid var(--border); border-right:none;">      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink:0; color:var(--primary-light);"><path d="M12 17v5"/><path d="M9 10.76a2 2 0 0 1-1.11 1.79l-1.78.9A2 2 0 0 0 5 15.24V17h14v-1.76a2 2 0 0 0-1.11-1.79l-1.78-.9A2 2 0 0 1 15 10.76V7a1 1 0 0 1 1-1 2 2 0 0 0 0-4H8a2 2 0 0 0 0 4 1 1 0 0 1 1 1z"/></svg>
+      <span style="flex:1; font-size:13px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;">${escapeHtml(pin.text)}</span>
+      <button onclick="unpinMessage()" style="background:none; border:none; color:var(--text-secondary); cursor:pointer; flex-shrink:0; display:flex;"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 6L6 18"/><path d="M6 6l12 12"/></svg></button>
+    </div>`;
+  } else {
+    area.style.display = 'none';
+    area.innerHTML = '';
+  }
+}
 function selectMessage(i) { if (selectedMessageIndex === i) clearSelection(); else { selectedMessageIndex = i; displayChatMessages(); document.getElementById('action-menu').style.display = 'flex'; } }
 function clearSelection() { selectedMessageIndex = null; displayChatMessages(); document.getElementById('action-menu').style.display = 'none'; }
-function copyMessage() { if (selectedMessageIndex !== null) { navigator.clipboard.writeText(getMessages()[selectedMessageIndex].text); alert('کپی شد'); clearSelection(); } }
-function pinSelectedMessage() { if (selectedMessageIndex !== null) { const msg = getMessages()[selectedMessageIndex]; pinnedMessage = { text: msg.text, chatType: currentChatType }; localStorage.setItem('pinnedMessage', JSON.stringify(pinnedMessage)); displayChatMessages(); clearSelection(); } }
-function unpinMessage() { pinnedMessage = null; localStorage.removeItem('pinnedMessage'); displayChatMessages(); }
+function copyMessage() {
+  if (selectedMessageIndex !== null) {
+    const text = getMessages()[selectedMessageIndex].text;
+    const done = () => { alert('کپی شد'); clearSelection(); };
+    if (navigator.clipboard && navigator.clipboard.writeText) {
+      navigator.clipboard.writeText(text).then(done).catch(() => fallbackCopy(text, done));
+    } else {
+      fallbackCopy(text, done);
+    }
+  }
+}
+function fallbackCopy(text, done) {
+  const ta = document.createElement('textarea');
+  ta.value = text; ta.style.position = 'fixed'; ta.style.opacity = '0';
+  document.body.appendChild(ta); ta.focus(); ta.select();
+  try { document.execCommand('copy'); } catch (e) {}
+  document.body.removeChild(ta);
+  done();
+}
+let pinnedByRoom = {}; // { room: { text, message_id } } - برای گروه/خصوصی، مشترک روی سرور
+
+function currentRoomId() {
+  if (currentChatType === 'group') return 'general';
+  if (currentChatType === 'dm' && currentDmUser) return dmRoomId(username, currentDmUser);
+  return null;
+}
+
+async function pinSelectedMessage() {
+  if (selectedMessageIndex === null) return;
+  const msg = getMessages()[selectedMessageIndex];
+  const room = currentRoomId();
+  if (room) {
+    pinnedByRoom[room] = { text: msg.text, message_id: msg.id || null };
+    renderPinnedBar();
+    clearSelection();
+    if (sb) {
+      const { error } = await sb.from('pinned_messages').upsert({ room: room, text: msg.text, message_id: msg.id || null, pinned_by: username, updated_at: new Date().toISOString() });
+      if (error) console.error('❌ خطا در پین کردن:', error);
+    }
+  } else {
+    pinnedMessage = { text: msg.text, chatType: currentChatType };
+    localStorage.setItem('pinnedMessage', JSON.stringify(pinnedMessage));
+    renderPinnedBar();
+    clearSelection();
+  }
+}
+
+async function unpinMessage() {
+  const room = currentRoomId();
+  if (room) {
+    delete pinnedByRoom[room];
+    renderPinnedBar();
+    if (sb) {
+      const { error } = await sb.from('pinned_messages').delete().eq('room', room);
+      if (error) console.error('❌ خطا در حذف پین:', error);
+    }
+  } else {
+    pinnedMessage = null;
+    localStorage.removeItem('pinnedMessage');
+    renderPinnedBar();
+  }
+}
+
+async function loadPinnedForRoom(room) {
+  if (!sb || !room) return;
+  try {
+    const { data } = await sb.from('pinned_messages').select('text,message_id').eq('room', room).maybeSingle();
+    if (data) pinnedByRoom[room] = { text: data.text, message_id: data.message_id };
+    else delete pinnedByRoom[room];
+  } catch (e) { console.error('❌ خطا در دریافت پیام پین‌شده:', e); }
+  renderPinnedBar();
+}
 function forwardSelectedMessage() { if (selectedMessageIndex !== null) { forwardMessageIndex = selectedMessageIndex; document.getElementById('forward-panel').style.display = 'block'; } }
-function forwardToChat(target) { if (forwardMessageIndex !== null) { const msg = getMessages()[forwardMessageIndex]; const targetMsgs = target === 'saved' ? savedMessages : (target === 'ai' ? aiMessages : adminMessages); targetMsgs.push({ sender: 'user', text: `[فوروارد] ${msg.text}`, time: getCurrentTime() }); saveMessages(); if (target === currentChatType) displayChatMessages(); updateChatList(); closeForwardPanel(); clearSelection(); } }
+async function forwardToChat(target) {
+  if (forwardMessageIndex === null) return;
+  const msg = getMessages()[forwardMessageIndex];
+  const text = `[فوروارد] ${msg.text}`;
+  if (target === 'group') {
+    const time = getCurrentTime();
+    const newMsg = { sender: username || 'کاربر', text: text, time: time, replyTo: null };
+    adminMessages.push(newMsg);
+    if (currentChatType === 'group') displayChatMessages();
+    updateChatList();
+    if (sb) {
+      const { data, error } = await sb.from('messages').insert([{ sender: username || 'کاربر', text: text, time: time, room: 'general', reply_to: null }]).select().single();
+      if (error) console.error('❌ خطا در فوروارد:', error);
+      else if (data) newMsg.id = data.id;
+    }
+  } else {
+    const targetMsgs = target === 'saved' ? savedMessages : aiMessages;
+    targetMsgs.push({ sender: 'user', text: text, time: getCurrentTime() });
+    saveMessages();
+    if (target === currentChatType) displayChatMessages();
+    updateChatList();
+  }
+  closeForwardPanel(); clearSelection();
+}
 function closeForwardPanel() { document.getElementById('forward-panel').style.display = 'none'; forwardMessageIndex = null; }
 function replyToMessage() { if (selectedMessageIndex !== null) { const msg = getMessages()[selectedMessageIndex]; replyToMessageData = { text: msg.text }; document.getElementById('reply-text').innerHTML = `↩️ پاسخ به: ${msg.text.length > 50 ? msg.text.substring(0,50)+'...' : msg.text}`; document.getElementById('reply-bar').style.display = 'block'; clearSelection(); } }
 function cancelReply() { replyToMessageData = null; document.getElementById('reply-bar').style.display = 'none'; }
-function deleteSelectedMessage() { if (selectedMessageIndex !== null && confirm('حذف شود؟')) { getMessages().splice(selectedMessageIndex, 1); saveMessages(); displayChatMessages(); updateChatList(); clearSelection(); } }
+function deleteSelectedMessage() {
+  if (selectedMessageIndex !== null && confirm('حذف شود؟')) {
+    const msgs = getMessages();
+    const msg = msgs[selectedMessageIndex];
+    if ((currentChatType === 'group' || currentChatType === 'dm') && msg.sender !== username) { alert('فقط پیام خود را می‌توانید حذف کنید'); clearSelection(); return; }
+    msgs.splice(selectedMessageIndex, 1);
+    saveMessages(); displayChatMessages(); updateChatList(); clearSelection();
+    if ((currentChatType === 'group' || currentChatType === 'dm') && sb && msg.id) {
+      sb.from('messages').delete().eq('id', msg.id).then(({ error }) => { if (error) console.error('❌ خطا در حذف از سرور:', error); });
+    }
+  }
+}
 function editSelectedMessage() {
   if (selectedMessageIndex !== null) {
     const msgs = getMessages();
-    if (msgs[selectedMessageIndex].sender !== 'user') { alert('فقط پیام خود را می‌توانید ویرایش کنید'); clearSelection(); return; }
+    const msg = msgs[selectedMessageIndex];
+    const isOwn = (currentChatType === 'group' || currentChatType === 'dm') ? msg.sender === username : msg.sender === 'user';
+    if (!isOwn) { alert('فقط پیام خود را می‌توانید ویرایش کنید'); clearSelection(); return; }
     editingIndex = selectedMessageIndex;
     document.getElementById('editInput').value = msgs[selectedMessageIndex].text;
     document.getElementById('editPanel').style.display = 'block';
     document.getElementById('action-menu').style.display = 'none';
   }
 }
-function saveEditedMessage() { if (editingIndex !== null) { const newText = document.getElementById('editInput').value.trim(); if (newText) { const msgs = getMessages(); msgs[editingIndex].text = newText; msgs[editingIndex].time = getCurrentTime() + ' (ویرایش)'; saveMessages(); displayChatMessages(); updateChatList(); } closeEditPanel(); clearSelection(); } }
+function saveEditedMessage() {
+  if (editingIndex !== null) {
+    const newText = document.getElementById('editInput').value.trim();
+    if (newText) {
+      const msgs = getMessages();
+      const msg = msgs[editingIndex];
+      msg.text = newText;
+      msg.time = getCurrentTime() + ' (ویرایش)';
+      saveMessages(); displayChatMessages(); updateChatList();
+      if ((currentChatType === 'group' || currentChatType === 'dm') && sb && msg.id) {
+        sb.from('messages').update({ text: newText, time: msg.time }).eq('id', msg.id);
+      }
+    }
+    closeEditPanel(); clearSelection();
+  }
+}
 function closeEditPanel() { document.getElementById('editPanel').style.display = 'none'; editingIndex = null; }
 function sendChatMessage() {
   const input = document.getElementById('chat-detail-input');
