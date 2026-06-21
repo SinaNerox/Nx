@@ -5760,10 +5760,11 @@ function resetQuiz() { hearts = 5; updateHeartsDisplay(); currentQuizIndex = 0; 
 let currentProfile = localStorage.getItem('currentProfile') || 'default';
 let profiles = JSON.parse(localStorage.getItem('profiles')) || { default: { name: 'کاربر مهمان', xp: 0, completedLessons: [], quizSolvedCount: 0, streak: 0, lastActive: '', aiMessages: [], adminMessages: [], totalStudyMinutes: 0, weeklyActivity: [0,0,0,0,0,0,0], lastActivityDate: '', lastLessonTime: '' } };
 
-function saveAllData() {
+function saveAllData(skipSync) {
   profiles[currentProfile] = { name: username, xp: xp, completedLessons: completedLessons, quizSolvedCount: quizSolvedCount, streak: streak, lastActive: lastActive, aiMessages: aiMessages, adminMessages: adminMessages, totalStudyMinutes: totalStudyMinutes, weeklyActivity: weeklyActivityData, lastActivityDate: lastActivityDate, lastLessonTime: lastLessonTime };
   localStorage.setItem('profiles', JSON.stringify(profiles));
   localStorage.setItem('currentProfile', currentProfile);
+  if (!skipSync) syncProgressToSupabase();
 }
 function loadProfile(profileName) {
   const profile = profiles[profileName];
@@ -5782,8 +5783,9 @@ function loadProfile(profileName) {
   weeklyActivityData = profile.weeklyActivity || [0,0,0,0,0,0,0];
   lastActivityDate = profile.lastActivityDate || '';
   lastLessonTime = profile.lastLessonTime || '';
-  updateUI(); updateChatList(); saveAllData();
+  updateUI(); updateChatList(); saveAllData(true);
   loadSavedMessagesFromSupabase();
+  loadProgressFromSupabase();
 }
 function addNewProfile() {
   let newName = prompt('نام پروفایل جدید را وارد کنید:');
@@ -5818,6 +5820,41 @@ async function syncSavedMessagesToSupabase() {
   try {
     await sb.from('saved_messages').upsert({ username: username, messages: savedMessages, updated_at: new Date().toISOString() });
   } catch (e) { console.error('❌ خطا در ذخیره پیام‌های ذخیره شده:', e); }
+}
+
+// ==================== پیشرفت کاربر (Supabase) ====================
+function currentProgressObj() {
+  return { xp, completedLessons, quizSolvedCount, streak, lastActive, totalStudyMinutes, weeklyActivity: weeklyActivityData, lastActivityDate, lastLessonTime };
+}
+async function loadProgressFromSupabase() {
+  if (!sb || !username) return;
+  try {
+    const { data, error } = await sb.from('user_progress').select('progress').eq('username', username).maybeSingle();
+    if (!error && data && data.progress) {
+      const p = data.progress;
+      xp = p.xp || 0;
+      completedLessons = p.completedLessons || [];
+      quizSolvedCount = p.quizSolvedCount || 0;
+      streak = p.streak || 0;
+      lastActive = p.lastActive || '';
+      totalStudyMinutes = p.totalStudyMinutes || 0;
+      weeklyActivityData = p.weeklyActivity || [0,0,0,0,0,0,0];
+      lastActivityDate = p.lastActivityDate || '';
+      lastLessonTime = p.lastLessonTime || '';
+      saveAllData();
+      updateUI();
+    }
+  } catch (e) { console.error('❌ خطا در دریافت پیشرفت:', e); }
+}
+let progressSyncTimeout = null;
+function syncProgressToSupabase() {
+  if (!sb || !username) return;
+  clearTimeout(progressSyncTimeout);
+  progressSyncTimeout = setTimeout(async () => {
+    try {
+      await sb.from('user_progress').upsert({ username: username, progress: currentProgressObj(), updated_at: new Date().toISOString() });
+    } catch (e) { console.error('❌ خطا در ذخیره پیشرفت:', e); }
+  }, 600);
 }
 
 // ==================== تم رنگی ====================
@@ -7177,7 +7214,7 @@ function renderQuiz() {
 function answerQuiz(selected) {
   if (quizAnswers[currentQuizIndex] !== null) return;
   quizAnswers[currentQuizIndex] = selected;
-  if (selected === quickQuizzes[currentQuizIndex].a) { xp += 5; quizSolvedCount++; updateUI(); }
+  if (selected === quickQuizzes[currentQuizIndex].a) { xp += 5; quizSolvedCount++; updateUI(); saveAllData(); }
   else { loseHeart(); if (hearts <= 0) { resetQuiz(); return; } }
   renderQuiz();
 }
