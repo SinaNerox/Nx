@@ -5818,7 +5818,7 @@ async function loadSavedMessagesFromSupabase() {
 async function syncSavedMessagesToSupabase() {
   if (!sb || !username) return;
   try {
-    await sb.from('saved_messages').upsert({ username: username, messages: savedMessages, updated_at: new Date().toISOString() });
+    await sb.from('saved_messages').upsert({ username: username, messages: savedMessages, updated_at: new Date().toISOString() }, { onConflict: 'username' });
   } catch (e) { console.error('❌ خطا در ذخیره پیام‌های ذخیره شده:', e); }
 }
 
@@ -5852,7 +5852,7 @@ function syncProgressToSupabase() {
   clearTimeout(progressSyncTimeout);
   progressSyncTimeout = setTimeout(async () => {
     try {
-      await sb.from('user_progress').upsert({ username: username, progress: currentProgressObj(), updated_at: new Date().toISOString() });
+      await sb.from('user_progress').upsert({ username: username, progress: currentProgressObj(), updated_at: new Date().toISOString() }, { onConflict: 'username' });
     } catch (e) { console.error('❌ خطا در ذخیره پیشرفت:', e); }
   }, 600);
 }
