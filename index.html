@@ -6255,6 +6255,7 @@ async function joinPublicGroup(groupId) {
   if (!sb) return;
   const { error } = await sb.from('group_members').insert([{ group_id: groupId, username: username, role: 'member' }]);
   if (error) { console.error('❌ خطا در عضویت:', error); alert('خطا در عضویت'); return; }
+  await sendSystemMessage('grp:' + groupId, `${username} به گروه پیوست`);
   await loadMyGroups();
   searchPublicGroups();
   const group = myGroups.find(g => g.id === groupId);
@@ -6278,6 +6279,7 @@ async function joinByCode() {
   if (myGroups.some(g => g.id === data.id)) { navigateTo('chat-list'); openGroupRoom({ ...data, role: 'member' }); return; }
   const { error: joinError } = await sb.from('group_members').insert([{ group_id: data.id, username: username, role: 'member' }]);
   if (joinError) { errEl.innerText = 'خطا در عضویت'; errEl.style.display = 'block'; return; }
+  await sendSystemMessage('grp:' + data.id, `${username} به گروه پیوست`);
   await loadMyGroups();
   navigateTo('chat-list');
   const group = myGroups.find(g => g.id === data.id);
@@ -6351,6 +6353,10 @@ let groupInfoState = null; // { room, group, returnType, viewerCanManage }
 
 function maybeOpenGroupInfo() {
   if (currentChatType === 'usergroup' && currentGroupInfo) {
+    if (currentGroupInfo.type === 'channel' && !isOwnerOrAdminOfCurrentGroup() && !isAdmin) {
+      alert('اطلاعات کانال فقط برای مدیران قابل مشاهده است');
+      return;
+    }
     openGroupInfo(currentGroupRoom, currentGroupInfo, 'usergroup', isOwnerOrAdminOfCurrentGroup());
   } else if (currentChatType === 'admin-view' && currentAdminRoom && currentAdminRoom.startsWith('grp:')) {
     const g = adminGroupsCache[currentAdminRoom] || {};
@@ -6391,6 +6397,9 @@ async function openGroupInfo(room, group, returnType, viewerCanManage) {
   for (const m of members) {
     const badge = m.username === ADMIN_USERNAME ? adminBadgeHtml(13) : '';
     let actions = '';
+    if (m.username !== username) {
+      actions += `<button onclick="messageMemberFromGroupInfo('${m.username.replace(/'/g,"\\'")}')" style="background:none;border:1px solid var(--primary);color:var(--primary-light);border-radius:8px;padding:4px 8px;font-size:11px;cursor:pointer;margin-inline-start:6px;">💬 پیام</button>`;
+    }
     if (viewerCanManage && m.username !== group.owner && m.role !== 'owner') {
       if (m.role === 'member') actions += `<button onclick="setMemberRole(${groupId},'${m.username.replace(/'/g,"\\'")}','admin')" style="background:none;border:1px solid var(--border);color:var(--text-secondary);border-radius:8px;padding:4px 8px;font-size:11px;cursor:pointer;margin-inline-start:6px;">ارتقا به مدیر</button>`;
       else actions += `<button onclick="setMemberRole(${groupId},'${m.username.replace(/'/g,"\\'")}','member')" style="background:none;border:1px solid var(--border);color:var(--text-secondary);border-radius:8px;padding:4px 8px;font-size:11px;cursor:pointer;margin-inline-start:6px;">عزل از مدیریت</button>`;
@@ -6413,6 +6422,11 @@ async function openGroupInfo(room, group, returnType, viewerCanManage) {
   actionsBox.innerHTML = actionsHtml;
 }
 
+function messageMemberFromGroupInfo(otherUser) {
+  if (!knownDmUsers.includes(otherUser)) { knownDmUsers.push(otherUser); saveKnownDmUsers(); }
+  openDmChat(otherUser);
+}
+
 function closeGroupInfo() {
   if (!groupInfoState) { navigateTo('chat-list'); return; }
   if (groupInfoState.returnType === 'usergroup' && currentGroupInfo) openGroupRoom(currentGroupInfo);
@@ -6429,6 +6443,8 @@ async function setMemberRole(groupId, targetUser, role) {
   if (!sb) return;
   const { error } = await sb.from('group_members').update({ role: role }).eq('group_id', groupId).eq('username', targetUser);
   if (error) { console.error('❌ خطا در تغییر رنک:', error); alert('خطا در تغییر رنک'); return; }
+  if (role === 'admin') await sendSystemMessage('grp:' + groupId, `${targetUser} توسط مدیر ارتقا یافت 🛡️`);
+  else await sendSystemMessage('grp:' + groupId, `${targetUser} از مدیریت عزل شد`);
   openGroupInfo(groupInfoState.room, groupInfoState.group, groupInfoState.returnType, groupInfoState.viewerCanManage);
 }
 
@@ -6437,6 +6453,7 @@ async function removeMember(groupId, targetUser) {
   if (!sb) return;
   const { error } = await sb.from('group_members').delete().eq('group_id', groupId).eq('username', targetUser);
   if (error) { console.error('❌ خطا در حذف عضو:', error); alert('خطا در حذف'); return; }
+  await sendSystemMessage('grp:' + groupId, `${targetUser} از گروه حذف شد`);
   openGroupInfo(groupInfoState.room, groupInfoState.group, groupInfoState.returnType, groupInfoState.viewerCanManage);
 }
 
@@ -6444,6 +6461,7 @@ async function leaveGroup(groupId) {
   if (!confirm('از این گروه/کانال خارج می‌شوید؟')) return;
   if (!sb) return;
   await sb.from('group_members').delete().eq('group_id', groupId).eq('username', username);
+  await sendSystemMessage('grp:' + groupId, `${username} گروه را ترک کرد`);
   await loadMyGroups();
   navigateTo('chat-list');
 }
@@ -6497,20 +6515,20 @@ async function computeUnreadCounts() {
   if (!sb || !username) return;
   try {
     const groupLastRead = readStatus['general'] || 0;
-    const { count: groupCount } = await sb.from('messages').select('id', { count: 'exact', head: true }).eq('room', 'general').gt('id', groupLastRead).neq('sender', username);
+    const { count: groupCount } = await sb.from('messages').select('id', { count: 'exact', head: true }).eq('room', 'general').gt('id', groupLastRead).neq('sender', username).neq('sender', 'system');
     unreadGroupCount = groupCount || 0;
     updateUnreadBadge();
 
     for (const u of knownDmUsers) {
       const room = dmRoomId(username, u);
       const lastRead = readStatus[room] || 0;
-      const { count } = await sb.from('messages').select('id', { count: 'exact', head: true }).eq('room', room).gt('id', lastRead).neq('sender', username);
+      const { count } = await sb.from('messages').select('id', { count: 'exact', head: true }).eq('room', room).gt('id', lastRead).neq('sender', username).neq('sender', 'system');
       dmUnread[u] = count || 0;
     }
     for (const g of myGroups) {
       const room = 'grp:' + g.id;
       const lastRead = readStatus[room] || 0;
-      const { count } = await sb.from('messages').select('id', { count: 'exact', head: true }).eq('room', room).gt('id', lastRead).neq('sender', username);
+      const { count } = await sb.from('messages').select('id', { count: 'exact', head: true }).eq('room', room).gt('id', lastRead).neq('sender', username).neq('sender', 'system');
       groupUnread[room] = count || 0;
     }
     updateChatList();
@@ -6568,6 +6586,12 @@ async function sendToSupabase(text, senderName, replyText) {
   if (data) newMsg.id = data.id;
 }
 
+async function sendSystemMessage(room, text) {
+  if (!sb) return;
+  const time = getCurrentTime();
+  await sb.from('messages').insert([{ sender: 'system', text: text, time: time, room: room, reply_to: null }]);
+}
+
 function subscribeToGeneralChat() {
   if (!sb) return;
   sb
@@ -6585,7 +6609,7 @@ function subscribeToGeneralChat() {
           if (currentChatType === 'group') {
             displayChatMessages();
             markRoomRead('general', m.id);
-          } else if (m.sender !== username) {
+          } else if (m.sender !== username && m.sender !== 'system') {
             unreadGroupCount++;
             updateUnreadBadge();
           }
@@ -6616,7 +6640,7 @@ function subscribeToGeneralChat() {
           if (currentChatType === 'usergroup' && currentGroupRoom === m.room) {
             displayChatMessages();
             markRoomRead(m.room, m.id);
-          } else if (m.sender !== username) {
+          } else if (m.sender !== username && m.sender !== 'system') {
             groupUnread[m.room] = (groupUnread[m.room] || 0) + 1;
           }
           renderMyGroupsList();
@@ -6686,6 +6710,10 @@ function displayChatMessages() {
   if (!messages.length) html += '<div style="text-align: center; padding: 40px;">پیامی وجود ندارد</div>';
   else for (let i = 0; i < messages.length; i++) {
     const msg = messages[i];
+    if (msg.sender === 'system') {
+      html += `<div style="text-align:center; margin:6px 0;"><span style="background:var(--bg-secondary); color:var(--text-secondary); font-size:11px; padding:5px 12px; border-radius:999px; display:inline-block;">${escapeHtml(msg.text)}</span></div>`;
+      continue;
+    }
     const isMyMsg = (currentChatType === 'group' || currentChatType === 'dm' || currentChatType === 'admin-view' || currentChatType === 'usergroup') ? (msg.sender === username) : (msg.sender === 'user');
     html += `<div class="message ${isMyMsg ? 'user' : 'bot'} ${selectedMessageIndex === i ? 'selected' : ''}" onclick="selectMessage(${i})">`;
     if (msg.replyTo) html += `<div class="reply-preview">↩️ پاسخ به: ${escapeHtml(msg.replyTo)}</div>`;
