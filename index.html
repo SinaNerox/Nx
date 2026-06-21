@@ -431,6 +431,30 @@
   </div>
 </div>
 
+<!-- صفحه اطلاعات گروه/کانال -->
+<div class="page" id="group-info-page">
+  <div class="header"><button class="back-btn" onclick="closeGroupInfo()">←</button><div class="header-center"><h1 style="font-size: 18px;">اطلاعات</h1></div></div>
+  <div style="padding:20px; text-align:center;">
+    <div id="group-info-icon" style="font-size:48px; margin-bottom:10px;">👥</div>
+    <h2 id="group-info-name" style="margin-bottom:6px;"></h2>
+    <p id="group-info-meta" style="color:var(--text-secondary); font-size:13px; margin-bottom:20px;"></p>
+  </div>
+  <div id="group-info-invite-section" style="display:none; padding: 0 20px 20px;">
+    <div style="background:var(--bg-secondary); border-radius:12px; padding:14px;">
+      <p style="font-size:12px; color:var(--text-secondary); margin-bottom:8px;">🔒 کد دعوت (فقط مدیر می‌بیند):</p>
+      <div style="display:flex; gap:8px; align-items:center; justify-content:center;">
+        <code id="group-info-invite-code" style="font-size:16px; font-weight:bold; letter-spacing:2px; background:var(--border); padding:6px 12px; border-radius:8px;"></code>
+        <button onclick="copyGroupInfoInviteCode()" style="background:none; border:1px solid var(--border); border-radius:8px; padding:6px 10px; cursor:pointer; color:var(--text-primary);">کپی</button>
+      </div>
+    </div>
+  </div>
+  <div style="padding: 0 20px;">
+    <p style="font-size:13px; color:var(--text-secondary); margin-bottom:10px;">👤 اعضا (<span id="group-info-member-count">0</span>)</p>
+    <div id="group-info-members-list"></div>
+  </div>
+  <div style="padding: 20px;" id="group-info-actions"></div>
+</div>
+
 
 <!-- صفحه جستجوی کاربران -->
 <div class="page" id="user-search-page">
@@ -442,7 +466,7 @@
 
 <!-- صفحه گفتگوی چت -->
 <div class="page" id="chat-detail-page">
-  <div class="header"><button class="back-btn" onclick="goBackFromChat()">←</button><div class="header-center"><h1 id="chat-detail-title" style="font-size: 18px;"></h1><p id="chat-detail-sub" style="font-size: 11px; color: var(--text-secondary);"></p></div><div style="display: flex; gap: 12px; align-items:center;"><button onclick="refreshCurrentChat()" style="background: none; border: none; color: var(--text-secondary); cursor: pointer; display:flex; align-items:center;"><svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M23 4v6h-6"/><path d="M1 20v-6h6"/><path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"/></svg></button><button onclick="toggleSearch()" style="background: none; border: none; color: var(--text-secondary); cursor: pointer; display:flex; align-items:center;"><svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><path d="M21 21l-4.35-4.35"/></svg></button><button class="clear-chat" onclick="clearCurrentChat()" style="background: none; border: none; color: var(--danger); cursor: pointer; display:flex; align-items:center;"><svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 6h18"/><path d="M8 6V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/><path d="M10 11v6"/><path d="M14 11v6"/></svg></button></div></div>
+  <div class="header"><button class="back-btn" onclick="goBackFromChat()">←</button><div class="header-center" id="chat-detail-header-center" onclick="maybeOpenGroupInfo()" style="cursor:pointer;"><h1 id="chat-detail-title" style="font-size: 18px;"></h1><p id="chat-detail-sub" style="font-size: 11px; color: var(--text-secondary);"></p></div><div style="display: flex; gap: 12px; align-items:center;"><button onclick="refreshCurrentChat()" style="background: none; border: none; color: var(--text-secondary); cursor: pointer; display:flex; align-items:center;"><svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M23 4v6h-6"/><path d="M1 20v-6h6"/><path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"/></svg></button><button onclick="toggleSearch()" style="background: none; border: none; color: var(--text-secondary); cursor: pointer; display:flex; align-items:center;"><svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><path d="M21 21l-4.35-4.35"/></svg></button><button class="clear-chat" onclick="clearCurrentChat()" style="background: none; border: none; color: var(--danger); cursor: pointer; display:flex; align-items:center;"><svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 6h18"/><path d="M8 6V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/><path d="M10 11v6"/><path d="M14 11v6"/></svg></button></div></div>
   <div id="search-area" style="padding: 8px; display: none;"><input type="text" id="search-input" class="search-box" placeholder="جستجو در پیام‌ها..." onkeyup="searchMessages()"></div>
   <div id="pinned-area" style="padding: 8px;"></div>
   <div id="reply-bar" class="reply-bar"><span class="reply-text" id="reply-text"></span><button class="cancel-reply" onclick="cancelReply()">✖️</button></div>
@@ -6042,8 +6066,17 @@ async function openAdminPanel() {
   await loadAllRoomsForAdmin();
 }
 
+let adminGroupsCache = {}; // { 'grp:<id>': groupRow }
+
 function roomLabel(room) {
-  return room === 'general' ? '👥 گروه عمومی' : (room.startsWith('dm:') ? '💬 ' + room.replace('dm:', '').replace(':', ' ↔ ') : '📢 ' + room);
+  if (room === 'general') return '👥 گروه عمومی';
+  if (room.startsWith('dm:')) return '💬 ' + room.replace('dm:', '').replace(':', ' ↔ ');
+  if (room.startsWith('grp:')) {
+    const g = adminGroupsCache[room];
+    if (g) return (g.type === 'channel' ? '📢 ' : '👥 ') + g.name;
+    return '📢 ' + room;
+  }
+  return '📢 ' + room;
 }
 
 async function loadAllRoomsForAdmin() {
@@ -6055,6 +6088,9 @@ async function loadAllRoomsForAdmin() {
   if (error) { list.innerHTML = '<div style="text-align:center;padding:20px;color:var(--danger);">خطا در دریافت اطلاعات</div>'; return; }
   adminRoomsCache = {};
   for (const m of data) { if (!adminRoomsCache[m.room]) adminRoomsCache[m.room] = m; } // اولین مورد = آخرین پیام چون نزولی مرتب شده
+  const { data: groupsData } = await sb.from('groups').select('*');
+  adminGroupsCache = {};
+  if (groupsData) for (const g of groupsData) adminGroupsCache['grp:' + g.id] = g;
   renderAdminRoomsList();
 }
 
@@ -6308,6 +6344,119 @@ async function loadGroupRoomMessages(room) {
 
 function isOwnerOrAdminOfCurrentGroup() {
   return currentChatType === 'usergroup' && currentGroupInfo && (currentGroupInfo.role === 'owner' || currentGroupInfo.role === 'admin');
+}
+
+// ==================== صفحه اطلاعات گروه/کانال ====================
+let groupInfoState = null; // { room, group, returnType, viewerCanManage }
+
+function maybeOpenGroupInfo() {
+  if (currentChatType === 'usergroup' && currentGroupInfo) {
+    openGroupInfo(currentGroupRoom, currentGroupInfo, 'usergroup', isOwnerOrAdminOfCurrentGroup());
+  } else if (currentChatType === 'admin-view' && currentAdminRoom && currentAdminRoom.startsWith('grp:')) {
+    const g = adminGroupsCache[currentAdminRoom] || {};
+    openGroupInfo(currentAdminRoom, g, 'admin-view', true);
+  }
+}
+
+async function openGroupInfo(room, group, returnType, viewerCanManage) {
+  groupInfoState = { room, group, returnType, viewerCanManage };
+  stopChatPolling();
+  navigateTo('group-info');
+  const icon = group.type === 'channel' ? '📢' : '👥';
+  document.getElementById('group-info-icon').innerText = icon;
+  document.getElementById('group-info-name').innerText = group.name || room;
+  document.getElementById('group-info-meta').innerText = `${group.type === 'channel' ? 'کانال' : 'گروه'} • ${group.visibility === 'private' ? 'خصوصی 🔒' : 'عمومی 🌐'}`;
+
+  const inviteSection = document.getElementById('group-info-invite-section');
+  if (group.visibility === 'private' && viewerCanManage && group.invite_code) {
+    inviteSection.style.display = 'block';
+    document.getElementById('group-info-invite-code').innerText = group.invite_code;
+  } else {
+    inviteSection.style.display = 'none';
+  }
+
+  const membersList = document.getElementById('group-info-members-list');
+  membersList.innerHTML = '<div style="text-align:center;padding:14px;color:var(--text-secondary);">در حال بارگذاری...</div>';
+  const actionsBox = document.getElementById('group-info-actions');
+  actionsBox.innerHTML = '';
+
+  if (!sb) return;
+  const groupId = group.id || parseInt(room.replace('grp:', ''));
+  const { data: members, error } = await sb.from('group_members').select('*').eq('group_id', groupId).order('joined_at', { ascending: true });
+  if (error || !members) { membersList.innerHTML = '<div style="text-align:center;padding:14px;color:var(--danger);">خطا در دریافت اعضا</div>'; return; }
+  document.getElementById('group-info-member-count').innerText = members.length;
+
+  const roleLabel = { owner: '👑 مالک', admin: '🛡️ مدیر', member: 'عضو' };
+  let html = '';
+  for (const m of members) {
+    const badge = m.username === ADMIN_USERNAME ? adminBadgeHtml(13) : '';
+    let actions = '';
+    if (viewerCanManage && m.username !== group.owner && m.role !== 'owner') {
+      if (m.role === 'member') actions += `<button onclick="setMemberRole(${groupId},'${m.username.replace(/'/g,"\\'")}','admin')" style="background:none;border:1px solid var(--border);color:var(--text-secondary);border-radius:8px;padding:4px 8px;font-size:11px;cursor:pointer;margin-inline-start:6px;">ارتقا به مدیر</button>`;
+      else actions += `<button onclick="setMemberRole(${groupId},'${m.username.replace(/'/g,"\\'")}','member')" style="background:none;border:1px solid var(--border);color:var(--text-secondary);border-radius:8px;padding:4px 8px;font-size:11px;cursor:pointer;margin-inline-start:6px;">عزل از مدیریت</button>`;
+      actions += `<button onclick="removeMember(${groupId},'${m.username.replace(/'/g,"\\'")}')" style="background:none;border:1px solid var(--danger);color:var(--danger);border-radius:8px;padding:4px 8px;font-size:11px;cursor:pointer;margin-inline-start:6px;">حذف</button>`;
+    }
+    html += `<div style="display:flex; align-items:center; justify-content:space-between; padding:10px 0; border-bottom:1px solid var(--border);">
+      <div style="display:flex; align-items:center; gap:6px; font-size:13px;">👤 ${escapeHtml(m.username)}${badge}</div>
+      <div style="display:flex; align-items:center; font-size:12px; color:var(--text-secondary);">${roleLabel[m.role] || m.role}${actions}</div>
+    </div>`;
+  }
+  membersList.innerHTML = html || '<div style="text-align:center;padding:14px;color:var(--text-secondary);">عضوی نیست</div>';
+
+  let actionsHtml = '';
+  const myRole = members.find(m => m.username === username)?.role;
+  if (myRole === 'owner' || (isAdmin && returnType === 'admin-view')) {
+    actionsHtml += `<button onclick="deleteGroupCompletely(${groupId})" style="width:100%; background:none; border:1px solid var(--danger); color:var(--danger); padding:10px; border-radius:10px; cursor:pointer; margin-bottom:8px;">🗑️ حذف کامل ${group.type === 'channel' ? 'کانال' : 'گروه'}</button>`;
+  } else if (myRole) {
+    actionsHtml += `<button onclick="leaveGroup(${groupId})" style="width:100%; background:none; border:1px solid var(--danger); color:var(--danger); padding:10px; border-radius:10px; cursor:pointer;">🚪 ترک ${group.type === 'channel' ? 'کانال' : 'گروه'}</button>`;
+  }
+  actionsBox.innerHTML = actionsHtml;
+}
+
+function closeGroupInfo() {
+  if (!groupInfoState) { navigateTo('chat-list'); return; }
+  if (groupInfoState.returnType === 'usergroup' && currentGroupInfo) openGroupRoom(currentGroupInfo);
+  else if (groupInfoState.returnType === 'admin-view' && currentAdminRoom) openAdminRoom(currentAdminRoom);
+  else navigateTo('chat-list');
+}
+
+function copyGroupInfoInviteCode() {
+  const code = document.getElementById('group-info-invite-code').innerText;
+  fallbackCopy(code, () => alert('کد دعوت کپی شد'));
+}
+
+async function setMemberRole(groupId, targetUser, role) {
+  if (!sb) return;
+  const { error } = await sb.from('group_members').update({ role: role }).eq('group_id', groupId).eq('username', targetUser);
+  if (error) { console.error('❌ خطا در تغییر رنک:', error); alert('خطا در تغییر رنک'); return; }
+  openGroupInfo(groupInfoState.room, groupInfoState.group, groupInfoState.returnType, groupInfoState.viewerCanManage);
+}
+
+async function removeMember(groupId, targetUser) {
+  if (!confirm(`${targetUser} از گروه حذف شود؟`)) return;
+  if (!sb) return;
+  const { error } = await sb.from('group_members').delete().eq('group_id', groupId).eq('username', targetUser);
+  if (error) { console.error('❌ خطا در حذف عضو:', error); alert('خطا در حذف'); return; }
+  openGroupInfo(groupInfoState.room, groupInfoState.group, groupInfoState.returnType, groupInfoState.viewerCanManage);
+}
+
+async function leaveGroup(groupId) {
+  if (!confirm('از این گروه/کانال خارج می‌شوید؟')) return;
+  if (!sb) return;
+  await sb.from('group_members').delete().eq('group_id', groupId).eq('username', username);
+  await loadMyGroups();
+  navigateTo('chat-list');
+}
+
+async function deleteGroupCompletely(groupId) {
+  if (!confirm('این گروه/کانال و تمام پیام‌هایش برای همیشه حذف شود؟')) return;
+  if (!sb) return;
+  const room = 'grp:' + groupId;
+  await sb.from('messages').delete().eq('room', room);
+  await sb.from('group_members').delete().eq('group_id', groupId);
+  await sb.from('groups').delete().eq('id', groupId);
+  await loadMyGroups();
+  navigateTo('chat-list');
 }
 
 function dmRoomId(u1, u2) {
@@ -6939,7 +7088,7 @@ function navigateTo(page) {
   else if (page === 'quiz') { document.getElementById('quiz-page').classList.add('active'); document.getElementById('nav-quiz').classList.add('active'); hearts = 5; updateHeartsDisplay(); }
   else if (page === 'editor') { document.getElementById('editor-page').classList.add('active'); document.getElementById('nav-editor').classList.add('active'); if (editor) runCode(); else setTimeout(() => { initEditor(); runCode(); }, 100); }
   else if (page === 'admin-panel') { document.getElementById('admin-panel-page').classList.add('active'); }
-  else if (page === 'create-group' || page === 'public-groups' || page === 'join-code') { document.getElementById(`${page}-page`).classList.add('active'); }
+  else if (page === 'create-group' || page === 'public-groups' || page === 'join-code' || page === 'group-info') { document.getElementById(`${page}-page`).classList.add('active'); }
   else { document.getElementById(`${page}-page`).classList.add('active'); document.getElementById(`nav-${page}`).classList.add('active'); }
   updateUI(); if (page === 'profile') checkDailyReminder();
 }
