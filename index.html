@@ -463,30 +463,6 @@
   <div id="user-search-results" style="padding: 0 12px;"></div>
 </div>
 
-<!-- صفحه پروفایل عمومی کاربر -->
-<div class="page" id="public-profile-page">
-  <div class="header">
-    <button class="back-btn" id="public-profile-back-btn" onclick="closePublicProfile()">←</button>
-    <div class="header-center"><h1 style="font-size: 18px;">👤 پروفایل کاربر</h1></div>
-    <button id="public-profile-msg-btn" onclick="" style="background:none;border:none;color:var(--primary-light);cursor:pointer;font-size:22px;padding:0 12px;">💬</button>
-  </div>
-  <div style="padding: 24px 16px; text-align:center;">
-    <div class="profile-avatar" id="public-profile-avatar">👨‍💻</div>
-    <h2 style="margin-top:12px; font-size:20px;" id="public-profile-name">—</h2>
-    <p style="color:var(--text-secondary); font-size:13px;" id="public-profile-level">سطح ۱</p>
-    <p style="color:var(--primary-light); font-size:12px; margin-top:4px;" id="public-profile-study">⏱ زمان مطالعه: ۰ دقیقه</p>
-  </div>
-  <div class="grid-2">
-    <div class="stat-card"><p style="color:var(--text-secondary);font-size:12px;">کل XP</p><p class="stat-value" id="public-profile-xp">0</p></div>
-    <div class="stat-card"><p style="color:var(--text-secondary);font-size:12px;">روزهای پیاپی</p><p class="stat-value" style="color:var(--warning);" id="public-profile-streak">0</p></div>
-    <div class="stat-card"><p style="color:var(--text-secondary);font-size:12px;">درس تموم شده</p><p class="stat-value" id="public-profile-lessons">0</p></div>
-    <div class="stat-card"><p style="color:var(--text-secondary);font-size:12px;">تمرین حل شده</p><p class="stat-value" id="public-profile-quiz">0</p></div>
-  </div>
-  <div style="padding:16px;"><div class="section"><h4>📊 فعالیت هفتگی</h4><div id="public-weekly-chart" class="progress-chart"></div><p style="text-align:center;font-size:11px;color:var(--text-secondary);margin-top:8px;">روزهایی که درس خوانده</p></div></div>
-  <div style="padding:16px;"><div class="section"><h4>🏆 دستاوردها</h4><div id="public-achievements-list"></div></div></div>
-  <div style="padding:16px;"><div class="section"><p style="color:var(--text-secondary);font-size:12px;margin-bottom:8px;">📊 پیشرفت کلی</p><div class="timer-bar"><div class="timer-fill" id="public-overall-progress" style="width:0%;"></div></div><p style="font-size:12px;margin-top:8px;" id="public-overall-text">۰ از ۰ درس</p></div></div>
-</div>
-
 
 <!-- صفحه گفتگوی چت -->
 <div class="page" id="chat-detail-page">
@@ -5769,113 +5745,25 @@ function openEditorWithCode(code) {
 }
 
 // ==================== سیستم قلب برای تمرین ====================
-const MAX_HEARTS = 5;
-const HEART_REGEN_MS = 10 * 60 * 1000; // 10 دقیقه
-let hearts = MAX_HEARTS;
-let heartLostTimes = JSON.parse(localStorage.getItem('heartLostTimes') || '[]');
-let heartTimerInterval = null;
-
-function saveHeartLostTimes() { localStorage.setItem('heartLostTimes', JSON.stringify(heartLostTimes)); }
-
-function recalcHearts() {
-  const now = Date.now();
-  heartLostTimes = heartLostTimes.filter(t => now - t < HEART_REGEN_MS);
-  saveHeartLostTimes();
-  hearts = MAX_HEARTS - heartLostTimes.length;
-}
-
-function nextHeartIn() {
-  if (heartLostTimes.length === 0 || hearts >= MAX_HEARTS) return null;
-  const oldest = Math.min(...heartLostTimes);
-  const ms = HEART_REGEN_MS - (Date.now() - oldest);
-  return ms > 0 ? ms : 0;
-}
-
+let hearts = 5;
 function updateHeartsDisplay() {
   const container = document.getElementById('hearts-container');
   if (!container) return;
-  recalcHearts();
   let html = '';
-  for (let i = 0; i < MAX_HEARTS; i++) html += `<span class="heart ${i >= hearts ? 'lost' : ''}">❤️</span>`;
-  const ms = nextHeartIn();
-  if (ms !== null) {
-    const min = Math.floor(ms / 60000);
-    const sec = Math.floor((ms % 60000) / 1000);
-    html += `<span style="font-size:11px;color:var(--text-secondary);margin-right:8px;">⏱ ${min}:${sec.toString().padStart(2,'0')}</span>`;
-  }
+  for (let i = 0; i < 5; i++) html += `<span class="heart ${i >= hearts ? 'lost' : ''}">❤️</span>`;
   container.innerHTML = html;
 }
-
-function startHeartTimer() {
-  clearInterval(heartTimerInterval);
-  heartTimerInterval = setInterval(() => {
-    recalcHearts();
-    updateHeartsDisplay();
-  }, 1000);
-}
-
-function loseHeart() {
-  recalcHearts();
-  if (hearts <= 0) { showNoHeartsOverlay(); return; }
-  heartLostTimes.push(Date.now());
-  saveHeartLostTimes();
-  recalcHearts();
-  updateHeartsDisplay();
-  startHeartTimer();
-  if (hearts <= 0) { showNoHeartsOverlay(); }
-}
-
-function showNoHeartsOverlay() {
-  const ms = nextHeartIn();
-  const min = ms !== null ? Math.ceil(ms / 60000) : 10;
-  const overlay = document.createElement('div');
-  overlay.id = 'no-hearts-overlay';
-  overlay.style.cssText = 'position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.85);z-index:9999;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:16px;';
-  overlay.innerHTML = `
-    <div style="font-size:48px;">💔</div>
-    <h2 style="color:white;text-align:center;">قلب‌هات تمام شد!</h2>
-    <p style="color:#aaa;text-align:center;font-size:14px;">هر قلب هر ۱۰ دقیقه برمی‌گرده<br>یا می‌تونی درس‌ها رو مطالعه کنی</p>
-    <div id="no-hearts-timer" style="font-size:28px;color:var(--primary-light);font-weight:bold;">⏱ ${min} دقیقه</div>
-    <div style="display:flex;gap:12px;margin-top:8px;">
-      <button onclick="closeNoHeartsOverlay()" style="padding:12px 20px;background:none;border:1px solid #666;color:white;border-radius:12px;cursor:pointer;font-size:14px;">ادامه مطالعه</button>
-    </div>`;
-  document.body.appendChild(overlay);
-  const timerEl = document.getElementById('no-hearts-timer');
-  const interval = setInterval(() => {
-    recalcHearts();
-    const remaining = nextHeartIn();
-    if (remaining === null || hearts >= MAX_HEARTS) {
-      clearInterval(interval);
-      document.getElementById('no-hearts-overlay')?.remove();
-      updateHeartsDisplay();
-      return;
-    }
-    const m = Math.floor(remaining / 60000);
-    const s = Math.floor((remaining % 60000) / 1000);
-    if (timerEl) timerEl.innerText = `⏱ ${m}:${s.toString().padStart(2,'0')}`;
-  }, 1000);
-}
-
-function closeNoHeartsOverlay() {
-  document.getElementById('no-hearts-overlay')?.remove();
-  navigateTo('lessons');
-}
-
-function resetQuiz() {
-  currentQuizIndex = 0;
-  quizAnswers = new Array(quickQuizzes.length).fill(null);
-  renderQuiz();
-}
+function loseHeart() { hearts--; updateHeartsDisplay(); if (hearts <= 0) { alert('💔 قلب‌ها تمام شد! تمرین مجدداً شروع می‌شود.'); resetQuiz(); } }
+function resetQuiz() { hearts = 5; updateHeartsDisplay(); currentQuizIndex = 0; quizAnswers = new Array(quickQuizzes.length).fill(null); renderQuiz(); }
 
 // ==================== پروفایل‌های چندگانه ====================
 let currentProfile = localStorage.getItem('currentProfile') || 'default';
 let profiles = JSON.parse(localStorage.getItem('profiles')) || { default: { name: 'کاربر مهمان', xp: 0, completedLessons: [], quizSolvedCount: 0, streak: 0, lastActive: '', aiMessages: [], adminMessages: [], totalStudyMinutes: 0, weeklyActivity: [0,0,0,0,0,0,0], lastActivityDate: '', lastLessonTime: '' } };
 
-function saveAllData(skipSync) {
+function saveAllData() {
   profiles[currentProfile] = { name: username, xp: xp, completedLessons: completedLessons, quizSolvedCount: quizSolvedCount, streak: streak, lastActive: lastActive, aiMessages: aiMessages, adminMessages: adminMessages, totalStudyMinutes: totalStudyMinutes, weeklyActivity: weeklyActivityData, lastActivityDate: lastActivityDate, lastLessonTime: lastLessonTime };
   localStorage.setItem('profiles', JSON.stringify(profiles));
   localStorage.setItem('currentProfile', currentProfile);
-  if (!skipSync) syncProgressToSupabase();
 }
 function loadProfile(profileName) {
   const profile = profiles[profileName];
@@ -5894,9 +5782,8 @@ function loadProfile(profileName) {
   weeklyActivityData = profile.weeklyActivity || [0,0,0,0,0,0,0];
   lastActivityDate = profile.lastActivityDate || '';
   lastLessonTime = profile.lastLessonTime || '';
-  updateUI(); updateChatList(); saveAllData(true);
+  updateUI(); updateChatList(); saveAllData();
   loadSavedMessagesFromSupabase();
-  loadProgressFromSupabase();
 }
 function addNewProfile() {
   let newName = prompt('نام پروفایل جدید را وارد کنید:');
@@ -5929,43 +5816,8 @@ async function loadSavedMessagesFromSupabase() {
 async function syncSavedMessagesToSupabase() {
   if (!sb || !username) return;
   try {
-    await sb.from('saved_messages').upsert({ username: username, messages: savedMessages, updated_at: new Date().toISOString() }, { onConflict: 'username' });
+    await sb.from('saved_messages').upsert({ username: username, messages: savedMessages, updated_at: new Date().toISOString() });
   } catch (e) { console.error('❌ خطا در ذخیره پیام‌های ذخیره شده:', e); }
-}
-
-// ==================== پیشرفت کاربر (Supabase) ====================
-function currentProgressObj() {
-  return { xp, completedLessons, quizSolvedCount, streak, lastActive, totalStudyMinutes, weeklyActivity: weeklyActivityData, lastActivityDate, lastLessonTime };
-}
-async function loadProgressFromSupabase() {
-  if (!sb || !username) return;
-  try {
-    const { data, error } = await sb.from('user_progress').select('progress').eq('username', username).maybeSingle();
-    if (!error && data && data.progress) {
-      const p = data.progress;
-      xp = p.xp || 0;
-      completedLessons = p.completedLessons || [];
-      quizSolvedCount = p.quizSolvedCount || 0;
-      streak = p.streak || 0;
-      lastActive = p.lastActive || '';
-      totalStudyMinutes = p.totalStudyMinutes || 0;
-      weeklyActivityData = p.weeklyActivity || [0,0,0,0,0,0,0];
-      lastActivityDate = p.lastActivityDate || '';
-      lastLessonTime = p.lastLessonTime || '';
-      saveAllData();
-      updateUI();
-    }
-  } catch (e) { console.error('❌ خطا در دریافت پیشرفت:', e); }
-}
-let progressSyncTimeout = null;
-function syncProgressToSupabase() {
-  if (!sb || !username) return;
-  clearTimeout(progressSyncTimeout);
-  progressSyncTimeout = setTimeout(async () => {
-    try {
-      await sb.from('user_progress').upsert({ username: username, progress: currentProgressObj(), updated_at: new Date().toISOString() }, { onConflict: 'username' });
-    } catch (e) { console.error('❌ خطا در ذخیره پیشرفت:', e); }
-  }, 600);
 }
 
 // ==================== تم رنگی ====================
@@ -6403,7 +6255,7 @@ async function joinPublicGroup(groupId) {
   if (!sb) return;
   const { error } = await sb.from('group_members').insert([{ group_id: groupId, username: username, role: 'member' }]);
   if (error) { console.error('❌ خطا در عضویت:', error); alert('خطا در عضویت'); return; }
-  await sendSystemMessage('grp:' + groupId, `${username} به گروه پیوست`);
+  await postSystemMessage('grp:' + groupId, `${username} به گفتگو پیوست`);
   await loadMyGroups();
   searchPublicGroups();
   const group = myGroups.find(g => g.id === groupId);
@@ -6427,7 +6279,7 @@ async function joinByCode() {
   if (myGroups.some(g => g.id === data.id)) { navigateTo('chat-list'); openGroupRoom({ ...data, role: 'member' }); return; }
   const { error: joinError } = await sb.from('group_members').insert([{ group_id: data.id, username: username, role: 'member' }]);
   if (joinError) { errEl.innerText = 'خطا در عضویت'; errEl.style.display = 'block'; return; }
-  await sendSystemMessage('grp:' + data.id, `${username} به گروه پیوست`);
+  await postSystemMessage('grp:' + data.id, `${username} به گفتگو پیوست`);
   await loadMyGroups();
   navigateTo('chat-list');
   const group = myGroups.find(g => g.id === data.id);
@@ -6492,6 +6344,16 @@ async function loadGroupRoomMessages(room) {
   }
 }
 
+async function verifyChannelPostPermission() {
+  if (!sb || !currentGroupInfo) return false;
+  const groupId = currentGroupInfo.id;
+  const { data, error } = await sb.from('group_members').select('role').eq('group_id', groupId).eq('username', username).maybeSingle();
+  if (error || !data) return false;
+  const allowed = data.role === 'owner' || data.role === 'admin';
+  currentGroupInfo.role = data.role; // به‌روزرسانی نقش محلی در صورت تغییر
+  return allowed;
+}
+
 function isOwnerOrAdminOfCurrentGroup() {
   return currentChatType === 'usergroup' && currentGroupInfo && (currentGroupInfo.role === 'owner' || currentGroupInfo.role === 'admin');
 }
@@ -6501,11 +6363,9 @@ let groupInfoState = null; // { room, group, returnType, viewerCanManage }
 
 function maybeOpenGroupInfo() {
   if (currentChatType === 'usergroup' && currentGroupInfo) {
-    if (currentGroupInfo.type === 'channel' && !isOwnerOrAdminOfCurrentGroup() && !isAdmin) {
-      alert('اطلاعات کانال فقط برای مدیران قابل مشاهده است');
-      return;
-    }
-    openGroupInfo(currentGroupRoom, currentGroupInfo, 'usergroup', isOwnerOrAdminOfCurrentGroup());
+    const canManage = isOwnerOrAdminOfCurrentGroup();
+    if (currentGroupInfo.type === 'channel' && !canManage && !isAdmin) { alert('اطلاعات کانال فقط برای مدیران قابل مشاهده است'); return; }
+    openGroupInfo(currentGroupRoom, currentGroupInfo, 'usergroup', canManage);
   } else if (currentChatType === 'admin-view' && currentAdminRoom && currentAdminRoom.startsWith('grp:')) {
     const g = adminGroupsCache[currentAdminRoom] || {};
     openGroupInfo(currentAdminRoom, g, 'admin-view', true);
@@ -6545,17 +6405,14 @@ async function openGroupInfo(room, group, returnType, viewerCanManage) {
   for (const m of members) {
     const badge = m.username === ADMIN_USERNAME ? adminBadgeHtml(13) : '';
     let actions = '';
-    if (m.username !== username) {
-      actions += `<button onclick="openPublicProfile('${m.username.replace(/'/g,"\\'")}')" style="background:none;border:1px solid var(--border);color:var(--text-secondary);border-radius:8px;padding:4px 8px;font-size:11px;cursor:pointer;margin-inline-start:6px;">👤 پروفایل</button>`;
-      actions += `<button onclick="messageMemberFromGroupInfo('${m.username.replace(/'/g,"\\'")}')" style="background:none;border:1px solid var(--primary);color:var(--primary-light);border-radius:8px;padding:4px 8px;font-size:11px;cursor:pointer;margin-inline-start:6px;">💬 پیام</button>`;
-    }
+    const msgBtn = m.username !== username ? `<button onclick="messageMemberFromGroupInfo('${m.username.replace(/'/g,"\\'")}')" title="ارسال پیام خصوصی" style="background:none;border:1px solid var(--primary-light);color:var(--primary-light);border-radius:8px;padding:4px 7px;font-size:11px;cursor:pointer;margin-inline-start:6px;display:inline-flex;align-items:center;"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg></button>` : '';
     if (viewerCanManage && m.username !== group.owner && m.role !== 'owner') {
       if (m.role === 'member') actions += `<button onclick="setMemberRole(${groupId},'${m.username.replace(/'/g,"\\'")}','admin')" style="background:none;border:1px solid var(--border);color:var(--text-secondary);border-radius:8px;padding:4px 8px;font-size:11px;cursor:pointer;margin-inline-start:6px;">ارتقا به مدیر</button>`;
       else actions += `<button onclick="setMemberRole(${groupId},'${m.username.replace(/'/g,"\\'")}','member')" style="background:none;border:1px solid var(--border);color:var(--text-secondary);border-radius:8px;padding:4px 8px;font-size:11px;cursor:pointer;margin-inline-start:6px;">عزل از مدیریت</button>`;
       actions += `<button onclick="removeMember(${groupId},'${m.username.replace(/'/g,"\\'")}')" style="background:none;border:1px solid var(--danger);color:var(--danger);border-radius:8px;padding:4px 8px;font-size:11px;cursor:pointer;margin-inline-start:6px;">حذف</button>`;
     }
-    html += `<div style="display:flex; align-items:center; justify-content:space-between; padding:10px 0; border-bottom:1px solid var(--border);">
-      <div style="display:flex; align-items:center; gap:6px; font-size:13px;">👤 ${escapeHtml(m.username)}${badge}</div>
+    html += `<div style="display:flex; align-items:center; justify-content:space-between; padding:10px 0; border-bottom:1px solid var(--border); flex-wrap:wrap; gap:6px;">
+      <div style="display:flex; align-items:center; gap:6px; font-size:13px;">👤 ${escapeHtml(m.username)}${badge}${msgBtn}</div>
       <div style="display:flex; align-items:center; font-size:12px; color:var(--text-secondary);">${roleLabel[m.role] || m.role}${actions}</div>
     </div>`;
   }
@@ -6571,9 +6428,11 @@ async function openGroupInfo(room, group, returnType, viewerCanManage) {
   actionsBox.innerHTML = actionsHtml;
 }
 
-function messageMemberFromGroupInfo(otherUser) {
-  if (!knownDmUsers.includes(otherUser)) { knownDmUsers.push(otherUser); saveKnownDmUsers(); }
-  openDmChat(otherUser);
+function messageMemberFromGroupInfo(targetUser) {
+  if (isGuest) { requireSignup('ارسال پیام خصوصی'); return; }
+  if (!knownDmUsers.includes(targetUser)) { knownDmUsers.push(targetUser); saveKnownDmUsers(); }
+  navigateTo('chat-list');
+  openDmChat(targetUser);
 }
 
 function closeGroupInfo() {
@@ -6592,8 +6451,7 @@ async function setMemberRole(groupId, targetUser, role) {
   if (!sb) return;
   const { error } = await sb.from('group_members').update({ role: role }).eq('group_id', groupId).eq('username', targetUser);
   if (error) { console.error('❌ خطا در تغییر رنک:', error); alert('خطا در تغییر رنک'); return; }
-  if (role === 'admin') await sendSystemMessage('grp:' + groupId, `${targetUser} توسط مدیر ارتقا یافت 🛡️`);
-  else await sendSystemMessage('grp:' + groupId, `${targetUser} از مدیریت عزل شد`);
+  await postSystemMessage('grp:' + groupId, role === 'admin' ? `${targetUser} مدیر شد 🛡️` : `${targetUser} از مدیریت برکنار شد`);
   openGroupInfo(groupInfoState.room, groupInfoState.group, groupInfoState.returnType, groupInfoState.viewerCanManage);
 }
 
@@ -6602,7 +6460,7 @@ async function removeMember(groupId, targetUser) {
   if (!sb) return;
   const { error } = await sb.from('group_members').delete().eq('group_id', groupId).eq('username', targetUser);
   if (error) { console.error('❌ خطا در حذف عضو:', error); alert('خطا در حذف'); return; }
-  await sendSystemMessage('grp:' + groupId, `${targetUser} از گروه حذف شد`);
+  await postSystemMessage('grp:' + groupId, `${targetUser} از گفتگو حذف شد`);
   openGroupInfo(groupInfoState.room, groupInfoState.group, groupInfoState.returnType, groupInfoState.viewerCanManage);
 }
 
@@ -6610,7 +6468,7 @@ async function leaveGroup(groupId) {
   if (!confirm('از این گروه/کانال خارج می‌شوید؟')) return;
   if (!sb) return;
   await sb.from('group_members').delete().eq('group_id', groupId).eq('username', username);
-  await sendSystemMessage('grp:' + groupId, `${username} گروه را ترک کرد`);
+  await postSystemMessage('grp:' + groupId, `${username} از گفتگو خارج شد`);
   await loadMyGroups();
   navigateTo('chat-list');
 }
@@ -6624,6 +6482,17 @@ async function deleteGroupCompletely(groupId) {
   await sb.from('groups').delete().eq('id', groupId);
   await loadMyGroups();
   navigateTo('chat-list');
+}
+
+async function postSystemMessage(room, text) {
+  if (!sb) return;
+  const time = getCurrentTime();
+  const { data, error } = await sb.from('messages').insert([{ sender: 'system', text: text, time: time, room: room, reply_to: null }]).select().single();
+  if (error) { console.error('❌ خطا در ثبت پیام سیستمی:', error); return; }
+  const msgObj = { id: data.id, sender: 'system', text: text, time: time, replyTo: null };
+  if (groupRoomMessages[room]) groupRoomMessages[room].push(msgObj);
+  if (currentChatType === 'usergroup' && currentGroupRoom === room) displayChatMessages();
+  if (currentChatType === 'admin-view' && currentAdminRoom === room) { adminViewMessages.push(msgObj); displayChatMessages(); }
 }
 
 function dmRoomId(u1, u2) {
@@ -6664,20 +6533,20 @@ async function computeUnreadCounts() {
   if (!sb || !username) return;
   try {
     const groupLastRead = readStatus['general'] || 0;
-    const { count: groupCount } = await sb.from('messages').select('id', { count: 'exact', head: true }).eq('room', 'general').gt('id', groupLastRead).neq('sender', username).neq('sender', 'system');
+    const { count: groupCount } = await sb.from('messages').select('id', { count: 'exact', head: true }).eq('room', 'general').gt('id', groupLastRead).neq('sender', username);
     unreadGroupCount = groupCount || 0;
     updateUnreadBadge();
 
     for (const u of knownDmUsers) {
       const room = dmRoomId(username, u);
       const lastRead = readStatus[room] || 0;
-      const { count } = await sb.from('messages').select('id', { count: 'exact', head: true }).eq('room', room).gt('id', lastRead).neq('sender', username).neq('sender', 'system');
+      const { count } = await sb.from('messages').select('id', { count: 'exact', head: true }).eq('room', room).gt('id', lastRead).neq('sender', username);
       dmUnread[u] = count || 0;
     }
     for (const g of myGroups) {
       const room = 'grp:' + g.id;
       const lastRead = readStatus[room] || 0;
-      const { count } = await sb.from('messages').select('id', { count: 'exact', head: true }).eq('room', room).gt('id', lastRead).neq('sender', username).neq('sender', 'system');
+      const { count } = await sb.from('messages').select('id', { count: 'exact', head: true }).eq('room', room).gt('id', lastRead).neq('sender', username);
       groupUnread[room] = count || 0;
     }
     updateChatList();
@@ -6735,12 +6604,6 @@ async function sendToSupabase(text, senderName, replyText) {
   if (data) newMsg.id = data.id;
 }
 
-async function sendSystemMessage(room, text) {
-  if (!sb) return;
-  const time = getCurrentTime();
-  await sb.from('messages').insert([{ sender: 'system', text: text, time: time, room: room, reply_to: null }]);
-}
-
 function subscribeToGeneralChat() {
   if (!sb) return;
   sb
@@ -6758,7 +6621,7 @@ function subscribeToGeneralChat() {
           if (currentChatType === 'group') {
             displayChatMessages();
             markRoomRead('general', m.id);
-          } else if (m.sender !== username && m.sender !== 'system') {
+          } else if (m.sender !== username) {
             unreadGroupCount++;
             updateUnreadBadge();
           }
@@ -6789,7 +6652,7 @@ function subscribeToGeneralChat() {
           if (currentChatType === 'usergroup' && currentGroupRoom === m.room) {
             displayChatMessages();
             markRoomRead(m.room, m.id);
-          } else if (m.sender !== username && m.sender !== 'system') {
+          } else if (m.sender !== username) {
             groupUnread[m.room] = (groupUnread[m.room] || 0) + 1;
           }
           renderMyGroupsList();
@@ -6859,10 +6722,7 @@ function displayChatMessages() {
   if (!messages.length) html += '<div style="text-align: center; padding: 40px;">پیامی وجود ندارد</div>';
   else for (let i = 0; i < messages.length; i++) {
     const msg = messages[i];
-    if (msg.sender === 'system') {
-      html += `<div style="text-align:center; margin:6px 0;"><span style="background:var(--bg-secondary); color:var(--text-secondary); font-size:11px; padding:5px 12px; border-radius:999px; display:inline-block;">${escapeHtml(msg.text)}</span></div>`;
-      continue;
-    }
+    if (msg.sender === 'system') { html += `<div style="text-align:center; margin:10px 0;"><span style="background:var(--bg-secondary); color:var(--text-secondary); font-size:11px; padding:5px 12px; border-radius:20px; display:inline-block;">ℹ️ ${escapeHtml(msg.text)}</span></div>`; continue; }
     const isMyMsg = (currentChatType === 'group' || currentChatType === 'dm' || currentChatType === 'admin-view' || currentChatType === 'usergroup') ? (msg.sender === username) : (msg.sender === 'user');
     html += `<div class="message ${isMyMsg ? 'user' : 'bot'} ${selectedMessageIndex === i ? 'selected' : ''}" onclick="selectMessage(${i})">`;
     if (msg.replyTo) html += `<div class="reply-preview">↩️ پاسخ به: ${escapeHtml(msg.replyTo)}</div>`;
@@ -7043,7 +6903,16 @@ function sendChatMessage() {
   const text = input.value.trim();
   if (!text) return;
   if (currentChatType === 'group' || currentChatType === 'dm' || currentChatType === 'admin-view' || currentChatType === 'usergroup') {
-    if (currentChatType === 'usergroup' && currentGroupInfo && currentGroupInfo.type === 'channel' && !isOwnerOrAdminOfCurrentGroup() && !isAdmin) { alert('فقط مدیر کانال می‌تواند پیام بدهد'); return; }
+    if (currentChatType === 'usergroup' && currentGroupInfo && currentGroupInfo.type === 'channel' && !isAdmin) {
+      verifyChannelPostPermission().then(allowed => {
+        if (!allowed) { alert('فقط مدیر کانال می‌تواند پیام بدهد'); return; }
+        const replyText = replyToMessageData ? replyToMessageData.text : null;
+        sendToSupabase(text, username || 'کاربر', replyText);
+        if (replyToMessageData) cancelReply();
+        input.value = '';
+      });
+      return;
+    }
     const replyText = replyToMessageData ? replyToMessageData.text : null;
     sendToSupabase(text, username || 'کاربر', replyText);
     if (replyToMessageData) cancelReply();
@@ -7161,14 +7030,7 @@ function searchUsers() {
     let html = '';
     for (const u of data) {
       if (u.username === username) continue;
-      html += `<div class="chat-item">
-        <div class="chat-avatar">👤</div>
-        <div class="chat-info"><div class="chat-name">${escapeHtml(u.username)}</div></div>
-        <div style="display:flex;gap:8px;">
-          <button onclick="openPublicProfile('${escapeHtml(u.username)}')" style="background:none;border:1px solid var(--border);color:var(--text-secondary);border-radius:8px;padding:6px 10px;font-size:12px;cursor:pointer;">👤 پروفایل</button>
-          <button onclick="startDmFromSearch('${escapeHtml(u.username)}')" style="background:none;border:1px solid var(--primary);color:var(--primary-light);border-radius:8px;padding:6px 10px;font-size:12px;cursor:pointer;">💬 پیام</button>
-        </div>
-      </div>`;
+      html += `<div class="chat-item" onclick="startDmFromSearch('${escapeHtml(u.username)}')"><div class="chat-avatar">👤</div><div class="chat-info"><div class="chat-name">${escapeHtml(u.username)}</div></div></div>`;
     }
     resultsEl.innerHTML = html || '<div style="text-align:center;padding:20px;color:var(--text-secondary);">کاربری پیدا نشد</div>';
   }, 300);
@@ -7176,52 +7038,6 @@ function searchUsers() {
 function startDmFromSearch(otherUser) {
   if (!knownDmUsers.includes(otherUser)) { knownDmUsers.push(otherUser); saveKnownDmUsers(); }
   openDmChat(otherUser);
-}
-
-let publicProfileReturnPage = 'chat-list-page';
-async function openPublicProfile(otherUser) {
-  publicProfileReturnPage = document.querySelector('.page.active')?.id || 'chat-list-page';
-  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
-  document.getElementById('public-profile-page').classList.add('active');
-  document.getElementById('public-profile-name').innerText = otherUser;
-  document.getElementById('public-profile-avatar').innerText = '👨‍💻';
-  document.getElementById('public-profile-xp').innerText = '...';
-  document.getElementById('public-profile-streak').innerText = '...';
-  document.getElementById('public-profile-lessons').innerText = '...';
-  document.getElementById('public-profile-quiz').innerText = '...';
-  document.getElementById('public-profile-level').innerText = 'در حال بارگذاری...';
-  document.getElementById('public-profile-study').innerText = '';
-  document.getElementById('public-weekly-chart').innerHTML = '';
-  document.getElementById('public-achievements-list').innerHTML = '';
-  const msgBtn = document.getElementById('public-profile-msg-btn');
-  msgBtn.onclick = () => startDmFromSearch(otherUser);
-  if (!sb) { document.getElementById('public-profile-level').innerText = 'اتصال برقرار نیست'; return; }
-  const { data } = await sb.from('user_progress').select('progress').eq('username', otherUser).maybeSingle();
-  if (!data || !data.progress) { document.getElementById('public-profile-level').innerText = 'اطلاعاتی موجود نیست'; return; }
-  const p = data.progress;
-  const lvl = Math.floor((p.xp || 0) / 100) + 1;
-  const totalLessons = languagesData ? Object.values(languagesData).reduce((s, l) => s + (l.lessons?.length || 0), 0) : 0;
-  document.getElementById('public-profile-xp').innerText = p.xp || 0;
-  document.getElementById('public-profile-streak').innerText = p.streak || 0;
-  document.getElementById('public-profile-lessons').innerText = (p.completedLessons || []).length;
-  document.getElementById('public-profile-quiz').innerText = p.quizSolvedCount || 0;
-  document.getElementById('public-profile-level').innerText = `سطح ${lvl}`;
-  document.getElementById('public-profile-study').innerText = `⏱ زمان مطالعه: ${p.totalStudyMinutes || 0} دقیقه`;
-  const progress = totalLessons > 0 ? Math.round(((p.completedLessons || []).length / totalLessons) * 100) : 0;
-  document.getElementById('public-overall-progress').style.width = progress + '%';
-  document.getElementById('public-overall-text').innerText = `${(p.completedLessons || []).length} از ${totalLessons} درس`;
-  const wa = p.weeklyActivity || [0,0,0,0,0,0,0];
-  const days = ['د','س','چ','پ','ج','ش','ی'];
-  document.getElementById('public-weekly-chart').innerHTML = days.map((d,i) => `<div class="chart-bar-container"><div class="chart-bar${wa[i] ? ' active' : ''}" style="height:${wa[i] ? '100' : '20'}%"></div><div class="chart-label">${d}</div></div>`).join('');
-  const achieved = getAchievements(p.xp || 0, p.streak || 0, (p.completedLessons || []).length, p.quizSolvedCount || 0);
-  document.getElementById('public-achievements-list').innerHTML = achieved.length
-    ? achieved.map(a => `<div class="achievement-item"><span class="achievement-icon">${a.icon}</span><div><strong>${a.name}</strong><p style="font-size:11px;color:var(--text-secondary)">${a.desc}</p></div></div>`).join('')
-    : '<p style="color:var(--text-secondary);font-size:13px;">هنوز دستاوردی کسب نشده</p>';
-}
-
-function closePublicProfile() {
-  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
-  document.getElementById(publicProfileReturnPage).classList.add('active');
 }
 
 function goBackFromChat() {
@@ -7281,20 +7097,6 @@ function displayAchievements() {
   }
   c.innerHTML = html;
 }
-function getAchievements(xpVal, streakVal, lessonsCount, quizCount) {
-  const result = [];
-  if (xpVal >= 100) result.push({ icon: '⭐', name: 'اولین صد', desc: '۱۰۰ XP کسب کردی' });
-  if (xpVal >= 500) result.push({ icon: '🌟', name: 'پنج صد', desc: '۵۰۰ XP کسب کردی' });
-  if (xpVal >= 1000) result.push({ icon: '💫', name: 'هزار XP', desc: '۱۰۰۰ XP کسب کردی' });
-  if (streakVal >= 3) result.push({ icon: '🔥', name: 'آتش‌نشین', desc: '۳ روز پیاپی درس خواندی' });
-  if (streakVal >= 7) result.push({ icon: '🏅', name: 'یک هفته پیاپی', desc: '۷ روز پیاپی درس خواندی' });
-  if (lessonsCount >= 5) result.push({ icon: '📚', name: 'دانش‌آموز', desc: '۵ درس تموم کردی' });
-  if (lessonsCount >= 20) result.push({ icon: '🎓', name: 'دانشجو', desc: '۲۰ درس تموم کردی' });
-  if (quizCount >= 10) result.push({ icon: '✏️', name: 'تمرین‌کار', desc: '۱۰ تمرین حل کردی' });
-  if (quizCount >= 50) result.push({ icon: '🧠', name: 'ذهن تیز', desc: '۵۰ تمرین حل کردی' });
-  return result;
-}
-
 function getLevel() { return Math.floor(xp / 100) + 1; }
 function getTotalLessons() { return Object.values(languagesData).reduce((s, l) => s + l.lessons.length, 0); }
 function updateUI() {
@@ -7329,7 +7131,7 @@ function navigateTo(page) {
   if (page === 'chat-list' && isGuest) { requireSignup('بخش پیام‌ها'); return; }
   stopTimer(); stopChatPolling(); clearSelection(); document.querySelectorAll('.page').forEach(p => p.classList.remove('active')); document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
   if (page === 'chat-list') { document.getElementById('chat-list-page').classList.add('active'); document.getElementById('nav-chat').classList.add('active'); updateChatList(); }
-  else if (page === 'quiz') { document.getElementById('quiz-page').classList.add('active'); document.getElementById('nav-quiz').classList.add('active'); recalcHearts(); updateHeartsDisplay(); startHeartTimer(); }
+  else if (page === 'quiz') { document.getElementById('quiz-page').classList.add('active'); document.getElementById('nav-quiz').classList.add('active'); hearts = 5; updateHeartsDisplay(); }
   else if (page === 'editor') { document.getElementById('editor-page').classList.add('active'); document.getElementById('nav-editor').classList.add('active'); if (editor) runCode(); else setTimeout(() => { initEditor(); runCode(); }, 100); }
   else if (page === 'admin-panel') { document.getElementById('admin-panel-page').classList.add('active'); }
   else if (page === 'create-group' || page === 'public-groups' || page === 'join-code' || page === 'group-info') { document.getElementById(`${page}-page`).classList.add('active'); }
@@ -7379,15 +7181,7 @@ function checkLessonAnswer(el, sel, correct, already, mins) {
   document.getElementById('quizResult').style.display = 'block';
 }
 function closeQuizOverlay() { document.querySelector('.quiz-overlay')?.remove(); activeQuizOverlay = false; currentLessonId = ''; pendingComplete = null; goBack(); }
-function startQuiz() {
-  if (isGuest) { requireSignup('تمرین‌ها'); return; }
-  recalcHearts();
-  if (hearts <= 0) { showNoHeartsOverlay(); return; }
-  currentQuizIndex = 0;
-  quizAnswers = new Array(quickQuizzes.length).fill(null);
-  navigateTo('quiz');
-  renderQuiz();
-}
+function startQuiz() { if (isGuest) { requireSignup('تمرین‌ها'); return; } hearts = 5; updateHeartsDisplay(); currentQuizIndex = 0; quizAnswers = new Array(quickQuizzes.length).fill(null); navigateTo('quiz'); renderQuiz(); }
 function renderQuiz() {
   const q = quickQuizzes[currentQuizIndex];
   document.getElementById('quiz-counter').innerHTML = `سوال ${currentQuizIndex+1} از ${quickQuizzes.length}`;
@@ -7401,7 +7195,7 @@ function renderQuiz() {
 function answerQuiz(selected) {
   if (quizAnswers[currentQuizIndex] !== null) return;
   quizAnswers[currentQuizIndex] = selected;
-  if (selected === quickQuizzes[currentQuizIndex].a) { xp += 5; quizSolvedCount++; updateUI(); saveAllData(); }
+  if (selected === quickQuizzes[currentQuizIndex].a) { xp += 5; quizSolvedCount++; updateUI(); }
   else { loseHeart(); if (hearts <= 0) { resetQuiz(); return; } }
   renderQuiz();
 }
