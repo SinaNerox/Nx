@@ -197,7 +197,11 @@
     .chart-bar-label { font-size: 10px; color: var(--text-secondary); }
     
     .search-box { padding: 8px 12px; background: var(--bg-primary); border: 1px solid var(--border); border-radius: 20px; color: var(--text-primary); width: 100%; margin-bottom: 12px; outline: none; }
-    .emoji-picker { position: absolute; bottom: 80px; left: 12px; background: var(--bg-secondary); border-radius: 16px; padding: 8px; display: none; grid-template-columns: repeat(6, 1fr); gap: 8px; z-index: 150; border: 1px solid var(--primary); }
+    .emoji-picker { position: absolute; bottom: 80px; left: 12px; right: 12px; max-width: 360px; background: var(--bg-secondary); border-radius: 16px; padding: 8px; display: none; z-index: 150; border: 1px solid var(--primary); }
+    .emoji-tabs { display: flex; gap: 4px; border-bottom: 1px solid var(--border); padding-bottom: 6px; margin-bottom: 6px; overflow-x: auto; }
+    .emoji-tab { background: none; border: none; font-size: 18px; padding: 5px 7px; border-radius: 8px; cursor: pointer; flex-shrink: 0; }
+    .emoji-tab.active { background: var(--primary); }
+    .emoji-grid { display: grid; grid-template-columns: repeat(6, 1fr); gap: 6px; max-height: 210px; overflow-y: auto; }
     .emoji-item { font-size: 24px; cursor: pointer; padding: 4px; text-align: center; border-radius: 8px; transition: all 0.2s; }
     .emoji-item:hover { background: var(--primary); }
     
@@ -358,6 +362,7 @@
   <div style="display:flex; gap:8px; padding:12px;">
     <button id="admin-tab-groups" class="admin-tab active" onclick="switchAdminTab('groups')" style="flex:1; padding:9px; border-radius:10px; border:none; cursor:pointer; font-size:13px;">👥 گروه‌ها و کانال‌ها</button>
     <button id="admin-tab-dms" class="admin-tab" onclick="switchAdminTab('dms')" style="flex:1; padding:9px; border-radius:10px; border:none; cursor:pointer; font-size:13px;">💬 پیوی‌ها</button>
+    <button id="admin-tab-reports" class="admin-tab" onclick="switchAdminTab('reports')" style="flex:1; padding:9px; border-radius:10px; border:none; cursor:pointer; font-size:13px;">🚩 گزارش‌ها</button>
   </div>
   <div id="admin-rooms-list" style="padding: 0 12px 12px;"></div>
 </div>
@@ -472,7 +477,19 @@
   <div id="reply-bar" class="reply-bar"><span class="reply-text" id="reply-text"></span><button class="cancel-reply" onclick="cancelReply()">✖️</button></div>
   <div id="chat-detail-messages" class="chat-messages-container"></div>
   <div class="chat-input-container"><button onclick="toggleEmojiPicker()" style="background: none; border: none; color: var(--text-secondary); cursor: pointer; font-size: 24px;">😊</button><input type="text" id="chat-detail-input" class="chat-input" placeholder="پیام خود را بنویسید..." onkeypress="if(event.key==='Enter') sendChatMessage()" onfocus="setTimeout(()=>{const c=document.getElementById('chat-detail-messages'); if(c) c.scrollTop = c.scrollHeight;}, 300)"><button class="send-btn" onclick="sendChatMessage()">📤</button></div>
-  <div id="emoji-picker" class="emoji-picker"><div class="emoji-item" onclick="addEmoji('😀')">😀</div><div class="emoji-item" onclick="addEmoji('😂')">😂</div><div class="emoji-item" onclick="addEmoji('❤️')">❤️</div><div class="emoji-item" onclick="addEmoji('👍')">👍</div><div class="emoji-item" onclick="addEmoji('🎉')">🎉</div><div class="emoji-item" onclick="addEmoji('🔥')">🔥</div><div class="emoji-item" onclick="addEmoji('✅')">✅</div><div class="emoji-item" onclick="addEmoji('⭐')">⭐</div><div class="emoji-item" onclick="addEmoji('💡')">💡</div><div class="emoji-item" onclick="addEmoji('📚')">📚</div><div class="emoji-item" onclick="addEmoji('💻')">💻</div><div class="emoji-item" onclick="addEmoji('🐍')">🐍</div></div>
+  <div id="emoji-picker" class="emoji-picker">
+    <div class="emoji-tabs">
+      <button class="emoji-tab active" data-cat="smileys" onclick="switchEmojiCategory('smileys')">😀</button>
+      <button class="emoji-tab" data-cat="gestures" onclick="switchEmojiCategory('gestures')">👍</button>
+      <button class="emoji-tab" data-cat="hearts" onclick="switchEmojiCategory('hearts')">❤️</button>
+      <button class="emoji-tab" data-cat="animals" onclick="switchEmojiCategory('animals')">🐶</button>
+      <button class="emoji-tab" data-cat="food" onclick="switchEmojiCategory('food')">🍕</button>
+      <button class="emoji-tab" data-cat="activities" onclick="switchEmojiCategory('activities')">⚽</button>
+      <button class="emoji-tab" data-cat="objects" onclick="switchEmojiCategory('objects')">💡</button>
+      <button class="emoji-tab" data-cat="symbols" onclick="switchEmojiCategory('symbols')">✅</button>
+    </div>
+    <div id="emoji-grid" class="emoji-grid"></div>
+  </div>
   <div id="action-menu" class="action-menu">
     <button class="action-btn" onclick="copyMessage()" title="کپی"><svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg></button>
     <button class="action-btn" onclick="pinSelectedMessage()" title="پین"><svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 17v5"/><path d="M9 10.76a2 2 0 0 1-1.11 1.79l-1.78.9A2 2 0 0 0 5 15.24V17h14v-1.76a2 2 0 0 0-1.11-1.79l-1.78-.9A2 2 0 0 1 15 10.76V7a1 1 0 0 1 1-1 2 2 0 0 0 0-4H8a2 2 0 0 0 0 4 1 1 0 0 1 1 1z"/></svg></button>
@@ -480,6 +497,7 @@
     <button class="action-btn" onclick="replyToMessage()" title="پاسخ"><svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 17l-5-5 5-5"/><path d="M20 18v-2a4 4 0 0 0-4-4H4"/></svg></button>
     <button class="action-btn" onclick="deleteSelectedMessage()" title="حذف"><svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 6h18"/><path d="M8 6V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/><path d="M10 11v6"/><path d="M14 11v6"/></svg></button>
     <button class="action-btn" onclick="editSelectedMessage()" title="ویرایش"><svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.12 2.12 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg></button>
+    <button class="action-btn" onclick="reportSelectedMessage()" title="گزارش"><svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 15s1-1 4-1 5 2 8 2 4-1 4-1V3s-1 1-4 1-5-2-8-2-4 1-4 1z"/><path d="M4 22v-7"/></svg></button>
     <button class="action-btn" onclick="clearSelection()" title="لغو"><svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 6L6 18"/><path d="M6 6l12 12"/></svg></button>
   </div>
   <div id="editPanel" class="edit-panel"><div style="display: flex; gap: 12px;"><input type="text" id="editInput" class="edit-input" placeholder="متن جدید را وارد کنید..."><button onclick="saveEditedMessage()" class="btn-primary" style="width: auto; margin-top: 0;">ذخیره</button><button onclick="closeEditPanel()" class="btn-secondary" style="width: auto; margin-top: 0;">انصراف</button></div></div>
@@ -537,6 +555,19 @@
   <p id="guest-lock-desc" style="color: var(--text-secondary); font-size:14px; max-width:320px; line-height:1.8; margin-bottom:28px;"></p>
   <button class="btn-primary" onclick="confirmSignupFromLock()" style="width:100%; max-width:280px; margin-bottom:10px;">ثبت‌نام رایگان</button>
   <button onclick="closeGuestLock()" style="width:100%; max-width:280px; background:none; border:1px solid var(--border); color:var(--text-secondary); padding:12px; border-radius:10px; cursor:pointer;">بازگشت</button>
+</div>
+
+<!-- صفحه‌ی گزارش -->
+<div id="report-modal" style="display:none; position:fixed; inset:0; z-index:9999; background:rgba(0,0,0,.6); align-items:center; justify-content:center; padding:20px;">
+  <div style="background:var(--bg-primary); border-radius:16px; padding:22px; width:100%; max-width:340px; max-height:85vh; overflow-y:auto;">
+    <h3 style="margin-bottom:6px; display:flex; align-items:center; gap:8px;">🚩 گزارش</h3>
+    <p id="report-target-preview" style="font-size:12px; color:var(--text-secondary); background:var(--bg-secondary); border-radius:8px; padding:8px; margin-bottom:14px;"></p>
+    <p style="font-size:13px; margin-bottom:8px; color:var(--text-secondary);">دلیل گزارش را انتخاب کن:</p>
+    <div id="report-reasons" style="display:flex; flex-direction:column; gap:8px; margin-bottom:14px;"></div>
+    <textarea id="report-details-input" placeholder="توضیحات بیشتر (اختیاری)" style="width:100%; min-height:60px; padding:10px; border-radius:10px; border:1px solid var(--border); background:var(--bg-secondary); color:var(--text-primary); font-size:13px; resize:vertical; margin-bottom:14px;"></textarea>
+    <button onclick="submitReport()" class="btn-primary" style="width:100%; margin-top:0;">ارسال گزارش</button>
+    <button onclick="closeReportModal()" style="width:100%; margin-top:8px; background:none; border:1px solid var(--border); color:var(--text-secondary); padding:12px; border-radius:10px; cursor:pointer;">انصراف</button>
+  </div>
 </div>
 
 <script>
@@ -6098,10 +6129,47 @@ function switchAdminTab(tab) {
   adminCurrentTab = tab;
   document.getElementById('admin-tab-groups').classList.toggle('active', tab === 'groups');
   document.getElementById('admin-tab-dms').classList.toggle('active', tab === 'dms');
-  renderAdminRoomsList();
+  document.getElementById('admin-tab-reports').classList.toggle('active', tab === 'reports');
+  document.getElementById('admin-search-input').style.display = tab === 'reports' ? 'none' : 'block';
+  if (tab === 'reports') loadAdminReports();
+  else renderAdminRoomsList();
 }
 
 function filterAdminRooms() { renderAdminRoomsList(); }
+
+async function loadAdminReports() {
+  const list = document.getElementById('admin-rooms-list');
+  list.innerHTML = '<div style="text-align:center;padding:20px;color:var(--text-secondary);">در حال بارگذاری...</div>';
+  if (!sb) return;
+  const { data, error } = await sb.from('reports').select('*').order('id', { ascending: false });
+  if (error) { list.innerHTML = '<div style="text-align:center;padding:20px;color:var(--danger);">خطا در دریافت گزارش‌ها</div>'; return; }
+  if (!data || !data.length) { list.innerHTML = '<div style="text-align:center;padding:30px;color:var(--text-secondary);">گزارشی وجود ندارد</div>'; return; }
+  const typeLabel = { message: '✉️ پیام', group: '👥 گروه/کانال', user: '👤 کاربر' };
+  let html = '';
+  for (const r of data) {
+    const statusColor = r.status === 'resolved' ? 'var(--text-secondary)' : 'var(--danger)';
+    const statusText = r.status === 'resolved' ? 'بررسی‌شده' : 'در انتظار بررسی';
+    html += `<div style="background:var(--bg-secondary); border-radius:12px; padding:12px; margin-bottom:10px; border-right:3px solid ${statusColor};">
+      <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:6px;">
+        <span style="font-size:12px; font-weight:bold;">${typeLabel[r.target_type] || r.target_type}</span>
+        <span style="font-size:11px; color:${statusColor};">${statusText}</span>
+      </div>
+      <p style="font-size:12px; margin-bottom:4px;"><b>دلیل:</b> ${escapeHtml(r.reason)}</p>
+      <p style="font-size:11px; color:var(--text-secondary); margin-bottom:4px; white-space:pre-wrap;">${escapeHtml(r.target_info || '')}</p>
+      ${r.details ? `<p style="font-size:11px; color:var(--text-secondary); margin-bottom:6px;"><b>توضیحات:</b> ${escapeHtml(r.details)}</p>` : ''}
+      <p style="font-size:11px; color:var(--text-secondary); margin-bottom:8px;">گزارش‌دهنده: ${escapeHtml(r.reporter)}</p>
+      ${r.status !== 'resolved' ? `<button onclick="resolveReport(${r.id})" style="background:var(--primary); color:#fff; border:none; padding:6px 12px; border-radius:8px; font-size:11px; cursor:pointer;">علامت‌گذاری به‌عنوان بررسی‌شده</button>` : ''}
+    </div>`;
+  }
+  list.innerHTML = html;
+}
+
+async function resolveReport(reportId) {
+  if (!sb) return;
+  const { error } = await sb.from('reports').update({ status: 'resolved' }).eq('id', reportId);
+  if (error) { console.error('❌ خطا در به‌روزرسانی گزارش:', error); return; }
+  loadAdminReports();
+}
 
 function renderAdminRoomsList() {
   const list = document.getElementById('admin-rooms-list');
@@ -6424,6 +6492,9 @@ async function openGroupInfo(room, group, returnType, viewerCanManage) {
     actionsHtml += `<button onclick="deleteGroupCompletely(${groupId})" style="width:100%; background:none; border:1px solid var(--danger); color:var(--danger); padding:10px; border-radius:10px; cursor:pointer; margin-bottom:8px;">🗑️ حذف کامل ${group.type === 'channel' ? 'کانال' : 'گروه'}</button>`;
   } else if (myRole) {
     actionsHtml += `<button onclick="leaveGroup(${groupId})" style="width:100%; background:none; border:1px solid var(--danger); color:var(--danger); padding:10px; border-radius:10px; cursor:pointer;">🚪 ترک ${group.type === 'channel' ? 'کانال' : 'گروه'}</button>`;
+  }
+  if (myRole !== 'owner') {
+    actionsHtml += `<button onclick="reportCurrentGroup()" style="width:100%; background:none; border:1px solid var(--border); color:var(--text-secondary); padding:10px; border-radius:10px; cursor:pointer; margin-top:8px;">🚩 گزارش این ${group.type === 'channel' ? 'کانال' : 'گروه'}</button>`;
   }
   actionsBox.innerHTML = actionsHtml;
 }
@@ -6774,6 +6845,53 @@ function fallbackCopy(text, done) {
   document.body.removeChild(ta);
   done();
 }
+
+// ==================== سیستم گزارش ====================
+const reportReasonsList = ['اسپم یا تبلیغات ناخواسته','محتوای توهین‌آمیز یا آزاررسان','محتوای نامناسب یا غیرقانونی','اطلاعات نادرست','نقض حریم خصوصی','سایر موارد'];
+let reportState = null; // { targetType, targetInfo, selectedReason }
+
+function openReportModal(targetType, targetInfo, previewText) {
+  reportState = { targetType, targetInfo, selectedReason: null };
+  document.getElementById('report-target-preview').innerText = previewText;
+  document.getElementById('report-details-input').value = '';
+  const reasonsBox = document.getElementById('report-reasons');
+  reasonsBox.innerHTML = reportReasonsList.map((r, idx) => `<button onclick="selectReportReason(${idx})" id="report-reason-${idx}" style="text-align:right; padding:10px 12px; border-radius:10px; border:1px solid var(--border); background:var(--bg-secondary); color:var(--text-primary); cursor:pointer; font-size:13px;">${r}</button>`).join('');
+  document.getElementById('report-modal').style.display = 'flex';
+}
+function selectReportReason(idx) {
+  reportState.selectedReason = reportReasonsList[idx];
+  document.querySelectorAll('#report-reasons button').forEach((b, i) => {
+    b.style.borderColor = i === idx ? 'var(--primary)' : 'var(--border)';
+    b.style.background = i === idx ? 'var(--primary)' : 'var(--bg-secondary)';
+  });
+}
+function closeReportModal() {
+  document.getElementById('report-modal').style.display = 'none';
+  reportState = null;
+}
+async function submitReport() {
+  if (!reportState || !reportState.selectedReason) { alert('لطفاً یک دلیل انتخاب کن'); return; }
+  if (!sb) { alert('اتصال به سرور برقرار نیست'); return; }
+  const details = document.getElementById('report-details-input').value.trim();
+  const { error } = await sb.from('reports').insert([{ reporter: username, target_type: reportState.targetType, target_info: reportState.targetInfo, reason: reportState.selectedReason, details: details || null }]);
+  if (error) { console.error('❌ خطا در ارسال گزارش:', error); alert('خطا در ارسال گزارش'); return; }
+  closeReportModal();
+  alert('گزارش شما ثبت شد. ممنون از همکاریت 🙏');
+}
+function reportSelectedMessage() {
+  if (selectedMessageIndex === null) return;
+  const msg = getMessages()[selectedMessageIndex];
+  const room = currentRoomId() || currentChatType;
+  const info = `پیام از: ${msg.sender}\nاتاق: ${room}\nمتن: ${msg.text}`;
+  openReportModal('message', info, `پیام از «${msg.sender}»: ${msg.text.substring(0, 80)}`);
+  clearSelection();
+}
+function reportCurrentGroup() {
+  if (!groupInfoState || !groupInfoState.group) return;
+  const g = groupInfoState.group;
+  const info = `گروه/کانال: ${g.name} (شناسه: ${g.id})\nمالک: ${g.owner}`;
+  openReportModal('group', info, `${g.type === 'channel' ? 'کانال' : 'گروه'} «${g.name}»`);
+}
 let pinnedByRoom = {}; // { room: { text, message_id } } - برای گروه/خصوصی، مشترک روی سرور
 
 function currentRoomId() {
@@ -6975,8 +7093,32 @@ function searchMessages() {
   for (let i = 0; i < msgs.length; i++) if (msgs[i].text.toLowerCase().includes(term)) html += `<div class="message ${msgs[i].sender === 'user' ? 'user' : 'bot'}"><div class="message-bubble">${escapeHtml(msgs[i].text)}</div><span class="message-time">${msgs[i].time}</span></div>`;
   container.innerHTML = html || '<div style="text-align:center;padding:40px;">نتیجه‌ای یافت نشد</div>';
 }
-function toggleEmojiPicker() { const p = document.getElementById('emoji-picker'); p.style.display = p.style.display === 'none' ? 'grid' : 'none'; }
-function addEmoji(e) { const i = document.getElementById('chat-detail-input'); i.value += e; i.focus(); document.getElementById('emoji-picker').style.display = 'none'; }
+const emojiCategories = {
+  smileys: ['😀','😃','😄','😁','😆','😅','🤣','😂','🙂','🙃','😉','😊','😇','🥰','😍','🤩','😘','😗','😚','😙','😋','😛','😜','🤪','😝','🤑','🤗','🤭','🫢','🫣','🤫','🤔','🫡','🤐','🤨','😐','😑','😶','🫠','😏','😒','🙄','😬','🤥','😌','😔','😪','🤤','😴','😷','🤒','🤕','🤢','🤮','🤧','🥵','🥶','🥴','😵','🤯','🤠','🥳','🥸','😎','🤓','🧐','😕','🫤','😟','🙁','☹️','😮','😯','😲','😳','🥺','😦','😧','😨','😰','😥','😢','😭','😱','😖','😣','😞','😓','😩','😫','🥱','😤','😡','😠','🤬','😈','👿','💀','☠️'],
+  gestures: ['👋','🤚','🖐️','✋','🖖','🫱','🫲','🫳','🫴','👌','🤌','🤏','✌️','🤞','🫰','🤟','🤘','🤙','👈','👉','👆','🖕','👇','☝️','👍','👎','✊','👊','🤛','🤜','👏','🙌','🫶','👐','🤲','🤝','🙏','✍️','💪','🦾','🦿','🦵','🦶','👂','🦻','👃','🧠','🫀','🦷','👀','👁️','👅','👄'],
+  hearts: ['❤️','🧡','💛','💚','💙','💜','🤎','🖤','🤍','💔','❤️‍🔥','❤️‍🩹','❣️','💕','💞','💓','💗','💖','💘','💝','💟','♥️','💌','💋'],
+  animals: ['🐶','🐱','🐭','🐹','🐰','🦊','🐻','🐼','🐻‍❄️','🐨','🐯','🦁','🐮','🐷','🐸','🐵','🙈','🙉','🙊','🐔','🐧','🐦','🐤','🦆','🦉','🦇','🐺','🐗','🐴','🦄','🐝','🪱','🐛','🦋','🐌','🐞','🐜','🪰','🪲','🪳','🦟','🦗','🕷️','🦂','🐢','🐍','🦎','🦖','🦕','🐙','🦑','🦐','🦞','🦀','🐡','🐠','🐟','🐬','🐳','🐋','🦈','🐊','🐅','🐆','🦓','🦍','🦧','🦣','🐘','🦛','🦏','🐪','🐫','🦒','🦘','🦬','🐃','🐂','🐄','🐎','🐖','🐏','🐑','🦙','🐐','🦌','🐕','🐩','🦮','🐈','🐓','🦃','🦤','🦚','🦜','🦢','🦩','🕊️','🐇','🦝','🦨','🦡','🦫','🦦','🦥'],
+  food: ['🍏','🍎','🍐','🍊','🍋','🍌','🍉','🍇','🍓','🫐','🍈','🍒','🍑','🥭','🍍','🥥','🥝','🍅','🍆','🥑','🥦','🥬','🥒','🌶️','🫑','🌽','🥕','🫒','🧄','🧅','🥔','🍠','🥐','🥯','🍞','🥖','🥨','🧀','🥚','🍳','🧈','🥞','🧇','🥓','🥩','🍗','🍖','🦴','🌭','🍔','🍟','🍕','🫓','🥪','🥙','🧆','🌮','🌯','🫔','🥗','🥘','🫕','🥫','🍝','🍜','🍲','🍛','🍣','🍱','🥟','🦪','🍤','🍙','🍚','🍘','🍥','🥠','🥮','🍢','🍡','🍧','🍨','🍦','🥧','🧁','🍰','🎂','🍮','🍭','🍬','🍫','🍿','🍩','🍪','🌰','🥜','🍯','🥛','🍼','☕','🍵','🧃','🥤','🧋','🍶','🍺','🍻','🥂','🍷','🥃','🍸','🍹','🧉','🍾'],
+  activities: ['⚽','🏀','🏈','⚾','🥎','🎾','🏐','🏉','🥏','🎱','🪀','🏓','🏸','🏒','🏑','🥍','🏏','🪃','🥅','⛳','🪁','🏹','🎣','🤿','🥊','🥋','🎽','🛹','🛼','🛷','⛸️','🥌','🎿','⛷️','🏂','🪂','🏋️','🤼','🤸','⛹️','🤺','🤾','🏌️','🏇','🧘','🏄','🏊','🤽','🚣','🧗','🚵','🚴','🏆','🥇','🥈','🥉','🏅','🎖️','🎗️','🎫','🎟️','🎪','🤹','🎭','🩰','🎨','🎬','🎤','🎧','🎼','🎹','🥁','🪘','🎷','🎺','🪗','🎸','🪕','🎻','🎲','♟️','🎯','🎳','🎮','🎰'],
+  objects: ['💡','🔋','🪫','🔌','💻','🖥️','🖨️','⌨️','🖱️','💽','💾','💿','📀','🎥','📷','📸','📹','📼','☎️','📞','📟','📠','📺','📻','🎙️','🎚️','🎛️','🧭','⏱️','⏲️','⏰','🕰️','⌛','⏳','📡','🔦','🕯️','🪔','🧯','🛢️','💸','💵','💴','💶','💷','🪙','💰','💳','🪪','💎','⚖️','🪜','🧰','🪛','🔧','🔨','⚒️','🛠️','⛏️','🪚','🔩','⚙️','🪤','🧱','⛓️','🧲','🔫','💣','🧨','🪓','🔪','🗡️','⚔️','🛡️','🚬','⚰️','🪦','⚱️','🏺','🔮','📿','🧿','💈','⚗️','🔭','🔬','🕳️','🩹','💊','💉','🩸','🧬','🦠','🧫','🧪','🌡️','🧹','🪠','🧺','🧻','🚽','🚿','🛁','🪞','🪥','🧼','🪒','🧽','🪣','🧴','🛎️','🔑','🗝️','🚪','🪑','🛋️','🛏️','🛌','🖼️','🪟','🛍️','🛒','🎁','🎈','🎀','🪄','🪅','🎊','🎉','🪩','✉️','📩','📨','📧','💌','📥','📤','📦','🏷️','📪','📫','📬','📭','📮','📯','📜','📃','📄','📑','🧾','📊','📈','📉','🗒️','🗓️','📆','📅','🗑️','📇','🗃️','🗳️','🗄️','📋','📁','📂','🗂️','🗞️','📰','📓','📔','📒','📕','📗','📘','📙','📚','📖','🔖','🧷','🔗','📎','🖇️','📐','📏','🧮','📌','📍','✂️','🖊️','🖋️','✒️','🖌️','🖍️','📝','✏️','🔍','🔎'],
+  symbols: ['✅','❌','❎','✔️','➕','➖','➗','✖️','♾️','‼️','⁉️','❓','❔','❕','❗','〜','💯','🔱','📛','🔰','⭐','🌟','✨','⚡','🔥','💥','💢','💦','💨','🕳️','💤','🚫','🔞','📵','🚭','♻️','✳️','✴️','❇️','🆗','🆕','🆙','🆒','🆓','🆖','🔝','🔙','🔛','🔜','🔚','🔘','🔴','🟠','🟡','🟢','🔵','🟣','🟤','⚪','⚫','🟥','🟧','🟨','🟩','🟦','🟪','🟫','◼️','◻️','◾','◽','▪️','▫️','🔺','🔻','💠','🔘','🔲','🔳','📍','📌','🚩','🏁','🏳️','🏴','🏳️‍🌈']
+};
+let currentEmojiCategory = 'smileys';
+function toggleEmojiPicker() {
+  const p = document.getElementById('emoji-picker');
+  if (p.style.display !== 'block') renderEmojiCategory(currentEmojiCategory);
+  p.style.display = p.style.display === 'block' ? 'none' : 'block';
+}
+function switchEmojiCategory(cat) {
+  currentEmojiCategory = cat;
+  document.querySelectorAll('.emoji-tab').forEach(t => t.classList.toggle('active', t.dataset.cat === cat));
+  renderEmojiCategory(cat);
+}
+function renderEmojiCategory(cat) {
+  const grid = document.getElementById('emoji-grid');
+  grid.innerHTML = emojiCategories[cat].map(e => `<div class="emoji-item" onclick="addEmoji('${e}')">${e}</div>`).join('');
+}
+function addEmoji(e) { const i = document.getElementById('chat-detail-input'); i.value += e; i.focus(); }
 function clearCurrentChat() { if (confirm('همه پیام‌ها پاک شوند؟')) { if (currentChatType === 'saved') savedMessages = []; else if (currentChatType === 'ai') aiMessages = []; else adminMessages = []; saveMessages(); displayChatMessages(); updateChatList(); clearSelection(); } }
 function openChat(type) { 
   currentChatType = type; 
