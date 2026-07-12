@@ -84,7 +84,8 @@
     .header-center { text-align: center; flex: 1; }
     .header-center h1 { color: var(--primary); font-size: 20px; display: flex; align-items: center; justify-content: center; gap: 8px; }
     .header-center p { color: var(--text-secondary); font-size: 11px; margin-top: 3px; }
-    .back-btn { font-size: 24px; cursor: pointer; color: var(--primary-light); flex-shrink: 0; padding: 4px 8px; background: none; border: none; }
+    .back-btn { cursor: pointer; color: var(--primary-light); flex-shrink: 0; padding: 4px 8px; background: none; border: none; display:flex; align-items:center; }
+    .back-btn::before { content: ''; display:none; }
     .streak { background: var(--warning); color: #78350f; padding: 4px 12px; border-radius: 20px; font-size: 12px; display: inline-block; margin-top: 6px; font-weight: bold; }
     
     .hearts-container { display: flex; gap: 5px; margin-bottom: 12px; justify-content: flex-start; }
@@ -104,9 +105,10 @@
     .lesson-xp { color: var(--primary-light); font-weight: bold; font-size: 13px; }
     
     .bottom-nav { position: fixed; bottom: 0; width: 100%; background: var(--bg-secondary); border-top: 1px solid var(--border); display: flex; justify-content: space-around; padding: 10px 0; z-index: 100; }
-    .nav-item { display: flex; flex-direction: column; align-items: center; gap: 4px; font-size: 11px; color: var(--text-secondary); cursor: pointer; transition: color 0.2s; background: none; border: none; }
+    .nav-item { display: flex; flex-direction: column; align-items: center; gap: 3px; font-size: 10px; color: var(--text-secondary); cursor: pointer; transition: color 0.2s; background: none; border: none; padding: 4px 8px; border-radius: 12px; }
     .nav-item.active { color: var(--primary); }
-    .nav-icon svg { width: 22px; height: 22px; fill: currentColor; stroke: none; }
+    .nav-item.active .nav-icon svg { stroke: var(--primary); }
+    .nav-icon svg { width: 24px; height: 24px; fill: none; stroke: currentColor; transition: stroke 0.2s; }
     
     .page { display: none; padding-bottom: 80px; }
     .page.active { display: block; }
@@ -253,6 +255,111 @@
       .editor-preview { flex: 1; display: flex; min-height: 0; padding: 0; }
       .editor-container { height: calc(100vh - 140px); gap: 8px; padding: 12px; }
     }
+
+    /* ==================== افکت‌ها ==================== */
+
+    /* انیمیشن ورود صفحات */
+    @keyframes pageEnter {
+      from { opacity: 0; transform: translateY(18px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+    .page.active {
+      animation: pageEnter 0.28s cubic-bezier(0.4, 0, 0.2, 1) both;
+    }
+
+    /* fade-in پیام‌های جدید */
+    @keyframes msgFadeIn {
+      from { opacity: 0; transform: translateY(10px) scale(0.97); }
+      to   { opacity: 1; transform: translateY(0) scale(1); }
+    }
+    .message {
+      animation: msgFadeIn 0.22s cubic-bezier(0.4, 0, 0.2, 1) both;
+    }
+
+    /* Ripple روی دکمه‌ها */
+    .btn-primary, .btn-secondary, .nav-item, .chat-item, .lang-card, .lesson-card, .section, .emoji-cat-btn {
+      position: relative;
+      overflow: hidden;
+    }
+    .ripple {
+      position: absolute;
+      border-radius: 50%;
+      background: rgba(255,255,255,0.25);
+      transform: scale(0);
+      animation: rippleAnim 0.5s linear;
+      pointer-events: none;
+    }
+    @keyframes rippleAnim {
+      to { transform: scale(4); opacity: 0; }
+    }
+
+    /* bounce آیکون navbar */
+    @keyframes navBounce {
+      0%   { transform: scale(1); }
+      40%  { transform: scale(1.28); }
+      70%  { transform: scale(0.9); }
+      100% { transform: scale(1); }
+    }
+    .nav-item.active .nav-icon {
+      animation: navBounce 0.35s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    /* shimmer برای لود شدن */
+    @keyframes shimmer {
+      0%   { background-position: -400px 0; }
+      100% { background-position: 400px 0; }
+    }
+    .skeleton {
+      background: linear-gradient(90deg, var(--bg-secondary) 25%, var(--border) 50%, var(--bg-secondary) 75%);
+      background-size: 400px 100%;
+      animation: shimmer 1.4s infinite;
+      border-radius: 8px;
+    }
+
+    /* scale دکمه send */
+    .send-btn:active { transform: scale(0.88); transition: transform 0.1s; }
+
+    /* slide-in bottom sheet */
+    @keyframes slideUp {
+      from { transform: translateY(100%); }
+      to   { transform: translateY(0); }
+    }
+    #user-sheet[style*="translateY(0)"] {
+      animation: slideUp 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    /* pulse روی badge پیام نخونده */
+    @keyframes badgePulse {
+      0%, 100% { transform: scale(1); }
+      50%       { transform: scale(1.18); }
+    }
+    .unread-badge-pulse {
+      animation: badgePulse 1.2s ease-in-out infinite;
+    }
+
+    /* hover روی chat-item */
+    .chat-item { transition: background 0.18s, transform 0.15s; }
+    .chat-item:active { transform: scale(0.985); background: var(--border); }
+
+    /* hover روی lang-card */
+    .lang-card { transition: transform 0.2s, box-shadow 0.2s; }
+    .lang-card:active { transform: scale(0.96); }
+
+    /* fade-in overlay */
+    @keyframes fadeIn {
+      from { opacity: 0; }
+      to   { opacity: 1; }
+    }
+    #user-sheet-overlay { animation: fadeIn 0.22s ease; }
+
+    /* تیک ارسال پیام */
+    @keyframes checkPop {
+      0%   { transform: scale(0); opacity: 0; }
+      70%  { transform: scale(1.2); opacity: 1; }
+      100% { transform: scale(1); }
+    }
+    .msg-sent-indicator { animation: checkPop 0.3s cubic-bezier(0.4,0,0.2,1) both; }
+
   </style>
 </head>
 <body class="theme-dark">
@@ -302,7 +409,7 @@
 <!-- صفحه درس‌های یک زبان -->
 <div class="page" id="lessons-page">
   <div class="header">
-    <button class="back-btn" onclick="goBack()">←</button>
+    <button class="back-btn" onclick="goBack()"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M19 12H5"/><path d="M12 19l-7-7 7-7"/></svg></button>
     <div class="header-center"><h1 id="lang-title" style="font-size: 18px;"></h1><p id="lang-progress" style="font-size: 11px; color: var(--text-secondary);"></p></div>
     <div style="width: 45px;"></div>
   </div>
@@ -312,7 +419,7 @@
 <!-- صفحه درس -->
 <div class="page" id="lesson-page">
   <div class="header">
-    <button class="back-btn" onclick="goBack()">←</button>
+    <button class="back-btn" onclick="goBack()"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M19 12H5"/><path d="M12 19l-7-7 7-7"/></svg></button>
     <div class="header-center"><h1 id="lesson-title" style="font-size: 15px;"></h1></div>
     <div id="lesson-timer" style="color: var(--text-secondary); font-size: 11px;">⏱ 0:00</div>
   </div>
@@ -333,8 +440,13 @@
 <!-- صفحه پروفایل -->
 <div class="page" id="profile-page">
   <div class="header"><div class="header-center"><h1 style="font-size: 20px;">👤 پروفایل من</h1></div></div>
-  <div style="padding: 24px 16px;">
-    <div class="profile-avatar" id="profile-avatar-display">👨‍💻</div>
+  <div style="padding: 24px 16px; text-align:center;">
+    <div style="position:relative;display:inline-block;">
+      <div class="profile-avatar" id="profile-avatar-display" style="cursor:pointer;" onclick="document.getElementById('avatar-upload-input').click()">👨‍💻</div>
+      <div onclick="document.getElementById('avatar-upload-input').click()" style="position:absolute;bottom:0;right:0;background:var(--primary);border-radius:50%;width:28px;height:28px;display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:14px;border:2px solid var(--bg-primary);">📷</div>
+      <input type="file" id="avatar-upload-input" accept="image/*" style="display:none" onchange="uploadAvatar(event)">
+    </div>
+    <div id="avatar-upload-progress" style="display:none;font-size:12px;color:var(--text-secondary);margin-top:6px;">در حال آپلود...</div>
     <h2 style="text-align: center; margin-top: 12px; font-size: 18px;" id="profile-name-display">کاربر</h2>
     <p style="text-align: center; color: var(--text-secondary); font-size: 13px;" id="profile-level">سطح 1</p>
     <p style="text-align: center; color: var(--primary-light); font-size: 12px; margin-top: 4px;" id="total-study-time">⏱ زمان کل مطالعه: ۰ دقیقه</p>
@@ -352,7 +464,7 @@
 
 <!-- صفحه پنل ادمین -->
 <div class="page" id="admin-panel-page">
-  <div class="header"><button class="back-btn" onclick="navigateTo('profile')">←</button><div class="header-center"><h1 style="font-size: 18px;">🛡 پنل ادمین</h1><p style="font-size: 11px; color: var(--text-secondary);">دسترسی به همه‌ی گفتگوها</p></div><button onclick="loadAllRoomsForAdmin()" style="background:none;border:none;color:var(--primary-light);cursor:pointer;display:flex;align-items:center;"><svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M23 4v6h-6"/><path d="M1 20v-6h6"/><path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"/></svg></button></div>
+  <div class="header"><button class="back-btn" onclick="navigateTo('profile')"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M19 12H5"/><path d="M12 19l-7-7 7-7"/></svg></button><div class="header-center"><h1 style="font-size: 18px;">🛡 پنل ادمین</h1><p style="font-size: 11px; color: var(--text-secondary);">دسترسی به همه‌ی گفتگوها</p></div><button onclick="loadAllRoomsForAdmin()" style="background:none;border:none;color:var(--primary-light);cursor:pointer;display:flex;align-items:center;"><svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M23 4v6h-6"/><path d="M1 20v-6h6"/><path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"/></svg></button></div>
   <div style="padding: 10px 12px 0;">
     <div style="position:relative;">
       <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="position:absolute; right:12px; top:50%; transform:translateY(-50%); color:var(--text-secondary);"><circle cx="11" cy="11" r="8"/><path d="M21 21l-4.35-4.35"/></svg>
@@ -382,7 +494,7 @@
 
 <!-- صفحه ساخت گروه/کانال -->
 <div class="page" id="create-group-page">
-  <div class="header"><button class="back-btn" onclick="navigateTo('chat-list')">←</button><div class="header-center"><h1 style="font-size: 18px;">ساخت گروه یا کانال</h1></div></div>
+  <div class="header"><button class="back-btn" onclick="navigateTo('chat-list')"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M19 12H5"/><path d="M12 19l-7-7 7-7"/></svg></button><div class="header-center"><h1 style="font-size: 18px;">ساخت گروه یا کانال</h1></div></div>
   <div style="padding:20px;" id="create-group-step-type">
     <p style="margin-bottom:14px; color:var(--text-secondary); font-size:14px;">می‌خوای چی بسازی؟</p>
     <button onclick="setGroupCreationType('group')" style="width:100%; padding:16px; margin-bottom:12px; border-radius:12px; border:1px solid var(--border); background:var(--bg-secondary); color:var(--text-primary); cursor:pointer; text-align:right; font-size:14px;">👥 <b>گروه</b><br><span style="font-size:12px; color:var(--text-secondary);">همه‌ی اعضا می‌توانند پیام بدهند</span></button>
@@ -414,14 +526,14 @@
 
 <!-- صفحه جستجوی گروه‌ها/کانال‌های عمومی -->
 <div class="page" id="public-groups-page">
-  <div class="header"><button class="back-btn" onclick="navigateTo('chat-list')">←</button><div class="header-center"><h1 style="font-size: 18px;">🔍 گروه‌ها و کانال‌های عمومی</h1></div></div>
+  <div class="header"><button class="back-btn" onclick="navigateTo('chat-list')"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M19 12H5"/><path d="M12 19l-7-7 7-7"/></svg></button><div class="header-center"><h1 style="font-size: 18px;">🔍 گروه‌ها و کانال‌های عمومی</h1></div></div>
   <div style="padding: 12px;"><input type="text" id="public-groups-search-input" class="search-box" placeholder="نام گروه یا کانال را وارد کنید..." oninput="searchPublicGroups()"></div>
   <div id="public-groups-results" style="padding: 0 12px;"></div>
 </div>
 
 <!-- صفحه عضویت با کد دعوت -->
 <div class="page" id="join-code-page">
-  <div class="header"><button class="back-btn" onclick="navigateTo('chat-list')">←</button><div class="header-center"><h1 style="font-size: 18px;">🔗 عضویت با کد دعوت</h1></div></div>
+  <div class="header"><button class="back-btn" onclick="navigateTo('chat-list')"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M19 12H5"/><path d="M12 19l-7-7 7-7"/></svg></button><div class="header-center"><h1 style="font-size: 18px;">🔗 عضویت با کد دعوت</h1></div></div>
   <div style="padding:20px;">
     <p style="margin-bottom:14px; color:var(--text-secondary); font-size:14px;">کد دعوتی که از مدیر گروه/کانال گرفتی را وارد کن:</p>
     <input type="text" id="join-code-input" placeholder="مثلاً: A1B2C3D4" style="width:100%; padding:12px; border-radius:10px; border:1px solid var(--border); background:var(--bg-secondary); color:var(--text-primary); font-size:14px; margin-bottom:14px; text-align:center; letter-spacing:2px;">
@@ -432,7 +544,7 @@
 
 <!-- صفحه اطلاعات گروه/کانال -->
 <div class="page" id="group-info-page">
-  <div class="header"><button class="back-btn" onclick="closeGroupInfo()">←</button><div class="header-center"><h1 style="font-size: 18px;">اطلاعات</h1></div></div>
+  <div class="header"><button class="back-btn" onclick="closeGroupInfo()"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M19 12H5"/><path d="M12 19l-7-7 7-7"/></svg></button><div class="header-center"><h1 style="font-size: 18px;">اطلاعات</h1></div></div>
   <div style="padding:20px; text-align:center;">
     <div id="group-info-icon" style="font-size:48px; margin-bottom:10px;">👥</div>
     <h2 id="group-info-name" style="margin-bottom:6px;"></h2>
@@ -457,7 +569,7 @@
 
 <!-- صفحه جستجوی کاربران -->
 <div class="page" id="user-search-page">
-  <div class="header"><button class="back-btn" onclick="closeUserSearch()">←</button><div class="header-center"><h1 style="font-size: 18px;">🔍 جستجوی کاربر</h1></div></div>
+  <div class="header"><button class="back-btn" onclick="closeUserSearch()"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M19 12H5"/><path d="M12 19l-7-7 7-7"/></svg></button><div class="header-center"><h1 style="font-size: 18px;">🔍 جستجوی کاربر</h1></div></div>
   <div style="padding: 12px;"><input type="text" id="user-search-input" class="search-box" placeholder="نام کاربری را وارد کنید..." oninput="searchUsers()"></div>
   <div id="user-search-results" style="padding: 0 12px;"></div>
 </div>
@@ -489,12 +601,12 @@
 
 <!-- صفحه گفتگوی چت -->
 <div class="page" id="chat-detail-page">
-  <div class="header"><button class="back-btn" onclick="goBackFromChat()">←</button><div class="header-center" id="chat-detail-header-center" onclick="maybeOpenGroupInfo()" style="cursor:pointer;"><h1 id="chat-detail-title" style="font-size: 18px;"></h1><p id="chat-detail-sub" style="font-size: 11px; color: var(--text-secondary);"></p></div><div style="display: flex; gap: 12px; align-items:center;"><button id="dm-profile-btn" onclick="viewDmProfile()" style="display:none;background:none;border:none;color:var(--text-secondary);cursor:pointer;font-size:20px;">👤</button><button onclick="refreshCurrentChat()" style="background: none; border: none; color: var(--text-secondary); cursor: pointer; display:flex; align-items:center;"><svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M23 4v6h-6"/><path d="M1 20v-6h6"/><path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"/></svg></button><button onclick="toggleSearch()" style="background: none; border: none; color: var(--text-secondary); cursor: pointer; display:flex; align-items:center;"><svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><path d="M21 21l-4.35-4.35"/></svg></button><button class="clear-chat" onclick="clearCurrentChat()" style="background: none; border: none; color: var(--danger); cursor: pointer; display:flex; align-items:center;"><svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 6h18"/><path d="M8 6V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/><path d="M10 11v6"/><path d="M14 11v6"/></svg></button></div></div>
+  <div class="header"><button class="back-btn" onclick="goBackFromChat()"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M19 12H5"/><path d="M12 19l-7-7 7-7"/></svg></button><div class="header-center" id="chat-detail-header-center" onclick="maybeOpenGroupInfo()" style="cursor:pointer;"><h1 id="chat-detail-title" style="font-size: 18px;"></h1><p id="chat-detail-sub" style="font-size: 11px; color: var(--text-secondary);"></p></div><div style="display: flex; gap: 12px; align-items:center;"><button id="dm-profile-btn" onclick="viewDmProfile()" style="display:none;background:none;border:none;color:var(--text-secondary);cursor:pointer;display:flex;align-items:center;"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg></button><button onclick="refreshCurrentChat()" style="background: none; border: none; color: var(--text-secondary); cursor: pointer; display:flex; align-items:center;"><svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M23 4v6h-6"/><path d="M1 20v-6h6"/><path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"/></svg></button><button onclick="toggleSearch()" style="background: none; border: none; color: var(--text-secondary); cursor: pointer; display:flex; align-items:center;"><svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><path d="M21 21l-4.35-4.35"/></svg></button><button class="clear-chat" onclick="clearCurrentChat()" style="background: none; border: none; color: var(--danger); cursor: pointer; display:flex; align-items:center;"><svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 6h18"/><path d="M8 6V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/><path d="M10 11v6"/><path d="M14 11v6"/></svg></button></div></div>
   <div id="search-area" style="padding: 8px; display: none;"><input type="text" id="search-input" class="search-box" placeholder="جستجو در پیام‌ها..." onkeyup="searchMessages()"></div>
   <div id="pinned-area" style="padding: 8px;"></div>
   <div id="reply-bar" class="reply-bar"><span class="reply-text" id="reply-text"></span><button class="cancel-reply" onclick="cancelReply()">✖️</button></div>
   <div id="chat-detail-messages" class="chat-messages-container"></div>
-  <div class="chat-input-container"><button onclick="toggleEmojiPicker()" style="background: none; border: none; color: var(--text-secondary); cursor: pointer; font-size: 24px;">😊</button><input type="text" id="chat-detail-input" class="chat-input" placeholder="پیام خود را بنویسید..." onkeypress="if(event.key==='Enter') sendChatMessage()" onfocus="setTimeout(()=>{const c=document.getElementById('chat-detail-messages'); if(c) c.scrollTop = c.scrollHeight;}, 300)"><button class="send-btn" onclick="sendChatMessage()">📤</button></div>
+  <div class="chat-input-container"><button onclick="toggleEmojiPicker()" style="background: none; border: none; color: var(--text-secondary); cursor: pointer; font-size: 24px;">😊</button><button onclick="document.getElementById('media-upload-input').click()" style="background:none;border:none;color:var(--text-secondary);cursor:pointer;font-size:22px;">📎</button><input type="file" id="media-upload-input" accept="image/*,video/*" style="display:none" onchange="uploadChatMedia(event)"><input type="text" id="chat-detail-input" class="chat-input" placeholder="پیام خود را بنویسید..." onkeypress="if(event.key==='Enter') sendChatMessage()" onfocus="setTimeout(()=>{const c=document.getElementById('chat-detail-messages'); if(c) c.scrollTop = c.scrollHeight;}, 300)"><button class="send-btn" onclick="sendChatMessage()">📤</button></div>
   <div id="emoji-picker" style="position:absolute;bottom:80px;left:0;right:0;background:var(--bg-secondary);border-radius:16px 16px 0 0;padding:12px;display:none;z-index:150;border-top:1px solid var(--border);max-height:300px;display:none;flex-direction:column;">
     <div style="display:flex;align-items:center;gap:8px;margin-bottom:8px;">
       <input type="text" id="emoji-search-input" class="search-box" placeholder="🔍 جستجوی ایموجی..." oninput="searchEmojis()" style="font-size:13px;flex:1;">
@@ -532,7 +644,7 @@
 
 <!-- صفحه ادیتور کد زنده -->
 <div class="page" id="editor-page">
-  <div class="header"><button class="back-btn" onclick="goBack()">←</button><div class="header-center"><h1 style="font-size: 18px;">✏️ ادیتور کد زنده</h1><p style="font-size: 11px; color: var(--text-secondary);">HTML/CSS/JS را بنویسید و نتیجه را ببینید</p></div><div style="width: 45px;"></div></div>
+  <div class="header"><button class="back-btn" onclick="goBack()"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M19 12H5"/><path d="M12 19l-7-7 7-7"/></svg></button><div class="header-center"><h1 style="font-size: 18px;">ادیتور کد زنده</h1><p style="font-size: 11px; color: var(--text-secondary);">HTML/CSS/JS را بنویسید و نتیجه را ببینید</p></div><div style="width: 45px;"></div></div>
   <div class="editor-container">
     <div class="editor-view-tabs">
       <button class="editor-view-tab active" id="view-tab-code" onclick="switchEditorView('code')">💻 کد</button>
@@ -564,11 +676,21 @@
 
 <!-- نوار پایین -->
 <div class="bottom-nav">
-  <button class="nav-item active" id="nav-home" onclick="navigateTo('home')"><span class="nav-icon"><svg fill="currentColor" viewBox="0 0 24 24"><path d="M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z"/></svg></span>خانه</button>
-  <button class="nav-item" id="nav-quiz" onclick="startQuiz()"><span class="nav-icon"><svg fill="currentColor" viewBox="0 0 24 24"><path d="M12 2L15 8.5L22 9.5L17 14L18.5 21L12 17.5L5.5 21L7 14L2 9.5L9 8.5L12 2z"/></svg></span>تمرین</button>
-  <button class="nav-item" id="nav-editor" onclick="navigateTo('editor')"><span class="nav-icon"><svg fill="currentColor" viewBox="0 0 24 24"><path d="M3 17.25V21h3.75L17.81 9.94l-3.75-3.75L3 17.25zM20.71 5.63l-2.34-2.34a1 1 0 0 0-1.41 0l-1.83 1.83 3.75 3.75 1.83-1.83a1 1 0 0 0 0-1.41z"/></svg></span>ادیتور</button>
-  <button class="nav-item" id="nav-chat" onclick="navigateTo('chat-list')"><span class="nav-icon"><svg fill="currentColor" viewBox="0 0 24 24"><path d="M20 2H4c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h4l4 4 4-4h4c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2z"/></svg></span>پیام</button>
-  <button class="nav-item" id="nav-profile" onclick="navigateTo('profile')"><span class="nav-icon"><svg fill="currentColor" viewBox="0 0 24 24"><path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/></svg></span>پروفایل</button>
+  <button class="nav-item active" id="nav-home" onclick="navigateTo('home')">
+    <span class="nav-icon"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9.5L12 3l9 6.5V20a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1V9.5z"/><path d="M9 21V12h6v9"/></svg></span>خانه
+  </button>
+  <button class="nav-item" id="nav-quiz" onclick="startQuiz()">
+    <span class="nav-icon"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2l2.4 7.4H22l-6.2 4.5 2.4 7.4L12 17l-6.2 4.3 2.4-7.4L2 9.4h7.6L12 2z"/></svg></span>تمرین
+  </button>
+  <button class="nav-item" id="nav-editor" onclick="navigateTo('editor')">
+    <span class="nav-icon"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="16 18 22 12 16 6"/><polyline points="8 6 2 12 8 18"/></svg></span>ادیتور
+  </button>
+  <button class="nav-item" id="nav-chat" onclick="navigateTo('chat-list')">
+    <span class="nav-icon"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg></span>پیام
+  </button>
+  <button class="nav-item" id="nav-profile" onclick="navigateTo('profile')">
+    <span class="nav-icon"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg></span>پروفایل
+  </button>
 </div>
 
 <!-- صفحه قفل برای مهمان -->
@@ -5977,6 +6099,104 @@ async function loadProgressFromSupabase() {
   } catch (e) { console.error('❌ خطا در دریافت پیشرفت:', e); }
 }
 let progressSyncTimeout = null;
+// ==================== Supabase Storage ====================
+const SUPABASE_URL_BASE = 'https://dkfqvgtlkqunttccukoo.supabase.co/storage/v1/object/public';
+
+async function uploadAvatar(event) {
+  const file = event.target.files[0];
+  if (!file) return;
+  if (file.size > 3 * 1024 * 1024) { alert('حجم عکس باید کمتر از ۳ مگابایت باشد'); return; }
+  if (!sb) { alert('اتصال برقرار نیست'); return; }
+  const progress = document.getElementById('avatar-upload-progress');
+  progress.style.display = 'block';
+  const ext = file.name.split('.').pop();
+  const path = `${username}.${ext}`;
+  const { error } = await sb.storage.from('avatars').upload(path, file, { upsert: true, contentType: file.type });
+  progress.style.display = 'none';
+  if (error) { alert('خطا در آپلود: ' + error.message); return; }
+  const url = `${SUPABASE_URL_BASE}/avatars/${path}?t=${Date.now()}`;
+  localStorage.setItem(`avatar_${username}`, url);
+  updateAvatarDisplay(url);
+  syncProgressToSupabase();
+}
+
+function updateAvatarDisplay(url) {
+  if (!url) return;
+  const img = `<img src="${url}" style="width:80px;height:80px;border-radius:50%;object-fit:cover;" onerror="this.parentElement.innerHTML='👨‍💻'">`;
+  const el = document.getElementById('profile-avatar-display');
+  if (el) el.innerHTML = img;
+}
+
+async function loadAvatar(uname) {
+  // اول از cache بخون
+  const cached = localStorage.getItem(`avatar_${uname}`);
+  if (cached && uname === username) { updateAvatarDisplay(cached); return; }
+  if (!sb) return;
+  // لیست فایل‌ها رو بگیر تا extension رو بفهمیم
+  const { data } = await sb.storage.from('avatars').list('', { search: uname });
+  if (!data || !data.length) return;
+  const file = data.find(f => f.name.startsWith(uname + '.'));
+  if (!file) return;
+  const url = `${SUPABASE_URL_BASE}/avatars/${file.name}?t=${Date.now()}`;
+  if (uname === username) { localStorage.setItem(`avatar_${uname}`, url); updateAvatarDisplay(url); }
+  return url;
+}
+
+async function uploadChatMedia(event) {
+  const file = event.target.files[0];
+  if (!file) return;
+  if (file.size > 20 * 1024 * 1024) { alert('حجم فایل باید کمتر از ۲۰ مگابایت باشد'); return; }
+  if (!sb) { alert('اتصال برقرار نیست'); return; }
+  const input = document.getElementById('chat-detail-input');
+  const prevPlaceholder = input.placeholder;
+  input.placeholder = '⏳ در حال آپلود...';
+  input.disabled = true;
+  const ext = file.name.split('.').pop();
+  const path = `${username}_${Date.now()}.${ext}`;
+  const { error } = await sb.storage.from('chat-media').upload(path, file, { contentType: file.type });
+  input.placeholder = prevPlaceholder;
+  input.disabled = false;
+  if (error) { alert('خطا در آپلود: ' + error.message); return; }
+  const url = `${SUPABASE_URL_BASE}/chat-media/${path}`;
+  const isVideo = file.type.startsWith('video/');
+  const mediaMsg = isVideo ? `[VIDEO:${url}]` : `[IMAGE:${url}]`;
+  // مستقیم به Supabase بفرست
+  const room = currentChatType === 'dm' ? dmRoomId(username, currentDmUser) : currentChatType === 'usergroup' ? currentGroupRoom : 'general';
+  const time = getCurrentTime();
+  const msgObj = { sender: username, text: mediaMsg, time: time, replyTo: null };
+  if (currentChatType === 'dm') { dmMessages[currentDmUser] = dmMessages[currentDmUser] || []; dmMessages[currentDmUser].push(msgObj); }
+  else if (currentChatType === 'usergroup') { groupRoomMessages[currentGroupRoom] = groupRoomMessages[currentGroupRoom] || []; groupRoomMessages[currentGroupRoom].push(msgObj); }
+  else { adminMessages.push(msgObj); }
+  displayChatMessages();
+  await sb.from('messages').insert([{ sender: username, text: mediaMsg, time: time, room: room, reply_to: null }]);
+  event.target.value = '';
+}
+
+// ==================== افکت‌ها ====================
+function createRipple(e) {
+  const btn = e.currentTarget;
+  const ripple = document.createElement('span');
+  ripple.classList.add('ripple');
+  const rect = btn.getBoundingClientRect();
+  const size = Math.max(rect.width, rect.height);
+  ripple.style.cssText = `width:${size}px;height:${size}px;left:${e.clientX - rect.left - size/2}px;top:${e.clientY - rect.top - size/2}px;`;
+  btn.appendChild(ripple);
+  ripple.addEventListener('animationend', () => ripple.remove());
+}
+
+function initRipple() {
+  document.querySelectorAll('.btn-primary, .btn-secondary, .nav-item, .chat-item, .lang-card, .emoji-cat-btn').forEach(el => {
+    el.removeEventListener('click', createRipple);
+    el.addEventListener('click', createRipple);
+  });
+}
+
+// اجرای ripple بعد از هر بار رندر
+const _origUpdateChatList = updateChatList;
+function updateChatList() { _origUpdateChatList(); setTimeout(initRipple, 50); }
+
+window.addEventListener('load', () => { setTimeout(initRipple, 300); });
+
 function syncProgressToSupabase() {
   if (!sb || !username) return;
   clearTimeout(progressSyncTimeout);
@@ -6122,12 +6342,12 @@ function logout() {
 
 async function startApp(uname) {
   document.getElementById('home-page').classList.add('active');
-  // اگر پروفایلی با این نام کاربری وجود ندارد، بسازش
   if (!profiles[uname]) {
     profiles[uname] = { name: uname, xp: 0, completedLessons: [], quizSolvedCount: 0, streak: 0, lastActive: '', aiMessages: [], adminMessages: [], totalStudyMinutes: 0, weeklyActivity: [0,0,0,0,0,0,0], lastActivityDate: '', lastLessonTime: '' };
   }
   loadProfile(uname);
   updateProfilesList();
+  loadAvatar(uname);
   await discoverDmConversations();
   await loadMyGroups();
   await loadReadStatus();
@@ -6912,9 +7132,26 @@ function displayChatMessages() {
     const isMyMsg = (currentChatType === 'group' || currentChatType === 'dm' || currentChatType === 'admin-view' || currentChatType === 'usergroup') ? (msg.sender === username) : (msg.sender === 'user');
     html += `<div class="message ${isMyMsg ? 'user' : 'bot'} ${selectedMessageIndex === i ? 'selected' : ''}" onclick="selectMessage(${i})">`;
     if (msg.replyTo) html += `<div class="reply-preview">↩️ پاسخ به: ${escapeHtml(msg.replyTo)}</div>`;
-    if ((currentChatType === 'group' || currentChatType === 'admin-view' || currentChatType === 'usergroup') && !isMyMsg) html += `<div style="font-size:11px;color:var(--primary-light);margin-bottom:4px;padding-right:4px;font-weight:bold;">👤 ${escapeHtml(msg.sender)}${msg.sender === ADMIN_USERNAME ? adminBadgeHtml(13) : ''}</div>`;
+    if ((currentChatType === 'group' || currentChatType === 'admin-view' || currentChatType === 'usergroup') && !isMyMsg) {
+      const senderAvatar = `avatar_${msg.sender}`;
+      const cachedUrl = localStorage.getItem(senderAvatar);
+      const avatarHtml = cachedUrl
+        ? `<img src="${cachedUrl}" style="width:30px;height:30px;border-radius:50%;object-fit:cover;cursor:pointer;" onclick="openUserSheet('${msg.sender.replace(/'/g,"\\'")}')" onerror="this.outerHTML='<span style=cursor:pointer onclick=openUserSheet(\\'${msg.sender.replace(/'/g,"\\'")}\\'')>👤</span>'">`
+        : `<span style="font-size:22px;cursor:pointer;" onclick="openUserSheet('${msg.sender.replace(/'/g,"\\'")}')">👤</span>`;
+      html += `<div style="display:flex;align-items:center;gap:6px;margin-bottom:4px;">${avatarHtml}<span style="font-size:12px;color:var(--primary-light);font-weight:bold;cursor:pointer;" onclick="openUserSheet('${msg.sender.replace(/'/g,"\\'")}')"> ${escapeHtml(msg.sender)}${msg.sender === ADMIN_USERNAME ? adminBadgeHtml(13) : ''}</span></div>`;
+    }
     else if (currentChatType === 'dm' && !isMyMsg && msg.sender === ADMIN_USERNAME) html += `<div style="font-size:11px;color:var(--primary-light);margin-bottom:4px;padding-right:4px;font-weight:bold;">🛡️ ادمین${adminBadgeHtml(13)}</div>`;
-    html += `<div class="message-bubble">${escapeHtml(msg.text)}</div><span class="message-time">${msg.time}</span></div>`;
+    let msgContent = '';
+    if (msg.text && msg.text.startsWith('[IMAGE:') && msg.text.endsWith(']')) {
+      const imgUrl = msg.text.slice(7, -1);
+      msgContent = `<img src="${imgUrl}" style="max-width:220px;max-height:260px;border-radius:12px;display:block;cursor:pointer;" onclick="window.open('${imgUrl}','_blank')" onerror="this.outerHTML='⚠️ عکس بارگذاری نشد'">`;
+    } else if (msg.text && msg.text.startsWith('[VIDEO:') && msg.text.endsWith(']')) {
+      const vidUrl = msg.text.slice(7, -1);
+      msgContent = `<video src="${vidUrl}" controls style="max-width:220px;border-radius:12px;display:block;" preload="metadata"></video>`;
+    } else {
+      msgContent = `<div class="message-bubble">${escapeHtml(msg.text)}</div>`;
+    }
+    html += `${msgContent}<span class="message-time">${msg.time}</span></div>`;
   }
   container.innerHTML = html;
   renderPinnedBar();
@@ -7292,6 +7529,13 @@ async function openPublicProfile(otherUser) {
   document.getElementById('public-profile-page').classList.add('active');
   document.getElementById('public-profile-name').innerText = otherUser;
   document.getElementById('public-profile-avatar').innerText = '👨‍💻';
+  // لود avatar
+  loadAvatar(otherUser).then(url => {
+    if (url) {
+      const el = document.getElementById('public-profile-avatar');
+      if (el) el.innerHTML = `<img src="${url}" style="width:80px;height:80px;border-radius:50%;object-fit:cover;" onerror="this.parentElement.innerHTML='👨‍💻'">`;
+    }
+  });
   document.getElementById('public-profile-xp').innerText = '...';
   document.getElementById('public-profile-streak').innerText = '...';
   document.getElementById('public-profile-lessons').innerText = '...';
@@ -7402,6 +7646,73 @@ function getAchievements(xpVal, streakVal, lessonsCount, quizCount) {
   if (quizCount >= 10) result.push({ icon: '✏️', name: 'تمرین‌کار', desc: '۱۰ تمرین حل کردی' });
   if (quizCount >= 50) result.push({ icon: '🧠', name: 'ذهن تیز', desc: '۵۰ تمرین حل کردی' });
   return result;
+}
+
+// ==================== Bottom Sheet پروفایل کاربر ====================
+let userSheetCurrentUser = null;
+
+async function openUserSheet(uname) {
+  if (uname === username) return; // پروفایل خودت رو نشون نده
+  userSheetCurrentUser = uname;
+  const overlay = document.getElementById('user-sheet-overlay');
+  const sheet = document.getElementById('user-sheet');
+  const nameEl = document.getElementById('user-sheet-name');
+  const levelEl = document.getElementById('user-sheet-level');
+  const avatarEl = document.getElementById('user-sheet-avatar');
+  nameEl.innerText = uname;
+  levelEl.innerText = 'در حال بارگذاری...';
+  avatarEl.innerHTML = '👤';
+  overlay.style.display = 'block';
+  sheet.style.display = 'block';
+  setTimeout(() => { sheet.style.transform = 'translateY(0)'; }, 10);
+  // لود avatar
+  const cached = localStorage.getItem(`avatar_${uname}`);
+  if (cached) {
+    avatarEl.innerHTML = `<img src="${cached}" style="width:60px;height:60px;border-radius:50%;object-fit:cover;" onerror="this.parentElement.innerHTML='👤'">`;
+  } else if (sb) {
+    const { data } = await sb.storage.from('avatars').list('', { search: uname });
+    if (data && data.length) {
+      const file = data.find(f => f.name.startsWith(uname + '.'));
+      if (file) {
+        const url = `${SUPABASE_URL_BASE}/avatars/${file.name}?t=${Date.now()}`;
+        localStorage.setItem(`avatar_${uname}`, url);
+        avatarEl.innerHTML = `<img src="${url}" style="width:60px;height:60px;border-radius:50%;object-fit:cover;" onerror="this.parentElement.innerHTML='👤'">`;
+      }
+    }
+  }
+  // لود سطح
+  if (sb) {
+    const { data } = await sb.from('user_progress').select('progress').eq('username', uname).maybeSingle();
+    if (data && data.progress) {
+      const lvl = Math.floor((data.progress.xp || 0) / 100) + 1;
+      levelEl.innerText = `سطح ${lvl} • ${data.progress.xp || 0} XP`;
+    } else {
+      levelEl.innerText = '';
+    }
+  }
+}
+
+function closeUserSheet() {
+  const sheet = document.getElementById('user-sheet');
+  const overlay = document.getElementById('user-sheet-overlay');
+  sheet.style.transform = 'translateY(100%)';
+  setTimeout(() => { sheet.style.display = 'none'; overlay.style.display = 'none'; }, 300);
+  userSheetCurrentUser = null;
+}
+
+function userSheetViewProfile() {
+  if (!userSheetCurrentUser) return;
+  closeUserSheet();
+  setTimeout(() => openPublicProfile(userSheetCurrentUser), 320);
+}
+
+function userSheetSendDm() {
+  if (!userSheetCurrentUser) return;
+  closeUserSheet();
+  setTimeout(() => {
+    if (!knownDmUsers.includes(userSheetCurrentUser)) { knownDmUsers.push(userSheetCurrentUser); saveKnownDmUsers(); }
+    openDmChat(userSheetCurrentUser);
+  }, 320);
 }
 
 function getLevel() { return Math.floor(xp / 100) + 1; }
@@ -7525,5 +7836,23 @@ updateUI();
 checkDailyReminder();
 setTimeout(() => { if (document.getElementById('editor-page').classList.contains('active')) { initEditor(); } }, 100);
 </script>
+
+<!-- Bottom Sheet پروفایل کاربر توی گروه -->
+<div id="user-sheet-overlay" onclick="closeUserSheet()" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.5);z-index:9000;"></div>
+<div id="user-sheet" style="display:none;position:fixed;bottom:0;left:0;right:0;background:var(--bg-secondary);border-radius:24px 24px 0 0;padding:24px 20px;z-index:9001;transform:translateY(100%);transition:transform 0.3s ease;">
+  <div style="width:40px;height:4px;background:var(--border);border-radius:2px;margin:0 auto 20px;"></div>
+  <div style="display:flex;align-items:center;gap:16px;margin-bottom:20px;">
+    <div id="user-sheet-avatar" style="width:60px;height:60px;border-radius:50%;background:var(--bg-primary);display:flex;align-items:center;justify-content:center;font-size:30px;overflow:hidden;flex-shrink:0;">👤</div>
+    <div>
+      <div id="user-sheet-name" style="font-size:17px;font-weight:bold;"></div>
+      <div id="user-sheet-level" style="font-size:12px;color:var(--text-secondary);margin-top:3px;"></div>
+    </div>
+  </div>
+  <div style="display:flex;gap:12px;">
+    <button onclick="userSheetViewProfile()" style="flex:1;padding:12px;background:var(--bg-primary);border:1px solid var(--border);color:var(--text-primary);border-radius:12px;cursor:pointer;font-size:14px;">👤 مشاهده پروفایل</button>
+    <button onclick="userSheetSendDm()" style="flex:1;padding:12px;background:var(--primary);border:none;color:white;border-radius:12px;cursor:pointer;font-size:14px;">💬 پیام خصوصی</button>
+  </div>
+</div>
+
 </body>
 </html>
