@@ -447,6 +447,7 @@
       <input type="file" id="avatar-upload-input" accept="image/*" style="display:none" onchange="uploadAvatar(event)">
     </div>
     <div id="avatar-upload-progress" style="display:none;font-size:12px;color:var(--text-secondary);margin-top:6px;">در حال آپلود...</div>
+    <button onclick="deleteAvatar()" style="margin-top:6px;background:none;border:none;color:var(--danger);font-size:12px;cursor:pointer;">🗑️ حذف عکس پروفایل</button>
     <h2 style="text-align: center; margin-top: 12px; font-size: 18px;" id="profile-name-display">کاربر</h2>
     <p style="text-align: center; color: var(--text-secondary); font-size: 13px;" id="profile-level">سطح 1</p>
     <p style="text-align: center; color: var(--primary-light); font-size: 12px; margin-top: 4px;" id="total-study-time">⏱ زمان کل مطالعه: ۰ دقیقه</p>
@@ -6120,6 +6121,20 @@ async function uploadAvatar(event) {
   syncProgressToSupabase();
 }
 
+async function deleteAvatar() {
+  if (!confirm('عکس پروفایل حذف شود؟')) return;
+  if (!sb) return;
+  // پیدا کردن فایل
+  const { data } = await sb.storage.from('avatars').list('', { search: username });
+  if (data && data.length) {
+    const file = data.find(f => f.name.startsWith(username + '.'));
+    if (file) await sb.storage.from('avatars').remove([file.name]);
+  }
+  localStorage.removeItem(`avatar_${username}`);
+  const el = document.getElementById('profile-avatar-display');
+  if (el) el.innerHTML = '👨‍💻';
+}
+
 function updateAvatarDisplay(url) {
   if (!url) return;
   const img = `<img src="${url}" style="width:80px;height:80px;border-radius:50%;object-fit:cover;" onerror="this.parentElement.innerHTML='👨‍💻'">`;
@@ -7053,7 +7068,14 @@ function updateUnreadBadge() {
 let savedMessages = [], aiMessages = [], adminMessages = [], currentChatType = null, selectedMessageIndex = null, editingIndex = null, forwardMessageIndex = null, replyToMessageData = null, pinnedMessage = JSON.parse(localStorage.getItem('pinnedMessage')) || null, weeklyActivityData = [0,0,0,0,0,0,0], lastActivityDate = '', lastLessonTime = '';
 function saveMessages() { saveAllData(); syncSavedMessagesToSupabase(); }
 function updateChatList() {
-  const getLastMsg = (arr) => arr.length ? (arr[arr.length-1].text.length > 30 ? arr[arr.length-1].text.substring(0,30)+'...' : arr[arr.length-1].text) : null;
+  const getLastMsg = (arr) => {
+    if (!arr.length) return null;
+    const text = arr[arr.length-1].text || '';
+    if (text.startsWith('[IMAGE:')) return '🖼️ عکس';
+    if (text.startsWith('[VIDEO:')) return '🎥 ویدیو';
+    if (text.startsWith('[VOICE:')) return '🎤 پیام صوتی';
+    return text.length > 30 ? text.substring(0,30)+'...' : text;
+  };
   const getTime = (arr) => arr.length ? arr[arr.length-1].time : '-';
   const getTs = (arr) => {
     if (!arr.length) return 0;
@@ -7136,7 +7158,7 @@ function displayChatMessages() {
       const senderAvatar = `avatar_${msg.sender}`;
       const cachedUrl = localStorage.getItem(senderAvatar);
       const avatarHtml = cachedUrl
-        ? `<img src="${cachedUrl}" style="width:30px;height:30px;border-radius:50%;object-fit:cover;cursor:pointer;" onclick="openUserSheet('${msg.sender.replace(/'/g,"\\'")}')" onerror="this.outerHTML='<span style=cursor:pointer onclick=openUserSheet(\\'${msg.sender.replace(/'/g,"\\'")}\\'')>👤</span>'">`
+        ? `<img src="${cachedUrl}" style="width:30px;height:30px;border-radius:50%;object-fit:cover;cursor:pointer;" onclick="openAvatarLightbox('${cachedUrl}','${msg.sender.replace(/'/g,"\\'")}')" onerror="this.outerHTML='<span style=cursor:pointer onclick=openUserSheet(\\'${msg.sender.replace(/'/g,"\\'")}\\'')>👤</span>'">`
         : `<span style="font-size:22px;cursor:pointer;" onclick="openUserSheet('${msg.sender.replace(/'/g,"\\'")}')">👤</span>`;
       html += `<div style="display:flex;align-items:center;gap:6px;margin-bottom:4px;">${avatarHtml}<span style="font-size:12px;color:var(--primary-light);font-weight:bold;cursor:pointer;" onclick="openUserSheet('${msg.sender.replace(/'/g,"\\'")}')"> ${escapeHtml(msg.sender)}${msg.sender === ADMIN_USERNAME ? adminBadgeHtml(13) : ''}</span></div>`;
     }
@@ -7144,10 +7166,20 @@ function displayChatMessages() {
     let msgContent = '';
     if (msg.text && msg.text.startsWith('[IMAGE:') && msg.text.endsWith(']')) {
       const imgUrl = msg.text.slice(7, -1);
-      msgContent = `<img src="${imgUrl}" style="max-width:220px;max-height:260px;border-radius:12px;display:block;cursor:pointer;" onclick="window.open('${imgUrl}','_blank')" onerror="this.outerHTML='⚠️ عکس بارگذاری نشد'">`;
+      msgContent = `<div style="max-width:220px;">
+        <img src="${imgUrl}" style="max-width:100%;max-height:260px;border-radius:12px;display:block;cursor:pointer;" 
+          onclick="openMediaLightbox('image','${imgUrl.replace(/'/g,"\\'")}')" 
+          onerror="this.style.display='none';this.nextElementSibling.style.display='flex'">
+        <div style="display:none;align-items:center;gap:8px;padding:12px;background:var(--bg-secondary);border-radius:12px;font-size:13px;color:var(--text-secondary);">
+          🖼️ <a href="${imgUrl}" target="_blank" style="color:var(--primary-light);">مشاهده عکس</a>
+        </div>
+      </div>`;
     } else if (msg.text && msg.text.startsWith('[VIDEO:') && msg.text.endsWith(']')) {
       const vidUrl = msg.text.slice(7, -1);
-      msgContent = `<video src="${vidUrl}" controls style="max-width:220px;border-radius:12px;display:block;" preload="metadata"></video>`;
+      msgContent = `<div style="max-width:220px;">
+        <video src="${vidUrl}" controls style="max-width:100%;border-radius:12px;display:block;" preload="metadata"></video>
+        <button onclick="openMediaLightbox('video','${vidUrl.replace(/'/g,"\\'")}')" style="width:100%;margin-top:6px;background:none;border:1px solid var(--border);color:var(--text-secondary);border-radius:8px;padding:6px;cursor:pointer;font-size:12px;">🔍 نمایش کامل</button>
+      </div>`;
     } else {
       msgContent = `<div class="message-bubble">${escapeHtml(msg.text)}</div>`;
     }
@@ -7285,6 +7317,18 @@ function deleteSelectedMessage() {
     const msgs = getMessages();
     const msg = msgs[selectedMessageIndex];
     if ((currentChatType === 'group' || currentChatType === 'dm' || currentChatType === 'admin-view' || currentChatType === 'usergroup') && msg.sender !== username && !isAdmin && !isOwnerOrAdminOfCurrentGroup()) { alert('فقط پیام خود را می‌توانید حذف کنید'); clearSelection(); return; }
+    // حذف فایل از Storage اگه media بود
+    if (sb && msg.text) {
+      if (msg.text.startsWith('[IMAGE:') && msg.text.endsWith(']')) {
+        const url = msg.text.slice(7, -1);
+        const fileName = url.split('/chat-media/')[1]?.split('?')[0];
+        if (fileName) sb.storage.from('chat-media').remove([fileName]);
+      } else if (msg.text.startsWith('[VIDEO:') && msg.text.endsWith(']')) {
+        const url = msg.text.slice(7, -1);
+        const fileName = url.split('/chat-media/')[1]?.split('?')[0];
+        if (fileName) sb.storage.from('chat-media').remove([fileName]);
+      }
+    }
     msgs.splice(selectedMessageIndex, 1);
     saveMessages(); displayChatMessages(); updateChatList(); renderMyGroupsList(); clearSelection();
     if ((currentChatType === 'group' || currentChatType === 'dm' || currentChatType === 'admin-view' || currentChatType === 'usergroup') && sb && msg.id) {
@@ -7533,7 +7577,7 @@ async function openPublicProfile(otherUser) {
   loadAvatar(otherUser).then(url => {
     if (url) {
       const el = document.getElementById('public-profile-avatar');
-      if (el) el.innerHTML = `<img src="${url}" style="width:80px;height:80px;border-radius:50%;object-fit:cover;" onerror="this.parentElement.innerHTML='👨‍💻'">`;
+      if (el) el.innerHTML = `<img src="${url}" style="width:80px;height:80px;border-radius:50%;object-fit:cover;cursor:pointer;" onclick="openAvatarLightbox('${url}','${otherUser.replace(/'/g,"\\'")}')" onerror="this.parentElement.innerHTML='👨‍💻'">`;
     }
   });
   document.getElementById('public-profile-xp').innerText = '...';
@@ -7668,7 +7712,7 @@ async function openUserSheet(uname) {
   // لود avatar
   const cached = localStorage.getItem(`avatar_${uname}`);
   if (cached) {
-    avatarEl.innerHTML = `<img src="${cached}" style="width:60px;height:60px;border-radius:50%;object-fit:cover;" onerror="this.parentElement.innerHTML='👤'">`;
+    avatarEl.innerHTML = `<img src="${cached}" style="width:60px;height:60px;border-radius:50%;object-fit:cover;cursor:pointer;" onclick="openAvatarLightbox('${cached}','${uname.replace(/'/g,"\\'")}')" onerror="this.parentElement.innerHTML='👤'">`;
   } else if (sb) {
     const { data } = await sb.storage.from('avatars').list('', { search: uname });
     if (data && data.length) {
@@ -7676,7 +7720,7 @@ async function openUserSheet(uname) {
       if (file) {
         const url = `${SUPABASE_URL_BASE}/avatars/${file.name}?t=${Date.now()}`;
         localStorage.setItem(`avatar_${uname}`, url);
-        avatarEl.innerHTML = `<img src="${url}" style="width:60px;height:60px;border-radius:50%;object-fit:cover;" onerror="this.parentElement.innerHTML='👤'">`;
+        avatarEl.innerHTML = `<img src="${url}" style="width:60px;height:60px;border-radius:50%;object-fit:cover;cursor:pointer;" onclick="openAvatarLightbox('${url}','${uname.replace(/'/g,"\\'")}')" onerror="this.parentElement.innerHTML='👤'">`;
       }
     }
   }
@@ -7713,6 +7757,43 @@ function userSheetSendDm() {
     if (!knownDmUsers.includes(userSheetCurrentUser)) { knownDmUsers.push(userSheetCurrentUser); saveKnownDmUsers(); }
     openDmChat(userSheetCurrentUser);
   }, 320);
+}
+
+function openMediaLightbox(type, url) {
+  const lb = document.getElementById('media-lightbox');
+  const content = document.getElementById('media-lightbox-content');
+  const dl = document.getElementById('media-lightbox-download');
+  if (type === 'image') {
+    content.innerHTML = `<img src="${url}" style="max-width:95vw;max-height:80vh;border-radius:12px;object-fit:contain;">`;
+  } else {
+    content.innerHTML = `<video src="${url}" controls autoplay style="max-width:95vw;max-height:80vh;border-radius:12px;"></video>`;
+  }
+  dl.href = url;
+  dl.download = type === 'image' ? 'image.jpg' : 'video.mp4';
+  lb.style.display = 'flex';
+}
+function closeMediaLightbox() {
+  const lb = document.getElementById('media-lightbox');
+  lb.style.display = 'none';
+  // متوقف کردن ویدیو
+  const vid = lb.querySelector('video');
+  if (vid) vid.pause();
+}
+
+function openAvatarLightbox(imgUrl, uname) {
+  const lb = document.getElementById('avatar-lightbox');
+  document.getElementById('avatar-lightbox-img').src = imgUrl;
+  const dmBtn = document.getElementById('avatar-lightbox-dm');
+  if (uname && uname !== username) {
+    dmBtn.style.display = 'block';
+    dmBtn.onclick = () => { closeAvatarLightbox(); if (!knownDmUsers.includes(uname)) { knownDmUsers.push(uname); saveKnownDmUsers(); } openDmChat(uname); };
+  } else {
+    dmBtn.style.display = 'none';
+  }
+  lb.style.display = 'flex';
+}
+function closeAvatarLightbox() {
+  document.getElementById('avatar-lightbox').style.display = 'none';
 }
 
 function getLevel() { return Math.floor(xp / 100) + 1; }
@@ -7851,6 +7932,24 @@ setTimeout(() => { if (document.getElementById('editor-page').classList.contains
   <div style="display:flex;gap:12px;">
     <button onclick="userSheetViewProfile()" style="flex:1;padding:12px;background:var(--bg-primary);border:1px solid var(--border);color:var(--text-primary);border-radius:12px;cursor:pointer;font-size:14px;">👤 مشاهده پروفایل</button>
     <button onclick="userSheetSendDm()" style="flex:1;padding:12px;background:var(--primary);border:none;color:white;border-radius:12px;cursor:pointer;font-size:14px;">💬 پیام خصوصی</button>
+  </div>
+</div>
+
+<!-- Lightbox برای عکس/ویدیو چت -->
+<div id="media-lightbox" onclick="if(event.target===this)closeMediaLightbox()" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.95);z-index:9998;flex-direction:column;align-items:center;justify-content:center;gap:16px;">
+  <div id="media-lightbox-content" style="max-width:95vw;max-height:80vh;display:flex;align-items:center;justify-content:center;"></div>
+  <div style="display:flex;gap:12px;">
+    <a id="media-lightbox-download" href="" download style="padding:10px 20px;background:var(--primary);border:none;color:white;border-radius:12px;cursor:pointer;font-size:14px;text-decoration:none;">⬇️ دانلود</a>
+    <button onclick="closeMediaLightbox()" style="padding:10px 20px;background:none;border:1px solid #666;color:white;border-radius:12px;cursor:pointer;font-size:14px;">✕ بستن</button>
+  </div>
+</div>
+
+<!-- Lightbox برای دیدن avatar -->
+<div id="avatar-lightbox" onclick="closeAvatarLightbox()" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.9);z-index:9999;display:none;align-items:center;justify-content:center;flex-direction:column;gap:16px;">
+  <img id="avatar-lightbox-img" src="" style="max-width:90vw;max-height:80vh;border-radius:16px;object-fit:contain;">
+  <div style="display:flex;gap:12px;">
+    <button id="avatar-lightbox-dm" style="padding:10px 20px;background:var(--primary);border:none;color:white;border-radius:12px;cursor:pointer;font-size:14px;">💬 پیام خصوصی</button>
+    <button onclick="closeAvatarLightbox()" style="padding:10px 20px;background:none;border:1px solid #666;color:white;border-radius:12px;cursor:pointer;font-size:14px;">✕ بستن</button>
   </div>
 </div>
 
