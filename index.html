@@ -30,54 +30,69 @@
       --warning: #fbbf24;
     }
     body.theme-light {
-      --bg-primary: #f0f0f0;
+      --bg-primary: #f3f4f6;
       --bg-secondary: #ffffff;
       --bg-card: #ffffff;
-      --border: #e0e0e0;
+      --border: #e5e7eb;
       --primary: #6366f1;
       --primary-light: #818cf8;
-      --text-primary: #1f2937;
+      --text-primary: #111827;
       --text-secondary: #6b7280;
+      --danger: #ef4444;
+      --success: #22c55e;
+      --warning: #f59e0b;
     }
     body.theme-nature {
-      --bg-primary: #0f2b1a;
-      --bg-secondary: #1a3a25;
-      --bg-card: #1e4a2a;
-      --border: #2d5a35;
+      --bg-primary: #0d2318;
+      --bg-secondary: #162f20;
+      --bg-card: #1a3d26;
+      --border: #254d30;
       --primary: #10b981;
       --primary-light: #34d399;
-      --text-primary: #eee;
-      --text-secondary: #aaa;
+      --text-primary: #ecfdf5;
+      --text-secondary: #86efac;
+      --danger: #f87171;
+      --success: #4ade80;
+      --warning: #fbbf24;
     }
     body.theme-ocean {
-      --bg-primary: #0a192f;
-      --bg-secondary: #0f2a4a;
-      --bg-card: #143a5a;
-      --border: #1e4a6a;
+      --bg-primary: #070f1f;
+      --bg-secondary: #0c1a35;
+      --bg-card: #0f2347;
+      --border: #1e3a6e;
       --primary: #3b82f6;
-      --primary-light: #60a5fa;
-      --text-primary: #eee;
-      --text-secondary: #aaa;
+      --primary-light: #93c5fd;
+      --text-primary: #eff6ff;
+      --text-secondary: #93c5fd;
+      --danger: #f87171;
+      --success: #4ade80;
+      --warning: #fbbf24;
     }
     body.theme-fire {
-      --bg-primary: #2a0a0a;
-      --bg-secondary: #3a1515;
-      --bg-card: #4a2020;
-      --border: #5a2a2a;
+      --bg-primary: #1c0a00;
+      --bg-secondary: #2d1200;
+      --bg-card: #3d1900;
+      --border: #6b2e00;
       --primary: #f97316;
-      --primary-light: #fb923c;
-      --text-primary: #eee;
-      --text-secondary: #aaa;
+      --primary-light: #fdba74;
+      --text-primary: #fff7ed;
+      --text-secondary: #fdba74;
+      --danger: #f87171;
+      --success: #4ade80;
+      --warning: #fbbf24;
     }
     body.theme-pink {
-      --bg-primary: #1a0a14;
-      --bg-secondary: #2a1020;
-      --bg-card: #351528;
-      --border: #4a1f38;
+      --bg-primary: #150810;
+      --bg-secondary: #220d1a;
+      --bg-card: #2d1122;
+      --border: #5b2048;
       --primary: #ec4899;
-      --primary-light: #f472b6;
-      --text-primary: #f5d0e8;
-      --text-secondary: #c084a8;
+      --primary-light: #f9a8d4;
+      --text-primary: #fdf2f8;
+      --text-secondary: #f9a8d4;
+      --danger: #f87171;
+      --success: #4ade80;
+      --warning: #fbbf24;
     }
     
     .header { background: var(--bg-secondary); padding: 16px 20px; border-bottom: 2px solid var(--primary); display: flex; align-items: center; gap: 12px; position: sticky; top: 0; z-index: 100; }
@@ -142,11 +157,12 @@
     .quiz-box { background: var(--bg-secondary); border-radius: 20px; padding: 24px; width: 100%; max-width: 400px; border: 1px solid var(--primary); }
     
     .chat-messages-container { flex: 1; overflow-y: auto; padding: 12px; padding-bottom: 90px; display: flex; flex-direction: column; gap: 8px; height: calc(100vh - 180px); }
-    .message { max-width: 80%; margin-bottom: 8px; position: relative; cursor: pointer; transition: all 0.2s; }
+    .message { max-width: 82%; margin-bottom: 8px; position: relative; cursor: pointer; transition: all 0.2s; }
+    @media (max-width: 480px) { .message { max-width: 90%; } }
     .message.selected { opacity: 0.7; background: rgba(124, 58, 237, 0.2); border-radius: 18px; }
     .message.user { align-self: flex-end; }
     .message.bot { align-self: flex-start; }
-    .message-bubble { padding: 10px 14px; border-radius: 18px; word-wrap: break-word; font-size: 14px; line-height: 1.5; }
+    .message-bubble { padding: 10px 14px; border-radius: 18px; word-wrap: break-word; word-break: break-word; font-size: 14px; line-height: 1.5; }
     .message.user .message-bubble { background: var(--primary); color: white; border-bottom-right-radius: 4px; }
     .message.bot .message-bubble { background: var(--bg-card); color: var(--text-primary); border-bottom-left-radius: 4px; border: 1px solid var(--border); }
     .message-time { font-size: 10px; color: var(--text-secondary); margin-top: 4px; display: block; text-align: center; }
@@ -173,7 +189,9 @@
     
     .edit-panel { position: fixed; bottom: 70px; left: 0; right: 0; background: var(--bg-secondary); padding: 12px; border-top: 1px solid var(--primary); z-index: 200; display: none; }
     .edit-input { flex: 1; background: var(--bg-primary); border: 1px solid var(--border); padding: 10px 15px; border-radius: 20px; color: var(--text-primary); outline: none; }
-    .chat-input-container { position: fixed; bottom: 70px; left: 12px; right: 12px; background: var(--bg-secondary); padding: 12px; border-radius: 28px; display: flex; gap: 12px; border: 1px solid var(--border); }
+    .chat-input-container { position: fixed; bottom: 70px; left: 8px; right: 8px; background: var(--bg-secondary); padding: 8px 10px; border-radius: 28px; display: flex; gap: 6px; border: 1px solid var(--border); align-items: center; }
+    .chat-input-container button { flex-shrink: 0; padding: 4px; display: flex; align-items: center; }
+    .chat-input { flex: 1; min-width: 0; }
     .chat-input { flex: 1; background: var(--bg-primary); border: none; padding: 12px 18px; border-radius: 28px; color: var(--text-primary); outline: none; font-size: 14px; }
     .send-btn { background: var(--primary); border: none; width: 48px; height: 48px; border-radius: 50%; cursor: pointer; font-size: 20px; display: flex; align-items: center; justify-content: center; }
     
@@ -215,7 +233,17 @@
     .profile-badge.active { background: var(--primary); color: white; }
     .add-profile-btn { background: var(--primary); border: none; border-radius: 20px; padding: 6px 12px; color: white; cursor: pointer; font-size: 12px; }
     
-    .theme-selector { display: flex; gap: 8px; flex-wrap: wrap; justify-content: center; margin: 12px 0; }
+    .font-btn { padding: 10px; background: var(--bg-card); border: 2px solid var(--border); color: var(--text-primary); border-radius: 10px; cursor: pointer; font-size: 13px; transition: all 0.2s; text-align: center; }
+    .font-btn.active { border-color: var(--primary); color: var(--primary); background: var(--bg-secondary); }
+    .font-btn:hover { border-color: var(--primary-light); }
+    .theme-option-btn { padding: 10px 14px; border-radius: 12px; border: 2px solid transparent; cursor: pointer; font-size: 13px; font-weight: 500; transition: all 0.2s; text-align: center; }
+    .theme-option-btn.active { box-shadow: 0 0 0 3px var(--primary); }
+    .theme-dark-btn { background: #1a1b2e; color: #e0e0ff; }
+    .theme-light-btn { background: #f3f4f6; color: #1f2937; }
+    .theme-nature-btn { background: #0d2318; color: #86efac; }
+    .theme-ocean-btn { background: #0a192f; color: #93c5fd; }
+    .theme-fire-btn { background: #2a0a0a; color: #fdba74; }
+    .theme-pink-btn { background: #1a0814; color: #f9a8d4; }
     .theme-btn { width: 32px; height: 32px; border-radius: 50%; cursor: pointer; border: 2px solid transparent; transition: all 0.2s; }
     .theme-btn.active { border-color: white; transform: scale(1.1); }
     .theme-dark { background: #0f0f1a; }
@@ -257,6 +285,10 @@
     }
 
     /* ==================== افکت‌ها ==================== */
+    /* highlight جستجو */
+    .message.search-highlight .message-bubble { outline: 2px solid var(--primary-light); border-radius: 10px; }
+    /* نشانگر آنلاین */
+    [data-online-user] { transition: background 0.3s; }
 
     /* انیمیشن ورود صفحات */
     @keyframes pageEnter {
@@ -361,6 +393,9 @@
     .msg-sent-indicator { animation: checkPop 0.3s cubic-bezier(0.4,0,0.2,1) both; }
 
   </style>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700&display=swap" rel="stylesheet">
+  <style id="dynamic-font-style"></style>
 </head>
 <body class="theme-dark">
 
@@ -456,7 +491,36 @@
     <button onclick="logout()" style="width:100%;margin-top:10px;background:none;border:1px solid var(--danger);color:var(--danger);padding:10px;border-radius:10px;cursor:pointer;">🚪 خروج از حساب</button>
     <div id="streak-medal" class="medal-badge" style="justify-content: center; margin-top: 16px;"></div>
   </div>
-  <div style="padding: 16px;"><div class="section"><h4>🎨 تم رنگی</h4><div class="theme-selector"><div class="theme-btn theme-dark" onclick="setTheme('dark')" title="تاریک"></div><div class="theme-btn theme-light" onclick="setTheme('light')" title="روشن"></div><div class="theme-btn theme-nature" onclick="setTheme('nature')" title="طبیعت"></div><div class="theme-btn theme-ocean" onclick="setTheme('ocean')" title="اقیانوسی"></div><div class="theme-btn theme-fire" onclick="setTheme('fire')" title="آتشین"></div><div class="theme-btn theme-pink" onclick="setTheme('pink')" title="صورتی"></div></div></div></div>
+  <div style="padding: 16px;"><div class="section"><h4>🎨 تم رنگی</h4><div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:12px;">
+    <button onclick="setTheme('dark')" class="theme-option-btn theme-dark-btn">🌑 تاریک</button>
+    <button onclick="setTheme('light')" class="theme-option-btn theme-light-btn">☀️ روشن</button>
+    <button onclick="setTheme('nature')" class="theme-option-btn theme-nature-btn">🌿 طبیعت</button>
+    <button onclick="setTheme('ocean')" class="theme-option-btn theme-ocean-btn">🌊 اقیانوس</button>
+    <button onclick="setTheme('fire')" class="theme-option-btn theme-fire-btn">🔥 آتش</button>
+    <button onclick="setTheme('pink')" class="theme-option-btn theme-pink-btn">🌸 صورتی</button>
+  </div></div></div>
+
+  <div style="padding: 0 16px 16px;"><div class="section"><h4>🔤 فونت</h4>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:12px;" id="font-selector">
+      <button class="font-btn active" onclick="setFont('default')" style="font-family:'Segoe UI',Tahoma,sans-serif;">پیش‌فرض</button>
+      <button class="font-btn" onclick="setFont('vazir')" style="font-family:'Vazir',sans-serif;">وزیر</button>
+      <button class="font-btn" onclick="setFont('shabnam')" style="font-family:'Shabnam',sans-serif;">شبنم</button>
+      <button class="font-btn" onclick="setFont('iransans')" style="font-family:'IRANSans',sans-serif;">ایران سنس</button>
+      <button class="font-btn" onclick="setFont('mono')" style="font-family:'Courier New',monospace;">Mono</button>
+      <button class="font-btn" onclick="setFont('rounded')" style="font-family:'Nunito',sans-serif;">Rounded</button>
+    </div>
+    <div style="margin-top:12px;">
+      <label style="font-size:12px;color:var(--text-secondary);">اندازه متن</label>
+      <div style="display:flex;align-items:center;gap:12px;margin-top:6px;">
+        <button onclick="changeFontSize(-1)" style="background:var(--bg-card);border:1px solid var(--border);color:var(--text-primary);width:32px;height:32px;border-radius:8px;cursor:pointer;font-size:16px;">−</button>
+        <span id="font-size-display" style="font-size:13px;color:var(--text-secondary);min-width:40px;text-align:center;">14px</span>
+        <button onclick="changeFontSize(1)" style="background:var(--bg-card);border:1px solid var(--border);color:var(--text-primary);width:32px;height:32px;border-radius:8px;cursor:pointer;font-size:16px;">+</button>
+      </div>
+    </div>
+    <div style="margin-top:12px;padding:12px;background:var(--bg-primary);border-radius:10px;font-size:14px;" id="font-preview">
+      پیش‌نمایش: سلام! این یک متن نمونه است. Hello World!
+    </div>
+  </div></div>
   <div class="grid-2"><div class="stat-card"><p style="color: var(--text-secondary); font-size: 12px;">کل XP</p><p class="stat-value" id="profile-xp">0</p></div><div class="stat-card"><p style="color: var(--text-secondary); font-size: 12px;">روزهای پیاپی</p><p class="stat-value" style="color: var(--warning);" id="profile-streak">0</p></div><div class="stat-card"><p style="color: var(--text-secondary); font-size: 12px;">درس تموم شده</p><p class="stat-value" id="profile-lessons">0</p></div><div class="stat-card"><p style="color: var(--text-secondary); font-size: 12px;">تمرین حل شده</p><p class="stat-value" id="profile-quiz">0</p></div></div>
   <div style="padding: 16px;"><div class="section"><h4>📊 فعالیت هفتگی</h4><div id="weekly-chart" class="progress-chart"></div><p style="text-align: center; font-size: 11px; color: var(--text-secondary); margin-top: 8px;" id="chart-note">روزهایی که درس خوندی</p></div></div>
   <div style="padding: 16px;"><div class="section"><h4>🏆 دستاوردها</h4><div id="achievements-list"></div></div></div>
@@ -607,7 +671,14 @@
   <div id="pinned-area" style="padding: 8px;"></div>
   <div id="reply-bar" class="reply-bar"><span class="reply-text" id="reply-text"></span><button class="cancel-reply" onclick="cancelReply()">✖️</button></div>
   <div id="chat-detail-messages" class="chat-messages-container"></div>
-  <div class="chat-input-container"><button onclick="toggleEmojiPicker()" style="background: none; border: none; color: var(--text-secondary); cursor: pointer; font-size: 24px;">😊</button><button onclick="document.getElementById('media-upload-input').click()" style="background:none;border:none;color:var(--text-secondary);cursor:pointer;font-size:22px;">📎</button><input type="file" id="media-upload-input" accept="image/*,video/*" style="display:none" onchange="uploadChatMedia(event)"><input type="text" id="chat-detail-input" class="chat-input" placeholder="پیام خود را بنویسید..." onkeypress="if(event.key==='Enter') sendChatMessage()" onfocus="setTimeout(()=>{const c=document.getElementById('chat-detail-messages'); if(c) c.scrollTop = c.scrollHeight;}, 300)"><button class="send-btn" onclick="sendChatMessage()">📤</button></div>
+  <div id="chat-search-bar" style="display:none;align-items:center;gap:8px;padding:8px 12px;background:var(--bg-secondary);border-bottom:1px solid var(--border);">
+    <input type="text" id="chat-search-input" class="search-box" placeholder="جستجو در پیام‌ها..." oninput="searchInChat()" style="flex:1;font-size:13px;">
+    <span id="chat-search-count" style="font-size:12px;color:var(--text-secondary);white-space:nowrap;"></span>
+    <button onclick="prevSearchResult()" style="background:none;border:none;cursor:pointer;font-size:14px;color:var(--text-secondary);">▲</button>
+    <button onclick="nextSearchResult()" style="background:none;border:none;cursor:pointer;font-size:14px;color:var(--text-secondary);">▼</button>
+    <button onclick="toggleChatSearch()" style="background:none;border:none;cursor:pointer;color:var(--danger);font-size:16px;">✕</button>
+  </div>
+  <div class="chat-input-container"><button onclick="toggleEmojiPicker()" style="background:none;border:none;color:var(--text-secondary);cursor:pointer;font-size:20px;flex-shrink:0;">😊</button><button onclick="document.getElementById('media-upload-input').click()" style="background:none;border:none;color:var(--text-secondary);cursor:pointer;font-size:18px;flex-shrink:0;">📎</button><input type="file" id="media-upload-input" accept="image/*,video/*" style="display:none" onchange="uploadChatMedia(event)"><button id="voice-record-btn" onclick="startVoiceRecord()" style="background:none;border:none;color:var(--text-secondary);cursor:pointer;flex-shrink:0;display:flex;align-items:center;"><svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"/><path d="M19 10v2a7 7 0 0 1-14 0v-2"/><line x1="12" y1="19" x2="12" y2="23"/><line x1="8" y1="23" x2="16" y2="23"/></svg></button><input type="text" id="chat-detail-input" class="chat-input" placeholder="پیام..." onkeypress="if(event.key==='Enter') sendChatMessage()" onfocus="setTimeout(()=>{const c=document.getElementById('chat-detail-messages');if(c)c.scrollTop=c.scrollHeight;},300)"><button class="send-btn" onclick="sendChatMessage()" style="flex-shrink:0;">📤</button></div>
   <div id="emoji-picker" style="position:absolute;bottom:80px;left:0;right:0;background:var(--bg-secondary);border-radius:16px 16px 0 0;padding:12px;display:none;z-index:150;border-top:1px solid var(--border);max-height:300px;display:none;flex-direction:column;">
     <div style="display:flex;align-items:center;gap:8px;margin-bottom:8px;">
       <input type="text" id="emoji-search-input" class="search-box" placeholder="🔍 جستجوی ایموجی..." oninput="searchEmojis()" style="font-size:13px;flex:1;">
@@ -677,6 +748,9 @@
 
 <!-- نوار پایین -->
 <div class="bottom-nav">
+  <div class="sidebar-logo" style="padding:8px 16px 20px;border-bottom:1px solid var(--border);margin-bottom:8px;display:none;">
+    <span style="color:var(--primary);font-size:18px;font-weight:bold;">راه‌آموز</span>
+  </div>
   <button class="nav-item active" id="nav-home" onclick="navigateTo('home')">
     <span class="nav-icon"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9.5L12 3l9 6.5V20a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1V9.5z"/><path d="M9 21V12h6v9"/></svg></span>خانه
   </button>
@@ -6075,6 +6149,203 @@ async function syncSavedMessagesToSupabase() {
   } catch (e) { console.error('❌ خطا در ذخیره پیام‌های ذخیره شده:', e); }
 }
 
+
+// ==================== وضعیت آنلاین ====================
+let onlineUsers = new Set();
+async function updatePresence() {
+  if (!sb || !username) return;
+  try { await sb.from('user_presence').upsert({ username, last_seen: new Date().toISOString(), is_online: true }, { onConflict: 'username' }); } catch(e) {}
+}
+async function setOffline() {
+  if (!sb || !username) return;
+  try { await sb.from('user_presence').upsert({ username, last_seen: new Date().toISOString(), is_online: false }, { onConflict: 'username' }); } catch(e) {}
+}
+function startPresence() {
+  updatePresence();
+  setInterval(updatePresence, 30000);
+  window.addEventListener('beforeunload', setOffline);
+  document.addEventListener('visibilitychange', () => { if (document.hidden) setOffline(); else updatePresence(); });
+}
+async function fetchOnlineUsers() {
+  if (!sb) return;
+  const since = new Date(Date.now() - 65000).toISOString();
+  const { data } = await sb.from('user_presence').select('username,is_online').gte('last_seen', since);
+  onlineUsers = new Set((data || []).filter(u => u.is_online).map(u => u.username));
+  document.querySelectorAll('[data-online-user]').forEach(el => {
+    el.style.background = onlineUsers.has(el.getAttribute('data-online-user')) ? '#22c55e' : '#6b7280';
+  });
+}
+function onlineDot(uname) {
+  const color = onlineUsers.has(uname) ? '#22c55e' : '#6b7280';
+  return `<span data-online-user="${uname}" style="display:inline-block;width:8px;height:8px;border-radius:50%;background:${color};margin-inline-start:4px;vertical-align:middle;"></span>`;
+}
+
+// ==================== تیک خوانده شدن ====================
+let msgReadMap = {};
+async function markRoomAsRead(room) {
+  if (!sb || !username) return;
+  const msgs = getMessages();
+  if (!msgs.length) return;
+  const lastMsg = msgs[msgs.length-1];
+  if (!lastMsg.id) return;
+  try { await sb.from('message_reads').upsert({ room, username, last_read_id: lastMsg.id }, { onConflict: 'room,username' }); } catch(e) {}
+}
+async function fetchMsgReadMap(room) {
+  if (!sb) return;
+  const { data } = await sb.from('message_reads').select('username,last_read_id').eq('room', room);
+  msgReadMap[room] = {};
+  (data || []).forEach(r => { msgReadMap[room][r.username] = r.last_read_id; });
+  displayChatMessages();
+}
+function getTicksHtml(msg, room) {
+  if (!msg.id || msg.sender !== username) return '';
+  const roomReads = msgReadMap[room] || {};
+  const readers = Object.entries(roomReads).filter(([u, id]) => u !== username && id >= msg.id);
+  if (!readers.length) return '<span style="font-size:10px;color:#6b7280;margin-inline-start:4px;">✓</span>';
+  return '<span style="font-size:10px;color:#3b82f6;margin-inline-start:4px;">✓✓</span>';
+}
+
+// ==================== ری‌اکشن ====================
+const REACTIONS = ['❤️','👍','😂','😮','😢','🔥'];
+let reactionsData = {};
+async function loadReactions(room) {
+  if (!sb) return;
+  const { data } = await sb.from('messages').select('id,reactions').eq('room', room).not('reactions', 'is', null);
+  if (!data) return;
+  data.forEach(m => { if (m.reactions && Object.keys(m.reactions).length) reactionsData[m.id] = m.reactions; });
+  displayChatMessages();
+}
+async function toggleReaction(msgId, emoji, room) {
+  if (!sb || !msgId) return;
+  const cur = JSON.parse(JSON.stringify(reactionsData[msgId] || {}));
+  const users = cur[emoji] ? [...cur[emoji]] : [];
+  const idx = users.indexOf(username);
+  if (idx >= 0) users.splice(idx, 1); else users.push(username);
+  if (users.length) cur[emoji] = users; else delete cur[emoji];
+  reactionsData[msgId] = cur;
+  displayChatMessages();
+  try { await sb.from('messages').update({ reactions: cur }).eq('id', msgId); } catch(e) {}
+}
+function reactionsHtml(msg, room) {
+  if (!msg.id) return '';
+  const data = reactionsData[msg.id] || {};
+  const entries = Object.entries(data).filter(([,u]) => u.length);
+  let html = '<div style="display:flex;flex-wrap:wrap;gap:4px;margin-top:4px;">';
+  entries.forEach(([emoji, users]) => {
+    const active = users.includes(username);
+    html += `<button onclick="event.stopPropagation();toggleReaction(${msg.id},'${emoji}','${room}')" style="background:${active?'var(--primary)':'var(--bg-primary)'};border:1px solid var(--border);border-radius:999px;padding:2px 8px;font-size:12px;cursor:pointer;color:${active?'white':'inherit'};">${emoji} ${users.length}</button>`;
+  });
+  html += `<button onclick="event.stopPropagation();openReactionPicker(${msg.id},'${room}')" style="background:none;border:1px solid var(--border);border-radius:999px;padding:2px 8px;font-size:14px;cursor:pointer;color:var(--text-secondary);">+</button></div>`;
+  return html;
+}
+function openReactionPicker(msgId, room) {
+  document.getElementById('reaction-picker-el')?.remove();
+  const picker = document.createElement('div');
+  picker.id = 'reaction-picker-el';
+  picker.style.cssText = 'position:fixed;bottom:90px;left:50%;transform:translateX(-50%);background:var(--bg-secondary);border:1px solid var(--border);border-radius:999px;padding:10px 18px;display:flex;gap:14px;z-index:8000;box-shadow:0 4px 20px rgba(0,0,0,0.4);';
+  picker.innerHTML = REACTIONS.map(e => `<span onclick="event.stopPropagation();toggleReaction(${msgId},'${e}','${room}');document.getElementById('reaction-picker-el')?.remove();" style="font-size:26px;cursor:pointer;">${e}</span>`).join('');
+  document.body.appendChild(picker);
+  setTimeout(() => {
+    document.addEventListener('click', function h(ev) {
+      if (!picker.contains(ev.target)) { picker.remove(); document.removeEventListener('click', h); }
+    });
+  }, 100);
+}
+
+// ==================== ویس پیام ====================
+let mediaRecorder = null;
+let audioChunks = [];
+let isRecording = false;
+let recordTimer = null;
+let recordSeconds = 0;
+
+async function startVoiceRecord() {
+  if (isRecording) { stopVoiceRecord(); return; }
+  try {
+    const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+    mediaRecorder = new MediaRecorder(stream);
+    audioChunks = [];
+    mediaRecorder.ondataavailable = e => { if (e.data.size > 0) audioChunks.push(e.data); };
+    mediaRecorder.onstop = async () => {
+      stream.getTracks().forEach(t => t.stop());
+      const blob = new Blob(audioChunks, { type: 'audio/webm' });
+      if (blob.size > 0) await uploadVoice(blob);
+    };
+    mediaRecorder.start();
+    isRecording = true; recordSeconds = 0; updateVoiceBtn();
+    recordTimer = setInterval(() => { recordSeconds++; updateVoiceBtn(); if (recordSeconds >= 120) stopVoiceRecord(); }, 1000);
+  } catch(e) { alert('دسترسی به میکروفون رد شد: ' + e.message); }
+}
+function stopVoiceRecord() {
+  if (!isRecording || !mediaRecorder) return;
+  mediaRecorder.stop(); isRecording = false;
+  clearInterval(recordTimer); recordTimer = null;
+  updateVoiceBtn();
+}
+function updateVoiceBtn() {
+  const btn = document.getElementById('voice-record-btn');
+  if (!btn) return;
+  if (isRecording) {
+    const m = Math.floor(recordSeconds/60), s = recordSeconds % 60;
+    btn.innerHTML = `<svg width="22" height="22" viewBox="0 0 24 24" fill="red"><rect x="6" y="6" width="12" height="12" rx="2"/></svg><span style="font-size:11px;color:red;"> ${m}:${String(s).padStart(2,'0')}</span>`;
+    btn.style.color = 'red';
+  } else {
+    btn.innerHTML = `<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"/><path d="M19 10v2a7 7 0 0 1-14 0v-2"/><line x1="12" y1="19" x2="12" y2="23"/><line x1="8" y1="23" x2="16" y2="23"/></svg>`;
+    btn.style.color = '';
+  }
+}
+async function uploadVoice(blob) {
+  if (!sb) return;
+  const path = `${username}_${Date.now()}.webm`;
+  const { error } = await sb.storage.from('chat-media').upload(path, blob, { contentType: 'audio/webm' });
+  if (error) { alert('خطا در آپلود ویس: ' + error.message); return; }
+  const url = `${SUPABASE_URL_BASE}/chat-media/${path}`;
+  const room = currentChatType === 'dm' ? dmRoomId(username, currentDmUser) : currentChatType === 'usergroup' ? currentGroupRoom : 'general';
+  const time = getCurrentTime();
+  const msgObj = { sender: username, text: `[VOICE:${url}]`, time, replyTo: null };
+  if (currentChatType === 'dm') { dmMessages[currentDmUser] = dmMessages[currentDmUser] || []; dmMessages[currentDmUser].push(msgObj); }
+  else if (currentChatType === 'usergroup') { groupRoomMessages[currentGroupRoom] = groupRoomMessages[currentGroupRoom] || []; groupRoomMessages[currentGroupRoom].push(msgObj); }
+  else { adminMessages.push(msgObj); }
+  displayChatMessages();
+  await sb.from('messages').insert([{ sender: username, text: `[VOICE:${url}]`, time, room, reply_to: null }]);
+}
+
+
+// ==================== جستجو داخل چت ====================
+let chatSearchActive = false;
+let chatSearchResults = [];
+let chatSearchIndex = 0;
+
+function toggleChatSearch() {
+  const bar = document.getElementById('chat-search-bar');
+  chatSearchActive = !chatSearchActive;
+  bar.style.display = chatSearchActive ? 'flex' : 'none';
+  if (chatSearchActive) { setTimeout(() => document.getElementById('chat-search-input').focus(), 100); }
+  else { document.getElementById('chat-search-input').value = ''; chatSearchResults = []; displayChatMessages(); }
+}
+function searchInChat() {
+  const term = document.getElementById('chat-search-input').value.trim().toLowerCase();
+  const countEl = document.getElementById('chat-search-count');
+  if (!term) { chatSearchResults = []; countEl.innerText = ''; displayChatMessages(); return; }
+  const msgs = getMessages();
+  chatSearchResults = msgs.reduce((acc, m, i) => {
+    if (m.text && !m.text.startsWith('[IMAGE:') && !m.text.startsWith('[VIDEO:') && !m.text.startsWith('[VOICE:') && m.text.toLowerCase().includes(term)) acc.push(i);
+    return acc;
+  }, []);
+  chatSearchIndex = chatSearchResults.length - 1;
+  countEl.innerText = chatSearchResults.length ? chatSearchResults.length + ' نتیجه' : 'یافت نشد';
+  displayChatMessages();
+  scrollToSearchResult();
+}
+function scrollToSearchResult() {
+  if (!chatSearchResults.length) return;
+  const el = document.querySelector('.message[data-idx="' + chatSearchResults[chatSearchIndex] + '"]');
+  if (el) el.scrollIntoView({ behavior: 'smooth', block: 'center' });
+}
+function nextSearchResult() { if (!chatSearchResults.length) return; chatSearchIndex = (chatSearchIndex - 1 + chatSearchResults.length) % chatSearchResults.length; scrollToSearchResult(); }
+function prevSearchResult() { if (!chatSearchResults.length) return; chatSearchIndex = (chatSearchIndex + 1) % chatSearchResults.length; scrollToSearchResult(); }
+function toggleSearch() { toggleChatSearch(); }
+
 // ==================== پیشرفت کاربر (Supabase) ====================
 function currentProgressObj() {
   return { xp, completedLessons, quizSolvedCount, streak, lastActive, totalStudyMinutes, weeklyActivity: weeklyActivityData, lastActivityDate, lastLessonTime };
@@ -6222,8 +6493,72 @@ function syncProgressToSupabase() {
   }, 600);
 }
 
+// ==================== فونت ====================
+const fontFamilies = {
+  default: "'Segoe UI', Tahoma, Geneva, Verdana, sans-serif",
+  vazir: "'Vazirmatn', 'Vazir', Tahoma, sans-serif",
+  shabnam: "'Shabnam', Tahoma, sans-serif",
+  iransans: "'IRANSansWeb', 'IRANSans', Tahoma, sans-serif",
+  mono: "'Courier New', 'Consolas', monospace",
+  rounded: "'Nunito', 'Segoe UI', sans-serif"
+};
+const fontCDNs = {
+  vazir: 'https://cdn.jsdelivr.net/gh/rastikerdar/vazirmatn@v33.003/Vazirmatn-font-face.css',
+  shabnam: 'https://cdn.jsdelivr.net/gh/rastikerdar/shabnam-font@v5.0.1/dist/font-face.css',
+};
+let currentFontSize = parseInt(localStorage.getItem('fontSize') || '14');
+
+function setFont(fontKey) {
+  localStorage.setItem('font', fontKey);
+  // لود CDN اگه لازمه
+  if (fontCDNs[fontKey] && !document.getElementById('font-cdn-' + fontKey)) {
+    const link = document.createElement('link');
+    link.rel = 'stylesheet'; link.href = fontCDNs[fontKey];
+    link.id = 'font-cdn-' + fontKey;
+    document.head.appendChild(link);
+  }
+  const family = fontFamilies[fontKey] || fontFamilies.default;
+  document.getElementById('dynamic-font-style').textContent = `body, input, button, textarea { font-family: ${family} !important; }`;
+  document.getElementById('font-preview').style.fontFamily = family;
+  // آپدیت دکمه‌های active
+  document.querySelectorAll('.font-btn').forEach(b => b.classList.remove('active'));
+  const fontMap = { default: 0, vazir: 1, shabnam: 2, iransans: 3, mono: 4, rounded: 5 };
+  const btns = document.querySelectorAll('.font-btn');
+  if (btns[fontMap[fontKey]]) btns[fontMap[fontKey]].classList.add('active');
+}
+
+function changeFontSize(delta) {
+  currentFontSize = Math.max(11, Math.min(20, currentFontSize + delta));
+  localStorage.setItem('fontSize', currentFontSize);
+  applyFontSize();
+}
+
+function applyFontSize() {
+  const el = document.getElementById('font-size-display');
+  if (el) el.innerText = currentFontSize + 'px';
+  const preview = document.getElementById('font-preview');
+  if (preview) preview.style.fontSize = currentFontSize + 'px';
+  // اعمال روی پیام‌ها و محتوای اصلی
+  const style = document.getElementById('dynamic-font-style');
+  const currentFont = fontFamilies[localStorage.getItem('font') || 'default'];
+  style.textContent = `body, input, button, textarea { font-family: ${currentFont} !important; } .message-bubble, .lesson-content, .lang-card { font-size: ${currentFontSize}px !important; }`;
+}
+
+function loadFont() {
+  const saved = localStorage.getItem('font') || 'default';
+  setFont(saved);
+  applyFontSize();
+}
+
 // ==================== تم رنگی ====================
-function setTheme(theme) { document.body.className = `theme-${theme}`; localStorage.setItem('theme', theme); document.querySelectorAll('.theme-btn').forEach(btn => btn.classList.remove('active')); document.querySelector(`.theme-${theme}`)?.classList.add('active'); }
+function setTheme(theme) {
+  document.body.className = `theme-${theme}`;
+  localStorage.setItem('theme', theme);
+  document.querySelectorAll('.theme-btn').forEach(btn => btn.classList.remove('active'));
+  document.querySelector(`.theme-${theme}`)?.classList.add('active');
+  document.querySelectorAll('.theme-option-btn').forEach(btn => btn.classList.remove('active'));
+  document.querySelector(`.theme-${theme}-btn`)?.classList.add('active');
+}
 function loadTheme() { const savedTheme = localStorage.getItem('theme') || 'dark'; setTheme(savedTheme); }
 
 // ==================== Supabase ====================
@@ -6367,6 +6702,9 @@ async function startApp(uname) {
   await loadMyGroups();
   await loadReadStatus();
   await computeUnreadCounts();
+  startPresence();
+  setInterval(fetchOnlineUsers, 30000);
+  fetchOnlineUsers();
 }
 
 async function discoverDmConversations() {
@@ -6422,19 +6760,34 @@ async function refreshChatList() {
 }
 
 async function refreshCurrentChat() {
-  if (currentChatType === 'group') await loadGroupMessages();
-  else if (currentChatType === 'dm') await loadDmMessages(currentDmUser);
-  else if (currentChatType === 'admin-view') await loadAdminRoomMessages(currentAdminRoom);
-  else if (currentChatType === 'usergroup') await loadGroupRoomMessages(currentGroupRoom);
-  else displayChatMessages();
+  // فقط برای fallback — realtime باید کافی باشه
+  if (!sb) return;
+  const msgs = getMessages();
+  const lastId = msgs.length ? (msgs[msgs.length-1].id || 0) : 0;
+  let room = 'general';
+  if (currentChatType === 'dm') room = dmRoomId(username, currentDmUser);
+  else if (currentChatType === 'usergroup') room = currentGroupRoom;
+  else if (currentChatType === 'admin-view') room = currentAdminRoom;
+  else if (currentChatType !== 'group') return;
+  const { data } = await sb.from('messages').select('*').eq('room', room).gt('id', lastId).order('id', { ascending: true });
+  if (!data || !data.length) return;
+  // فقط پیام‌های جدید رو اضافه کن
+  data.forEach(m => {
+    const msgObj = { id: m.id, sender: m.sender, text: m.text, time: m.time, replyTo: m.reply_to || null };
+    if (currentChatType === 'dm') { dmMessages[currentDmUser] = dmMessages[currentDmUser] || []; if (!dmMessages[currentDmUser].find(x => x.id === m.id)) dmMessages[currentDmUser].push(msgObj); }
+    else if (currentChatType === 'usergroup') { groupRoomMessages[currentGroupRoom] = groupRoomMessages[currentGroupRoom] || []; if (!groupRoomMessages[currentGroupRoom].find(x => x.id === m.id)) groupRoomMessages[currentGroupRoom].push(msgObj); }
+    else { if (!adminMessages.find(x => x.id === m.id)) adminMessages.push(msgObj); }
+  });
+  displayChatMessages();
 }
 
 let chatPollInterval = null;
 function startChatPolling() {
   stopChatPolling();
+  // polling فقط هر ۳۰ ثانیه برای پیام‌های از دست رفته (نه هر ۶ ثانیه)
   chatPollInterval = setInterval(() => {
-    if (currentChatType === 'group' || currentChatType === 'dm') refreshCurrentChat();
-  }, 6000);
+    if (document.visibilityState === 'visible') refreshCurrentChat();
+  }, 30000);
 }
 function stopChatPolling() {
   if (chatPollInterval) { clearInterval(chatPollInterval); chatPollInterval = null; }
@@ -7152,38 +7505,46 @@ function displayChatMessages() {
       continue;
     }
     const isMyMsg = (currentChatType === 'group' || currentChatType === 'dm' || currentChatType === 'admin-view' || currentChatType === 'usergroup') ? (msg.sender === username) : (msg.sender === 'user');
-    html += `<div class="message ${isMyMsg ? 'user' : 'bot'} ${selectedMessageIndex === i ? 'selected' : ''}" onclick="selectMessage(${i})">`;
+    const room = currentChatType === 'dm' ? dmRoomId(username, currentDmUser) : currentChatType === 'usergroup' ? currentGroupRoom : 'general';
+    const isSearchMatch = chatSearchResults.includes(i) && chatSearchResults[chatSearchIndex] === i;
+    html += `<div class="message ${isMyMsg ? 'user' : 'bot'} ${selectedMessageIndex === i ? 'selected' : ''} ${isSearchMatch ? 'search-highlight' : ''}" onclick="selectMessage(${i})" data-idx="${i}">`;
     if (msg.replyTo) html += `<div class="reply-preview">↩️ پاسخ به: ${escapeHtml(msg.replyTo)}</div>`;
     if ((currentChatType === 'group' || currentChatType === 'admin-view' || currentChatType === 'usergroup') && !isMyMsg) {
-      const senderAvatar = `avatar_${msg.sender}`;
-      const cachedUrl = localStorage.getItem(senderAvatar);
+      const cachedUrl = localStorage.getItem(`avatar_${msg.sender}`);
       const avatarHtml = cachedUrl
-        ? `<img src="${cachedUrl}" style="width:30px;height:30px;border-radius:50%;object-fit:cover;cursor:pointer;" onclick="openAvatarLightbox('${cachedUrl}','${msg.sender.replace(/'/g,"\\'")}')" onerror="this.outerHTML='<span style=cursor:pointer onclick=openUserSheet(\\'${msg.sender.replace(/'/g,"\\'")}\\'')>👤</span>'">`
-        : `<span style="font-size:22px;cursor:pointer;" onclick="openUserSheet('${msg.sender.replace(/'/g,"\\'")}')">👤</span>`;
-      html += `<div style="display:flex;align-items:center;gap:6px;margin-bottom:4px;">${avatarHtml}<span style="font-size:12px;color:var(--primary-light);font-weight:bold;cursor:pointer;" onclick="openUserSheet('${msg.sender.replace(/'/g,"\\'")}')"> ${escapeHtml(msg.sender)}${msg.sender === ADMIN_USERNAME ? adminBadgeHtml(13) : ''}</span></div>`;
+        ? `<img src="${cachedUrl}" style="width:28px;height:28px;border-radius:50%;object-fit:cover;cursor:pointer;flex-shrink:0;" onclick="openAvatarLightbox('${cachedUrl}','${msg.sender.replace(/'/g,"\\'")}')" onerror="this.outerHTML='<span style=cursor:pointer;font-size:20px onclick=openUserSheet(\\'${msg.sender.replace(/'/g,"\\'")}\\'')>👤</span>'">`
+        : `<span style="font-size:20px;cursor:pointer;flex-shrink:0;" onclick="openUserSheet('${msg.sender.replace(/'/g,"\\'")}')">👤</span>`;
+      html += `<div style="display:flex;align-items:center;gap:6px;margin-bottom:4px;">${avatarHtml}<span style="font-size:12px;color:var(--primary-light);font-weight:bold;cursor:pointer;" onclick="openUserSheet('${msg.sender.replace(/'/g,"\\'")}')"> ${escapeHtml(msg.sender)}${msg.sender === ADMIN_USERNAME ? adminBadgeHtml(13) : ''}${onlineDot(msg.sender)}</span></div>`;
     }
-    else if (currentChatType === 'dm' && !isMyMsg && msg.sender === ADMIN_USERNAME) html += `<div style="font-size:11px;color:var(--primary-light);margin-bottom:4px;padding-right:4px;font-weight:bold;">🛡️ ادمین${adminBadgeHtml(13)}</div>`;
+    else if (currentChatType === 'dm' && !isMyMsg && msg.sender === ADMIN_USERNAME) html += `<div style="font-size:11px;color:var(--primary-light);margin-bottom:4px;font-weight:bold;">🛡️ ادمین${adminBadgeHtml(13)}</div>`;
     let msgContent = '';
     if (msg.text && msg.text.startsWith('[IMAGE:') && msg.text.endsWith(']')) {
       const imgUrl = msg.text.slice(7, -1);
-      msgContent = `<div style="max-width:220px;">
-        <img src="${imgUrl}" style="max-width:100%;max-height:260px;border-radius:12px;display:block;cursor:pointer;" 
-          onclick="openMediaLightbox('image','${imgUrl.replace(/'/g,"\\'")}')" 
+      msgContent = `<div style="max-width:min(220px,70vw);">
+        <img src="${imgUrl}" style="max-width:100%;max-height:260px;border-radius:12px;display:block;cursor:pointer;"
+          onclick="openMediaLightbox('image','${imgUrl.replace(/'/g,"\\'")}')"
           onerror="this.style.display='none';this.nextElementSibling.style.display='flex'">
-        <div style="display:none;align-items:center;gap:8px;padding:12px;background:var(--bg-secondary);border-radius:12px;font-size:13px;color:var(--text-secondary);">
+        <div style="display:none;align-items:center;gap:8px;padding:10px;background:var(--bg-secondary);border-radius:12px;font-size:12px;color:var(--text-secondary);">
           🖼️ <a href="${imgUrl}" target="_blank" style="color:var(--primary-light);">مشاهده عکس</a>
         </div>
       </div>`;
     } else if (msg.text && msg.text.startsWith('[VIDEO:') && msg.text.endsWith(']')) {
       const vidUrl = msg.text.slice(7, -1);
-      msgContent = `<div style="max-width:220px;">
+      msgContent = `<div style="max-width:min(220px,70vw);">
         <video src="${vidUrl}" controls style="max-width:100%;border-radius:12px;display:block;" preload="metadata"></video>
         <button onclick="openMediaLightbox('video','${vidUrl.replace(/'/g,"\\'")}')" style="width:100%;margin-top:6px;background:none;border:1px solid var(--border);color:var(--text-secondary);border-radius:8px;padding:6px;cursor:pointer;font-size:12px;">🔍 نمایش کامل</button>
+      </div>`;
+    } else if (msg.text && msg.text.startsWith('[VOICE:') && msg.text.endsWith(']')) {
+      const audioUrl = msg.text.slice(7, -1);
+      msgContent = `<div style="display:flex;align-items:center;gap:8px;padding:10px 12px;background:var(--bg-primary);border-radius:12px;max-width:min(240px,72vw);">
+        <span style="font-size:18px;flex-shrink:0;">🎤</span>
+        <audio controls src="${audioUrl}" style="flex:1;height:30px;min-width:0;"></audio>
+        <a href="${audioUrl}" download style="color:var(--text-secondary);font-size:14px;text-decoration:none;flex-shrink:0;">⬇️</a>
       </div>`;
     } else {
       msgContent = `<div class="message-bubble">${escapeHtml(msg.text)}</div>`;
     }
-    html += `${msgContent}<span class="message-time">${msg.time}</span></div>`;
+    html += `${msgContent}<div style="display:flex;align-items:center;justify-content:${isMyMsg?'flex-end':'flex-start'};gap:4px;margin-top:2px;"><span class="message-time">${msg.time}</span>${getTicksHtml(msg, room)}</div>${reactionsHtml(msg, room)}</div>`;
   }
   container.innerHTML = html;
   renderPinnedBar();
@@ -7499,7 +7860,14 @@ function openChat(type) {
   const subs = { saved: 'یادداشت‌های شخصی', ai: 'دستیار هوش مصنوعی برنامه‌نویسی', group: 'همه کاربران' };
   document.getElementById('chat-detail-title').innerHTML = titles[type] || 'گروه عمومی';
   document.getElementById('chat-detail-sub').innerHTML = subs[type] || 'همه کاربران';
-  if (type === 'group') { unreadGroupCount = 0; updateUnreadBadge(); loadGroupMessages(); } else displayChatMessages(); 
+  if (type === 'group') {
+    unreadGroupCount = 0; updateUnreadBadge();
+    loadGroupMessages().then(() => {
+      markRoomAsRead('general');
+      fetchMsgReadMap('general');
+      loadReactions('general');
+    });
+  } else displayChatMessages(); 
   document.querySelectorAll('.page').forEach(p => p.classList.remove('active')); 
   document.getElementById('chat-detail-page').classList.add('active'); 
   startChatPolling();
@@ -7510,13 +7878,18 @@ function openDmChat(otherUser) {
   currentDmUser = otherUser;
   selectedMessageIndex = null;
   const inputBox0 = document.querySelector('.chat-input-container'); if (inputBox0) inputBox0.style.display = 'flex';
-  document.getElementById('chat-detail-title').innerHTML = `👤 ${escapeHtml(otherUser)}`;
-  document.getElementById('chat-detail-sub').innerHTML = 'چت خصوصی';
+  document.getElementById('chat-detail-title').innerHTML = `👤 ${escapeHtml(otherUser)}${onlineDot(otherUser)}`;
+  document.getElementById('chat-detail-sub').innerHTML = onlineUsers.has(otherUser) ? '<span style="color:#22c55e;font-size:11px;">● آنلاین</span>' : 'چت خصوصی';
   const dmBtn = document.getElementById('dm-profile-btn');
   if (dmBtn) dmBtn.style.display = 'block';
   dmUnread[otherUser] = 0;
   updateChatList();
-  loadDmMessages(otherUser);
+  const room = dmRoomId(username, otherUser);
+  loadDmMessages(otherUser).then(() => {
+    markRoomAsRead(room);
+    fetchMsgReadMap(room);
+    loadReactions(room);
+  });
   document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
   document.getElementById('chat-detail-page').classList.add('active');
   startChatPolling();
@@ -7913,6 +8286,7 @@ if (localStorage.getItem('authUser')) {
   loadProfile(localStorage.getItem('authUser'));
 }
 loadTheme();
+loadFont();
 updateUI();
 checkDailyReminder();
 setTimeout(() => { if (document.getElementById('editor-page').classList.contains('active')) { initEditor(); } }, 100);
