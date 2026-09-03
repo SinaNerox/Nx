@@ -5927,35 +5927,68 @@ randomizeQuizzes();
 // ==================== ادیتور کد ====================
 let editor = null;
 let currentMode = 'html';
-let savedCode = localStorage.getItem('savedCode') || '';
+// هر زبان بافر مستقل خودش را دارد
+let codeBuffers = { html: '', css: '', js: '' };
+let runCodeTimeout = null;
+let codeSyncTimeout = null;
+let codeLoadedFromSupabase = false;
 
 const templates = {
-  basic: `<html><head><title>صفحه من</title><style>body{font-family:Arial;text-align:center;padding:50px;}</style></head><body><h1>سلام دنیا!</h1><p>این اولین صفحه وب من است.</p></body></html>`,
-  card: `<html><head><style>.card{width:300px;margin:50px auto;padding:20px;border-radius:10px;background:linear-gradient(135deg,#667eea,#764ba2);color:white;text-align:center;box-shadow:0 10px 20px rgba(0,0,0,0.2);}</style></head><body><div class="card"><h1>کارت زیبا</h1><p>این یک کارت با طراحی مدرن است</p><button onclick="alert('سلام!')">کلیک کن</button></div></body></html>`,
-  form: `<html><head><style>form{width:300px;margin:50px auto;padding:20px;background:#f4f4f4;border-radius:10px;}input,textarea,button{width:100%;margin:8px 0;padding:10px;border-radius:5px;border:1px solid #ddd;}</style></head><body><form onsubmit="alert('فرم ارسال شد');return false"><h2>فرم تماس</h2><input type="text" placeholder="نام"><input type="email" placeholder="ایمیل"><textarea rows="3" placeholder="پیام"></textarea><button type="submit">ارسال</button></form></body></html>`,
-  flex: `<html><head><style>.container{display:flex;gap:20px;justify-content:center;align-items:center;height:100vh;background:#f0f0f0;}.box{background:#667eea;color:white;padding:40px;border-radius:10px;text-align:center;}</style></head><body><div class="container"><div class="box">1</div><div class="box">2</div><div class="box">3</div></div></body></html>`,
-  grid: `<html><head><style>.container{display:grid;grid-template-columns:repeat(3,1fr);gap:20px;padding:20px;background:#f0f0f0;}.item{background:#764ba2;color:white;padding:40px;text-align:center;border-radius:10px;}</style></head><body><div class="container"><div class="item">1</div><div class="item">2</div><div class="item">3</div><div class="item">4</div><div class="item">5</div><div class="item">6</div></div></body></html>`
+  basic: { html: `<h1>سلام دنیا!</h1>\n<p>این اولین صفحه وب من است.</p>`, css: `body{font-family:Arial;text-align:center;padding:50px;}`, js: `` },
+  card: { html: `<div class="card">\n  <h1>کارت زیبا</h1>\n  <p>این یک کارت با طراحی مدرن است</p>\n  <button onclick="alert('سلام!')">کلیک کن</button>\n</div>`, css: `.card{width:300px;margin:50px auto;padding:20px;border-radius:10px;background:linear-gradient(135deg,#667eea,#764ba2);color:white;text-align:center;box-shadow:0 10px 20px rgba(0,0,0,0.2);}`, js: `` },
+  form: { html: `<form>\n  <h2>فرم تماس</h2>\n  <input type="text" placeholder="نام">\n  <input type="email" placeholder="ایمیل">\n  <textarea rows="3" placeholder="پیام"></textarea>\n  <button type="submit">ارسال</button>\n</form>`, css: `form{width:300px;margin:50px auto;padding:20px;background:#f4f4f4;border-radius:10px;}\ninput,textarea,button{width:100%;margin:8px 0;padding:10px;border-radius:5px;border:1px solid #ddd;}`, js: `document.querySelector('form').addEventListener('submit', function(e){ e.preventDefault(); alert('فرم ارسال شد'); });` },
+  flex: { html: `<div class="container">\n  <div class="box">1</div>\n  <div class="box">2</div>\n  <div class="box">3</div>\n</div>`, css: `.container{display:flex;gap:20px;justify-content:center;align-items:center;height:100vh;background:#f0f0f0;}\n.box{background:#667eea;color:white;padding:40px;border-radius:10px;text-align:center;}`, js: `` },
+  grid: { html: `<div class="container">\n  <div class="item">1</div>\n  <div class="item">2</div>\n  <div class="item">3</div>\n  <div class="item">4</div>\n  <div class="item">5</div>\n  <div class="item">6</div>\n</div>`, css: `.container{display:grid;grid-template-columns:repeat(3,1fr);gap:20px;padding:20px;background:#f0f0f0;}\n.item{background:#764ba2;color:white;padding:40px;text-align:center;border-radius:10px;}`, js: `` }
 };
+
+function loadLocalCode() {
+  try {
+    const raw = JSON.parse(localStorage.getItem('savedCode') || 'null');
+    if (raw && typeof raw === 'object') return { html: raw.html || '', css: raw.css || '', js: raw.js || '' };
+  } catch (e) { /* فرمت قدیمی یا خراب - نادیده گرفته می‌شود */ }
+  return null;
+}
 
 function initEditor() {
   editor = CodeMirror.fromTextArea(document.getElementById('code-editor'), {
     lineNumbers: true, mode: 'htmlmixed', theme: 'material-darker', lineWrapping: true, autofocus: true
   });
-  if (savedCode) editor.setValue(savedCode);
-  else editor.setValue(templates.basic);
-  editor.on('change', () => runCode());
+  codeBuffers = loadLocalCode() || { ...templates.basic };
+  currentMode = 'html';
+  editor.setValue(codeBuffers.html);
+  editor.on('change', () => {
+    codeBuffers[currentMode] = editor.getValue();
+    localStorage.setItem('savedCode', JSON.stringify(codeBuffers));
+    debounceRunCode();
+    syncCodeToSupabase();
+  });
+  runCode();
+  if (!codeLoadedFromSupabase) loadCodeFromSupabase();
 }
 
 function switchEditorMode(mode) {
+  if (!editor) return;
+  codeBuffers[currentMode] = editor.getValue(); // ذخیره محتوای بافر قبلی قبل از سوییچ
   currentMode = mode;
   let mime = mode === 'css' ? 'css' : (mode === 'js' ? 'javascript' : 'htmlmixed');
   editor.setOption('mode', mime);
+  editor.setValue(codeBuffers[mode]);
   document.querySelectorAll('.editor-tab').forEach(t => t.classList.remove('active'));
   document.querySelector(`.editor-tab[data-mode="${mode}"]`).classList.add('active');
 }
 
-function runCode() { const iframe = document.getElementById('preview-frame'); iframe.contentDocument.open(); iframe.contentDocument.write(editor.getValue()); iframe.contentDocument.close(); }
+function buildPreviewDocument() {
+  return `<!DOCTYPE html>\n<html>\n<head>\n<meta charset="utf-8">\n<style>\n${codeBuffers.css}\n</style>\n</head>\n<body>\n${codeBuffers.html}\n<script>\n${codeBuffers.js}\n<\/script>\n</body>\n</html>`;
+}
+
+function runCode() {
+  if (editor) codeBuffers[currentMode] = editor.getValue();
+  const iframe = document.getElementById('preview-frame');
+  iframe.srcdoc = buildPreviewDocument();
+}
+function debounceRunCode() { clearTimeout(runCodeTimeout); runCodeTimeout = setTimeout(runCode, 400); }
 function runCodeAndPreview() { runCode(); switchEditorView('preview'); }
+
 function switchEditorView(view) {
   const codePanel = document.getElementById('editor-code-panel');
   const previewPanel = document.getElementById('editor-preview-panel');
@@ -5971,17 +6004,85 @@ function switchEditorView(view) {
     previewTab.classList.add('active'); codeTab.classList.remove('active');
   }
 }
-function loadTemplate(name) { if (templates[name]) { editor.setValue(templates[name]); runCode(); } }
-function saveCode() { localStorage.setItem('savedCode', editor.getValue()); alert('کد ذخیره شد!'); }
-function loadSavedCode() { const code = localStorage.getItem('savedCode'); if (code) { editor.setValue(code); runCode(); alert('کد بارگذاری شد!'); } else alert('کد ذخیره‌ای وجود ندارد'); }
+
+function loadTemplate(name) {
+  if (!templates[name] || !editor) return;
+  codeBuffers = { ...templates[name] };
+  editor.setValue(codeBuffers[currentMode]);
+  runCode();
+  localStorage.setItem('savedCode', JSON.stringify(codeBuffers));
+  syncCodeToSupabase();
+}
+
+function saveCode() {
+  if (editor) codeBuffers[currentMode] = editor.getValue();
+  localStorage.setItem('savedCode', JSON.stringify(codeBuffers));
+  syncCodeToSupabase(true);
+  alert('کد ذخیره شد!');
+}
+
+async function loadSavedCode() {
+  if (sb && username) {
+    try {
+      const { data, error } = await sb.from('user_code_snippets').select('code').eq('username', username).maybeSingle();
+      if (!error && data && data.code) {
+        codeBuffers = { html: data.code.html || '', css: data.code.css || '', js: data.code.js || '' };
+        if (editor) { editor.setValue(codeBuffers[currentMode]); runCode(); }
+        localStorage.setItem('savedCode', JSON.stringify(codeBuffers));
+        alert('کد بارگذاری شد!');
+        return;
+      }
+    } catch (e) { console.error('❌ خطا در بارگذاری کد از Supabase:', e); }
+  }
+  const local = loadLocalCode();
+  if (local) {
+    codeBuffers = local;
+    if (editor) { editor.setValue(codeBuffers[currentMode]); runCode(); }
+    alert('کد بارگذاری شد!');
+  } else {
+    alert('کد ذخیره‌ای وجود ندارد');
+  }
+}
+
 function openEditorWithCode(code) {
     navigateTo('editor');
     setTimeout(() => {
         if (editor) {
+            codeBuffers = { html: code, css: '', js: '' };
+            currentMode = 'html';
+            document.querySelectorAll('.editor-tab').forEach(t => t.classList.remove('active'));
+            document.querySelector('.editor-tab[data-mode="html"]').classList.add('active');
+            editor.setOption('mode', 'htmlmixed');
             editor.setValue(code);
             runCode();
+            localStorage.setItem('savedCode', JSON.stringify(codeBuffers));
         }
     }, 200);
+}
+
+// ==================== ذخیره/بارگذاری کد ادیتور در Supabase ====================
+function syncCodeToSupabase(immediate) {
+  if (!sb || !username) return;
+  clearTimeout(codeSyncTimeout);
+  const doSync = async () => {
+    try {
+      await sb.from('user_code_snippets').upsert({ username: username, code: codeBuffers, updated_at: new Date().toISOString() }, { onConflict: 'username' });
+    } catch (e) { console.error('❌ خطا در ذخیره کد:', e); }
+  };
+  if (immediate) doSync(); else codeSyncTimeout = setTimeout(doSync, 600);
+}
+
+async function loadCodeFromSupabase() {
+  if (!sb || !username) return;
+  try {
+    const { data, error } = await sb.from('user_code_snippets').select('code').eq('username', username).maybeSingle();
+    codeLoadedFromSupabase = true;
+    if (!error && data && data.code) {
+      codeBuffers = { html: data.code.html || '', css: data.code.css || '', js: data.code.js || '' };
+      localStorage.setItem('savedCode', JSON.stringify(codeBuffers));
+      if (editor) { editor.setValue(codeBuffers[currentMode]); runCode(); }
+    }
+  } catch (e) { console.error('❌ خطا در دریافت کد:', e); }
 }
 
 // ==================== سیستم قلب برای تمرین ====================
@@ -6113,6 +6214,8 @@ function loadProfile(profileName) {
   updateUI(); updateChatList(); saveAllData(true);
   loadSavedMessagesFromSupabase();
   loadProgressFromSupabase();
+  codeLoadedFromSupabase = false;
+  loadCodeFromSupabase();
 }
 function addNewProfile() {
   let newName = prompt('نام پروفایل جدید را وارد کنید:');
