@@ -95,7 +95,7 @@
       --warning: #fbbf24;
     }
     
-    .header { background: var(--bg-secondary); padding: 16px 20px; border-bottom: 2px solid var(--primary); display: flex; align-items: center; gap: 12px; position: sticky; top: 0; z-index: 100; }
+    .header { background: var(--bg-secondary); padding: 16px 20px; border-bottom: 2px solid var(--primary); display: flex; align-items: center; gap: 12px; position: sticky; top: 0; z-index: 100; box-shadow: 0 2px 10px rgba(0,0,0,0.1); }
     .header-center { text-align: center; flex: 1; }
     .header-center h1 { color: var(--primary); font-size: 20px; display: flex; align-items: center; justify-content: center; gap: 8px; }
     .header-center p { color: var(--text-secondary); font-size: 11px; margin-top: 3px; }
@@ -156,15 +156,15 @@
     .quiz-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.92); z-index: 1000; display: flex; align-items: center; justify-content: center; padding: 20px; }
     .quiz-box { background: var(--bg-secondary); border-radius: 20px; padding: 24px; width: 100%; max-width: 400px; border: 1px solid var(--primary); }
     
-    .chat-messages-container { flex: 1; overflow-y: auto; padding: 12px; padding-bottom: 90px; display: flex; flex-direction: column; gap: 8px; height: calc(100vh - 180px); }
-    .message { max-width: 82%; margin-bottom: 8px; position: relative; cursor: pointer; transition: all 0.2s; }
-    @media (max-width: 480px) { .message { max-width: 90%; } }
-    .message.selected { opacity: 0.7; background: rgba(124, 58, 237, 0.2); border-radius: 18px; }
+    .chat-messages-container { flex: 1; overflow-y: auto; padding: 14px 12px; padding-bottom: 90px; display: flex; flex-direction: column; gap: 10px; height: calc(100vh - 180px); }
+    .message { max-width: 78%; margin-bottom: 2px; position: relative; cursor: pointer; transition: opacity 0.2s; }
+    @media (max-width: 480px) { .message { max-width: 88%; } }
+    .message.selected { opacity: 0.7; background: rgba(124, 58, 237, 0.15); border-radius: 18px; }
     .message.user { align-self: flex-end; }
     .message.bot { align-self: flex-start; }
-    .message-bubble { padding: 10px 14px; border-radius: 18px; word-wrap: break-word; word-break: break-word; font-size: 14px; line-height: 1.5; }
-    .message.user .message-bubble { background: var(--primary); color: white; border-bottom-right-radius: 4px; }
-    .message.bot .message-bubble { background: var(--bg-card); color: var(--text-primary); border-bottom-left-radius: 4px; border: 1px solid var(--border); }
+    .message-bubble { padding: 11px 15px; border-radius: 20px; word-wrap: break-word; word-break: break-word; font-size: 14px; line-height: 1.55; box-shadow: 0 1px 3px rgba(0,0,0,0.08); }
+    .message.user .message-bubble { background: linear-gradient(135deg, var(--primary-light), var(--primary)); color: white; border-bottom-right-radius: 6px; }
+    .message.bot .message-bubble { background: var(--bg-card); color: var(--text-primary); border-bottom-left-radius: 6px; border: 1px solid var(--border); }
     .message-time { font-size: 10px; color: var(--text-secondary); margin-top: 4px; display: block; text-align: center; }
     .reply-preview { font-size: 11px; color: var(--primary-light); margin-bottom: 4px; padding-bottom: 4px; border-bottom: 1px dashed var(--border); }
     
@@ -189,21 +189,24 @@
     
     .edit-panel { position: fixed; bottom: 70px; left: 0; right: 0; background: var(--bg-secondary); padding: 12px; border-top: 1px solid var(--primary); z-index: 200; display: none; }
     .edit-input { flex: 1; background: var(--bg-primary); border: 1px solid var(--border); padding: 10px 15px; border-radius: 20px; color: var(--text-primary); outline: none; }
-    .chat-input-container { position: fixed; bottom: 70px; left: 8px; right: 8px; background: var(--bg-secondary); padding: 8px 10px; border-radius: 28px; display: flex; gap: 6px; border: 1px solid var(--border); align-items: center; }
+    .chat-input-container { position: fixed; bottom: 70px; left: 8px; right: 8px; background: var(--bg-secondary); padding: 8px 10px; border-radius: 28px; display: flex; gap: 6px; border: 1px solid var(--border); align-items: center; box-shadow: 0 4px 16px rgba(0,0,0,0.18); }
     .chat-input-container button { flex-shrink: 0; padding: 4px; display: flex; align-items: center; }
     .chat-input { flex: 1; min-width: 0; }
     .chat-input { flex: 1; background: var(--bg-primary); border: none; padding: 12px 18px; border-radius: 28px; color: var(--text-primary); outline: none; font-size: 14px; }
-    .send-btn { background: var(--primary); border: none; width: 48px; height: 48px; border-radius: 50%; cursor: pointer; font-size: 20px; display: flex; align-items: center; justify-content: center; }
+    .send-btn { background: linear-gradient(135deg, var(--primary-light), var(--primary)); border: none; width: 48px; height: 48px; border-radius: 50%; cursor: pointer; font-size: 20px; display: flex; align-items: center; justify-content: center; box-shadow: 0 2px 8px rgba(0,0,0,0.2); transition: transform 0.15s; }
+    .send-btn:active { transform: scale(0.92); }
     
-    .chat-list { padding: 8px; }
-    .chat-item { background: var(--bg-secondary); border-radius: 14px; padding: 14px; margin-bottom: 8px; display: flex; align-items: center; gap: 14px; cursor: pointer; border: 1px solid var(--border); transition: all 0.2s; }
-    .chat-item:hover { background: var(--bg-card); border-color: var(--primary); }
-    .chat-avatar { width: 50px; height: 50px; border-radius: 50%; background: var(--border); display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
-    .chat-avatar svg { width: 28px; height: 28px; }
-    .chat-info { flex: 1; }
-    .chat-name { font-size: 16px; font-weight: bold; margin-bottom: 4px; display: flex; align-items: center; gap: 8px; }
-    .chat-lastmsg { font-size: 12px; color: var(--text-secondary); }
-    .chat-time { font-size: 10px; color: var(--text-secondary); }
+    .chat-list { padding: 6px 8px; }
+    .chat-item { background: var(--bg-secondary); border-radius: 16px; padding: 12px 14px; margin-bottom: 6px; display: flex; align-items: center; gap: 12px; cursor: pointer; border: 1px solid transparent; transition: background 0.2s, border-color 0.2s, box-shadow 0.2s; }
+    .chat-item:hover { background: var(--bg-card); border-color: var(--border); box-shadow: 0 4px 14px rgba(0,0,0,0.12); }
+    .chat-avatar { width: 54px; height: 54px; border-radius: 50%; background: linear-gradient(135deg, var(--primary), var(--primary-light)); color: #fff; display: flex; align-items: center; justify-content: center; flex-shrink: 0; font-size: 22px; box-shadow: 0 2px 8px rgba(0,0,0,0.15); position: relative; overflow: hidden; }
+    .chat-avatar svg { width: 26px; height: 26px; }
+    .chat-avatar img { width: 100%; height: 100%; object-fit: cover; border-radius: 50%; }
+    .chat-info { flex: 1; min-width: 0; }
+    .chat-name { font-size: 15.5px; font-weight: 600; margin-bottom: 3px; display: flex; align-items: center; gap: 6px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .chat-lastmsg { font-size: 12.5px; color: var(--text-secondary); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .chat-time { font-size: 10.5px; color: var(--text-secondary); white-space: nowrap; }
+    .chat-unread-badge { background: linear-gradient(135deg, var(--primary), var(--primary-light)); color: #fff; border-radius: 999px; min-width: 20px; height: 20px; font-size: 11px; font-weight: 600; align-items: center; justify-content: center; padding: 0 6px; box-shadow: 0 2px 6px rgba(0,0,0,0.2); }
     
     .edit-name-section { display: flex; gap: 10px; margin-top: 16px; justify-content: center; }
     .edit-name-input { background: var(--bg-primary); border: 1px solid var(--border); border-radius: 12px; padding: 8px 12px; color: var(--text-primary); outline: none; flex: 1; }
@@ -611,7 +614,11 @@
 <div class="page" id="group-info-page">
   <div class="header"><button class="back-btn" onclick="closeGroupInfo()"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M19 12H5"/><path d="M12 19l-7-7 7-7"/></svg></button><div class="header-center"><h1 style="font-size: 18px;">اطلاعات</h1></div></div>
   <div style="padding:20px; text-align:center;">
-    <div id="group-info-icon" style="font-size:48px; margin-bottom:10px;">👥</div>
+    <div style="position:relative; width:90px; height:90px; margin:0 auto 10px;">
+      <div id="group-info-icon" style="width:90px; height:90px; border-radius:50%; background:var(--border); display:flex; align-items:center; justify-content:center; font-size:44px; overflow:hidden;">👥</div>
+      <div id="group-info-avatar-edit-btn" style="display:none; position:absolute; bottom:0; right:0; background:var(--primary); border-radius:50%; width:28px; height:28px; align-items:center; justify-content:center; cursor:pointer; font-size:14px; border:2px solid var(--bg-primary);" onclick="document.getElementById('group-avatar-upload-input').click()">📷</div>
+      <input type="file" id="group-avatar-upload-input" accept="image/*" style="display:none" onchange="uploadGroupAvatar(event)">
+    </div>
     <h2 id="group-info-name" style="margin-bottom:6px;"></h2>
     <p id="group-info-meta" style="color:var(--text-secondary); font-size:13px; margin-bottom:20px;"></p>
   </div>
@@ -6495,6 +6502,29 @@ async function uploadAvatar(event) {
   syncProgressToSupabase();
 }
 
+async function uploadGroupAvatar(event) {
+  const file = event.target.files[0];
+  if (!file) return;
+  if (!groupInfoState || !groupInfoState.viewerCanManage) { alert('فقط مدیر می‌تواند عکس را تغییر دهد'); return; }
+  if (file.size > 3 * 1024 * 1024) { alert('حجم عکس باید کمتر از ۳ مگابایت باشد'); return; }
+  if (!sb) { alert('اتصال برقرار نیست'); return; }
+  const group = groupInfoState.group;
+  const groupId = group.id || parseInt(groupInfoState.room.replace('grp:', ''));
+  const ext = file.name.split('.').pop();
+  const path = `${groupId}.${ext}`;
+  const { error } = await sb.storage.from('group-avatars').upload(path, file, { upsert: true, contentType: file.type });
+  if (error) { alert('خطا در آپلود: ' + error.message); return; }
+  const url = `${SUPABASE_URL_BASE}/group-avatars/${path}?t=${Date.now()}`;
+  const { error: updateError } = await sb.from('groups').update({ avatar_url: url }).eq('id', groupId);
+  if (updateError) { alert('خطا در ذخیره عکس: ' + updateError.message); return; }
+  group.avatar_url = url;
+  const cached = myGroups.find(x => x.id === groupId);
+  if (cached) cached.avatar_url = url;
+  document.getElementById('group-info-icon').innerHTML = `<img src="${url}" style="width:100%;height:100%;object-fit:cover;">`;
+  renderMyGroupsList();
+  updateChatList();
+}
+
 async function deleteAvatar() {
   if (!confirm('عکس پروفایل حذف شود؟')) return;
   if (!sb) return;
@@ -7104,7 +7134,7 @@ async function searchPublicGroups() {
   for (const g of data) {
     const joined = myGroups.some(mg => mg.id === g.id);
     const icon = g.type === 'channel' ? '📢' : '👥';
-    html += `<div class="chat-item"><div class="chat-avatar">${icon}</div><div class="chat-info"><div class="chat-name">${escapeHtml(g.name)}</div><div class="chat-lastmsg">${g.type === 'channel' ? 'کانال عمومی' : 'گروه عمومی'}</div></div>${joined ? '<span style="font-size:12px;color:var(--text-secondary);">عضو هستی ✓</span>' : `<button onclick="joinPublicGroup(${g.id})" style="background:var(--primary);color:#fff;border:none;padding:7px 14px;border-radius:8px;cursor:pointer;font-size:12px;">عضویت</button>`}</div>`;
+    html += `<div class="chat-item"><div class="chat-avatar">${chatAvatarHtml(g.avatar_url, icon)}</div><div class="chat-info"><div class="chat-name">${escapeHtml(g.name)}</div><div class="chat-lastmsg">${g.type === 'channel' ? 'کانال عمومی' : 'گروه عمومی'}</div></div>${joined ? '<span style="font-size:12px;color:var(--text-secondary);">عضو هستی ✓</span>' : `<button onclick="joinPublicGroup(${g.id})" style="background:var(--primary);color:#fff;border:none;padding:7px 14px;border-radius:8px;cursor:pointer;font-size:12px;">عضویت</button>`}</div>`;
   }
   list.innerHTML = html;
 }
@@ -7163,7 +7193,7 @@ function renderMyGroupsList() {
     const last = msgs.length ? (msgs[msgs.length-1].text.length > 30 ? msgs[msgs.length-1].text.substring(0,30)+'...' : msgs[msgs.length-1].text) : (g.type === 'channel' ? 'کانال' : 'گروه');
     const time = msgs.length ? msgs[msgs.length-1].time : '-';
     const unread = groupUnread[room] || 0;
-    html += `<div class="chat-item" onclick='openGroupRoom(${JSON.stringify(g).replace(/'/g, "&apos;")})'><div class="chat-avatar">${icon}</div><div class="chat-info"><div class="chat-name">${escapeHtml(g.name)}${g.role === 'owner' ? ' 👑' : ''}</div><div class="chat-lastmsg">${escapeHtml(last)}</div></div><div style="display:flex;flex-direction:column;align-items:flex-end;gap:4px;"><div class="chat-time">${time}</div><div style="background:var(--danger);color:#fff;border-radius:999px;min-width:20px;height:20px;font-size:11px;${unread > 0 ? 'display:flex' : 'display:none'};align-items:center;justify-content:center;padding:0 6px;">${unread > 99 ? '99+' : unread}</div></div></div>`;
+    html += `<div class="chat-item" onclick='openGroupRoom(${JSON.stringify(g).replace(/'/g, "&apos;")})'><div class="chat-avatar">${chatAvatarHtml(g.avatar_url, icon)}</div><div class="chat-info"><div class="chat-name">${escapeHtml(g.name)}${g.role === 'owner' ? ' 👑' : ''}</div><div class="chat-lastmsg">${escapeHtml(last)}</div></div><div style="display:flex;flex-direction:column;align-items:flex-end;gap:4px;"><div class="chat-time">${time}</div><div class="chat-unread-badge" style="${unread > 0 ? 'display:flex' : 'display:none'}">${unread > 99 ? '99+' : unread}</div></div></div>`;
   }
   container.innerHTML = html;
 }
@@ -7227,7 +7257,8 @@ async function openGroupInfo(room, group, returnType, viewerCanManage) {
   stopChatPolling();
   navigateTo('group-info');
   const icon = group.type === 'channel' ? '📢' : '👥';
-  document.getElementById('group-info-icon').innerText = icon;
+  document.getElementById('group-info-icon').innerHTML = group.avatar_url ? `<img src="${group.avatar_url}" style="width:100%;height:100%;object-fit:cover;" onerror="this.parentElement.innerHTML='${icon}'">` : icon;
+  document.getElementById('group-info-avatar-edit-btn').style.display = viewerCanManage ? 'flex' : 'none';
   document.getElementById('group-info-name').innerText = group.name || room;
   document.getElementById('group-info-meta').innerText = `${group.type === 'channel' ? 'کانال' : 'گروه'} • ${group.visibility === 'private' ? 'خصوصی 🔒' : 'عمومی 🌐'}`;
 
@@ -7551,7 +7582,7 @@ function updateChatList() {
 
   // گروه عمومی
   const groupUnreadCount = unreadGroupCount || 0;
-  const groupBadge = groupUnreadCount > 0 ? `<div style="background:var(--danger);color:#fff;border-radius:999px;min-width:20px;height:20px;font-size:11px;display:flex;align-items:center;justify-content:center;padding:0 6px;">${groupUnreadCount > 99 ? '99+' : groupUnreadCount}</div>` : '';
+  const groupBadge = groupUnreadCount > 0 ? `<div class="chat-unread-badge" style="display:flex">${groupUnreadCount > 99 ? '99+' : groupUnreadCount}</div>` : '';
   items.push({ ts: getTs(adminMessages), html: `<div class="chat-item" onclick="openChat('group')"><div class="chat-avatar"><svg fill="currentColor" width="28" height="28" viewBox="0 0 24 24"><path d="M16 11c1.66 0 2.99-1.34 2.99-3S17.66 5 16 5c-1.66 0-3 1.34-3 3s1.34 3 3 3zm-8 0c1.66 0 2.99-1.34 2.99-3S9.66 5 8 5C6.34 5 5 6.34 5 8s1.34 3 3 3zm0 2c-2.33 0-7 1.17-7 3.5V19h14v-2.5c0-2.33-4.67-3.5-7-3.5zm8 0c-.29 0-.62.02-.97.05 1.16.84 1.97 1.97 1.97 3.45V19h6v-2.5c0-2.33-4.67-3.5-7-3.5z"/></svg></div><div class="chat-info"><div class="chat-name">👥 گروه عمومی</div><div class="chat-lastmsg">${escapeHtml(getLastMsg(adminMessages) || 'به گروه خوش آمدید...')}</div></div><div style="display:flex;flex-direction:column;align-items:flex-end;gap:4px;"><div class="chat-time">${getTime(adminMessages)}</div>${groupBadge}</div></div>` });
 
   // گروه‌های کاربر
@@ -7559,18 +7590,19 @@ function updateChatList() {
     const room = 'grp:' + g.id;
     const msgs = groupRoomMessages[room] || [];
     const unread = groupUnread[room] || 0;
-    const badge = unread > 0 ? `<div style="background:var(--danger);color:#fff;border-radius:999px;min-width:20px;height:20px;font-size:11px;display:flex;align-items:center;justify-content:center;padding:0 6px;">${unread > 99 ? '99+' : unread}</div>` : '';
+    const badge = unread > 0 ? `<div class="chat-unread-badge" style="display:flex">${unread > 99 ? '99+' : unread}</div>` : '';
     const icon = g.type === 'channel' ? '📢' : '👥';
     const safeG = JSON.stringify(g).replace(/'/g, "&apos;");
-    items.push({ ts: getTs(msgs), html: `<div class="chat-item" onclick='openGroupRoom(${safeG})'><div class="chat-avatar">${icon}</div><div class="chat-info"><div class="chat-name">${icon} ${escapeHtml(g.name)}</div><div class="chat-lastmsg">${escapeHtml(getLastMsg(msgs) || 'به گروه خوش آمدید...')}</div></div><div style="display:flex;flex-direction:column;align-items:flex-end;gap:4px;"><div class="chat-time">${getTime(msgs)}</div>${badge}</div></div>` });
+    items.push({ ts: getTs(msgs), html: `<div class="chat-item" onclick='openGroupRoom(${safeG})'><div class="chat-avatar">${chatAvatarHtml(g.avatar_url, icon)}</div><div class="chat-info"><div class="chat-name">${icon} ${escapeHtml(g.name)}</div><div class="chat-lastmsg">${escapeHtml(getLastMsg(msgs) || 'به گروه خوش آمدید...')}</div></div><div style="display:flex;flex-direction:column;align-items:flex-end;gap:4px;"><div class="chat-time">${getTime(msgs)}</div>${badge}</div></div>` });
   }
 
   // چت‌های خصوصی
   for (const u of knownDmUsers) {
     const msgs = dmMessages[u] || [];
     const unread = dmUnread[u] || 0;
-    const badge = unread > 0 ? `<div style="background:var(--danger);color:#fff;border-radius:999px;min-width:20px;height:20px;font-size:11px;display:flex;align-items:center;justify-content:center;padding:0 6px;">${unread > 99 ? '99+' : unread}</div>` : '';
-    items.push({ ts: getTs(msgs), html: `<div class="chat-item" onclick="openDmChat('${escapeHtml(u)}')"><div class="chat-avatar">👤</div><div class="chat-info"><div class="chat-name">${escapeHtml(u)}${u === ADMIN_USERNAME ? adminBadgeHtml(13) : ''}</div><div class="chat-lastmsg">${escapeHtml(getLastMsg(msgs) || 'گفتگو را شروع کنید')}</div></div><div style="display:flex;flex-direction:column;align-items:flex-end;gap:4px;"><div class="chat-time">${getTime(msgs)}</div>${badge}</div></div>` });
+    const badge = unread > 0 ? `<div class="chat-unread-badge" style="display:flex">${unread > 99 ? '99+' : unread}</div>` : '';
+    const dmAvatarUrl = localStorage.getItem(`avatar_${u}`);
+    items.push({ ts: getTs(msgs), html: `<div class="chat-item" onclick="openDmChat('${escapeHtml(u)}')"><div class="chat-avatar">${chatAvatarHtml(dmAvatarUrl, '👤')}</div><div class="chat-info"><div class="chat-name">${escapeHtml(u)}${u === ADMIN_USERNAME ? adminBadgeHtml(13) : ''}</div><div class="chat-lastmsg">${escapeHtml(getLastMsg(msgs) || 'گفتگو را شروع کنید')}</div></div><div style="display:flex;flex-direction:column;align-items:flex-end;gap:4px;"><div class="chat-time">${getTime(msgs)}</div>${badge}</div></div>` });
   }
 
   // مرتب‌سازی بر اساس زمان (جدیدترین بالا)
@@ -7584,6 +7616,14 @@ function renderDmList() { updateChatList(); }
 function renderMyGroupsList() { updateChatList(); }
 
 function escapeHtml(t) { const d = document.createElement('div'); d.textContent = t; return d.innerHTML; }
+function b64EncodeUnicode(str) { return btoa(encodeURIComponent(str).replace(/%([0-9A-F]{2})/g, (m, p1) => String.fromCharCode('0x' + p1))); }
+function b64DecodeUnicode(str) { return decodeURIComponent(atob(str).split('').map(c => '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2)).join('')); }
+// آواتار گرد (عکس واقعی اگر باشد، وگرنه ایموجی/آیکون جایگزین)
+function chatAvatarHtml(url, fallbackHtml) {
+  if (!url) return fallbackHtml;
+  const fb = b64EncodeUnicode(fallbackHtml);
+  return `<img src="${url}" data-fb="${fb}" onerror="this.parentElement.innerHTML=b64DecodeUnicode(this.dataset.fb)">`;
+}
 function getCurrentTime() { const n = new Date(); return `${n.getHours().toString().padStart(2,'0')}:${n.getMinutes().toString().padStart(2,'0')}`; }
 function getMessages() { 
   if (currentChatType === 'saved') return savedMessages; 
