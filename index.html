@@ -202,6 +202,9 @@
     .chat-avatar { width: 54px; height: 54px; border-radius: 50%; background: linear-gradient(135deg, var(--primary), var(--primary-light)); color: #fff; display: flex; align-items: center; justify-content: center; flex-shrink: 0; font-size: 22px; box-shadow: 0 2px 8px rgba(0,0,0,0.15); position: relative; overflow: hidden; }
     .chat-avatar svg { width: 26px; height: 26px; }
     .chat-avatar img { width: 100%; height: 100%; object-fit: cover; border-radius: 50%; }
+    #chat-detail-avatar img { width: 100%; height: 100%; object-fit: cover; border-radius: 50%; }
+    .mini-avatar { width: 30px; height: 30px; border-radius: 50%; overflow: hidden; flex-shrink: 0; background: var(--border); display: flex; align-items: center; justify-content: center; font-size: 16px; }
+    .mini-avatar img { width: 100%; height: 100%; object-fit: cover; border-radius: 50%; }
     .chat-info { flex: 1; min-width: 0; }
     .chat-name { font-size: 15.5px; font-weight: 600; margin-bottom: 3px; display: flex; align-items: center; gap: 6px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
     .chat-lastmsg { font-size: 12.5px; color: var(--text-secondary); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
@@ -673,7 +676,7 @@
 
 <!-- صفحه گفتگوی چت -->
 <div class="page" id="chat-detail-page">
-  <div class="header"><button class="back-btn" onclick="goBackFromChat()"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M19 12H5"/><path d="M12 19l-7-7 7-7"/></svg></button><div class="header-center" id="chat-detail-header-center" onclick="maybeOpenGroupInfo()" style="cursor:pointer;"><h1 id="chat-detail-title" style="font-size: 18px;"></h1><p id="chat-detail-sub" style="font-size: 11px; color: var(--text-secondary);"></p></div><div style="display: flex; gap: 12px; align-items:center;"><button id="dm-profile-btn" onclick="viewDmProfile()" style="display:none;background:none;border:none;color:var(--text-secondary);cursor:pointer;display:flex;align-items:center;"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg></button><button onclick="refreshCurrentChat()" style="background: none; border: none; color: var(--text-secondary); cursor: pointer; display:flex; align-items:center;"><svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M23 4v6h-6"/><path d="M1 20v-6h6"/><path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"/></svg></button><button onclick="toggleSearch()" style="background: none; border: none; color: var(--text-secondary); cursor: pointer; display:flex; align-items:center;"><svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><path d="M21 21l-4.35-4.35"/></svg></button><button class="clear-chat" onclick="clearCurrentChat()" style="background: none; border: none; color: var(--danger); cursor: pointer; display:flex; align-items:center;"><svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 6h18"/><path d="M8 6V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/><path d="M10 11v6"/><path d="M14 11v6"/></svg></button></div></div>
+  <div class="header"><button class="back-btn" onclick="goBackFromChat()"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M19 12H5"/><path d="M12 19l-7-7 7-7"/></svg></button><div class="header-center" id="chat-detail-header-center" onclick="maybeOpenGroupInfo()" style="cursor:pointer; display:flex; align-items:center; justify-content:center; gap:10px;"><div id="chat-detail-avatar" style="width:36px;height:36px;border-radius:50%;background:var(--border);display:none;align-items:center;justify-content:center;font-size:18px;flex-shrink:0;overflow:hidden;"></div><div style="min-width:0;"><h1 id="chat-detail-title" style="font-size: 18px;"></h1><p id="chat-detail-sub" style="font-size: 11px; color: var(--text-secondary);"></p></div></div><div style="display: flex; gap: 12px; align-items:center;"><button id="dm-profile-btn" onclick="viewDmProfile()" style="display:none;background:none;border:none;color:var(--text-secondary);cursor:pointer;display:flex;align-items:center;"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg></button><button onclick="refreshCurrentChat()" style="background: none; border: none; color: var(--text-secondary); cursor: pointer; display:flex; align-items:center;"><svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M23 4v6h-6"/><path d="M1 20v-6h6"/><path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"/></svg></button><button onclick="toggleSearch()" style="background: none; border: none; color: var(--text-secondary); cursor: pointer; display:flex; align-items:center;"><svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><path d="M21 21l-4.35-4.35"/></svg></button><button class="clear-chat" onclick="clearCurrentChat()" style="background: none; border: none; color: var(--danger); cursor: pointer; display:flex; align-items:center;"><svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 6h18"/><path d="M8 6V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/><path d="M10 11v6"/><path d="M14 11v6"/></svg></button></div></div>
   <div id="search-area" style="padding: 8px; display: none;"><input type="text" id="search-input" class="search-box" placeholder="جستجو در پیام‌ها..." onkeyup="searchMessages()"></div>
   <div id="pinned-area" style="padding: 8px;"></div>
   <div id="reply-bar" class="reply-bar"><span class="reply-text" id="reply-text"></span><button class="cancel-reply" onclick="cancelReply()">✖️</button></div>
@@ -6521,6 +6524,7 @@ async function uploadGroupAvatar(event) {
   const cached = myGroups.find(x => x.id === groupId);
   if (cached) cached.avatar_url = url;
   document.getElementById('group-info-icon').innerHTML = `<img src="${url}" style="width:100%;height:100%;object-fit:cover;">`;
+  setChatHeaderAvatar(url, group.type === 'channel' ? '📢' : '👥');
   renderMyGroupsList();
   updateChatList();
 }
@@ -6966,6 +6970,16 @@ function roomLabel(room) {
   }
   return '📢 ' + room;
 }
+// همون roomLabel ولی بدون ایموجی جلوش - برای وقتی که کنارش یک آواتار دایره‌ای هم نشون داده می‌شود
+function roomPlainLabel(room) {
+  if (room === 'general') return 'گروه عمومی';
+  if (room.startsWith('dm:')) return room.replace('dm:', '').replace(':', ' ↔ ');
+  if (room.startsWith('grp:')) {
+    const g = adminGroupsCache[room];
+    return g ? g.name : room;
+  }
+  return room;
+}
 
 async function loadAllRoomsForAdmin() {
   const list = document.getElementById('admin-rooms-list');
@@ -7022,8 +7036,17 @@ function openAdminRoom(room) {
   currentAdminRoom = room;
   selectedMessageIndex = null;
   const inputBox0 = document.querySelector('.chat-input-container'); if (inputBox0) inputBox0.style.display = 'flex';
-  document.getElementById('chat-detail-title').innerHTML = escapeHtml(roomLabel(room));
+  document.getElementById('chat-detail-title').innerHTML = escapeHtml(roomPlainLabel(room));
   document.getElementById('chat-detail-sub').innerHTML = 'حالت ادمین (دسترسی کامل)';
+  if (room.startsWith('grp:')) {
+    const g = adminGroupsCache[room];
+    const icon = g && g.type === 'channel' ? '📢' : '👥';
+    setChatHeaderAvatar(g && g.avatar_url, icon);
+  } else if (room.startsWith('dm:')) {
+    setChatHeaderAvatar(null, '💬');
+  } else {
+    setChatHeaderAvatar(null, '👥');
+  }
   loadAdminRoomMessages(room);
   document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
   document.getElementById('chat-detail-page').classList.add('active');
@@ -7209,8 +7232,9 @@ function openGroupRoom(group) {
   selectedMessageIndex = null;
   groupUnread[currentGroupRoom] = 0;
   const icon = group.type === 'channel' ? '📢' : '👥';
-  document.getElementById('chat-detail-title').innerHTML = `${icon} ${escapeHtml(group.name)}`;
+  document.getElementById('chat-detail-title').innerHTML = escapeHtml(group.name);
   document.getElementById('chat-detail-sub').innerHTML = group.type === 'channel' ? 'کانال' : 'گروه';
+  setChatHeaderAvatar(group.avatar_url, icon);
   const inputBox = document.querySelector('.chat-input-container');
   if (inputBox) inputBox.style.display = (group.type === 'channel' && group.role !== 'owner' && group.role !== 'admin' && !isAdmin) ? 'none' : 'flex';
   loadGroupRoomMessages(currentGroupRoom);
@@ -7249,6 +7273,26 @@ function maybeOpenGroupInfo() {
   } else if (currentChatType === 'admin-view' && currentAdminRoom && currentAdminRoom.startsWith('grp:')) {
     const g = adminGroupsCache[currentAdminRoom] || {};
     openGroupInfo(currentAdminRoom, g, 'admin-view', true);
+  }
+}
+
+// برای اعضایی که آواتارشون هنوز کش نشده، از Supabase Storage می‌خونه و بعد از لود، تصویر رو جایگزین آیکون پیش‌فرض می‌کنه
+async function resolveMemberAvatars(members) {
+  if (!sb) return;
+  for (const m of members) {
+    if (localStorage.getItem(`avatar_${m.username}`)) continue;
+    try {
+      const { data } = await sb.storage.from('avatars').list('', { search: m.username });
+      if (data && data.length) {
+        const file = data.find(f => f.name.startsWith(m.username + '.'));
+        if (file) {
+          const url = `${SUPABASE_URL_BASE}/avatars/${file.name}?t=${Date.now()}`;
+          localStorage.setItem(`avatar_${m.username}`, url);
+          const el = document.querySelector(`.mini-avatar[data-avatar-for="${CSS.escape(m.username)}"]`);
+          if (el) el.innerHTML = `<img src="${url}">`;
+        }
+      }
+    } catch (e) { /* نادیده گرفتن خطای تکی برای یک عضو */ }
   }
 }
 
@@ -7296,11 +7340,12 @@ async function openGroupInfo(room, group, returnType, viewerCanManage) {
       actions += `<button onclick="removeMember(${groupId},'${m.username.replace(/'/g,"\\'")}')" style="background:none;border:1px solid var(--danger);color:var(--danger);border-radius:8px;padding:4px 8px;font-size:11px;cursor:pointer;margin-inline-start:6px;">حذف</button>`;
     }
     html += `<div style="display:flex; align-items:center; justify-content:space-between; padding:10px 0; border-bottom:1px solid var(--border);">
-      <div style="display:flex; align-items:center; gap:6px; font-size:13px;">👤 ${escapeHtml(m.username)}${badge}</div>
+      <div style="display:flex; align-items:center; gap:8px; font-size:13px;"><div class="mini-avatar" data-avatar-for="${escapeHtml(m.username)}">${chatAvatarHtml(localStorage.getItem(`avatar_${m.username}`), '👤')}</div>${escapeHtml(m.username)}${badge}</div>
       <div style="display:flex; align-items:center; font-size:12px; color:var(--text-secondary);">${roleLabel[m.role] || m.role}${actions}</div>
     </div>`;
   }
   membersList.innerHTML = html || '<div style="text-align:center;padding:14px;color:var(--text-secondary);">عضوی نیست</div>';
+  resolveMemberAvatars(members);
 
   let actionsHtml = '';
   const myRole = members.find(m => m.username === username)?.role;
@@ -7623,6 +7668,13 @@ function chatAvatarHtml(url, fallbackHtml) {
   if (!url) return fallbackHtml;
   const fb = b64EncodeUnicode(fallbackHtml);
   return `<img src="${url}" data-fb="${fb}" onerror="this.parentElement.innerHTML=b64DecodeUnicode(this.dataset.fb)">`;
+}
+// نمایش آواتار گرد در هدر صفحه‌ی گفتگو (گروه/کانال/کاربر)
+function setChatHeaderAvatar(url, fallbackHtml) {
+  const el = document.getElementById('chat-detail-avatar');
+  if (!el) return;
+  el.style.display = 'flex';
+  el.innerHTML = chatAvatarHtml(url, fallbackHtml);
 }
 function getCurrentTime() { const n = new Date(); return `${n.getHours().toString().padStart(2,'0')}:${n.getMinutes().toString().padStart(2,'0')}`; }
 function getMessages() { 
@@ -7999,10 +8051,12 @@ function openChat(type) {
   selectedMessageIndex = null; 
   const inputBox0 = document.querySelector('.chat-input-container'); if (inputBox0) inputBox0.style.display = 'flex';
   const dmBtn = document.getElementById('dm-profile-btn'); if (dmBtn) dmBtn.style.display = 'none';
-  const titles = { saved: '📝 پیام‌های ذخیره شده', ai: '🤖 هوش مصنوعی', group: '👥 گروه عمومی' };
+  const titles = { saved: 'پیام‌های ذخیره شده', ai: 'هوش مصنوعی', group: 'گروه عمومی' };
   const subs = { saved: 'یادداشت‌های شخصی', ai: 'دستیار هوش مصنوعی برنامه‌نویسی', group: 'همه کاربران' };
   document.getElementById('chat-detail-title').innerHTML = titles[type] || 'گروه عمومی';
   document.getElementById('chat-detail-sub').innerHTML = subs[type] || 'همه کاربران';
+  const headerIcons = { saved: '📝', ai: '🤖', group: '👥' };
+  setChatHeaderAvatar(null, headerIcons[type] || '👥');
   if (type === 'group') {
     unreadGroupCount = 0; updateUnreadBadge();
     loadGroupMessages().then(() => {
@@ -8021,8 +8075,9 @@ function openDmChat(otherUser) {
   currentDmUser = otherUser;
   selectedMessageIndex = null;
   const inputBox0 = document.querySelector('.chat-input-container'); if (inputBox0) inputBox0.style.display = 'flex';
-  document.getElementById('chat-detail-title').innerHTML = `👤 ${escapeHtml(otherUser)}${onlineDot(otherUser)}`;
+  document.getElementById('chat-detail-title').innerHTML = `${escapeHtml(otherUser)}${onlineDot(otherUser)}`;
   document.getElementById('chat-detail-sub').innerHTML = onlineUsers.has(otherUser) ? '<span style="color:#22c55e;font-size:11px;">● آنلاین</span>' : 'چت خصوصی';
+  setChatHeaderAvatar(localStorage.getItem(`avatar_${otherUser}`), '👤');
   const dmBtn = document.getElementById('dm-profile-btn');
   if (dmBtn) dmBtn.style.display = 'block';
   dmUnread[otherUser] = 0;
